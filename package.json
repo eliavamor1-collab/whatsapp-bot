@@ -6,6 +6,7 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "baileys": "latest"
+  "baileys": "latest",
+  "qrcode-terminal": "latest"
   }
 }
