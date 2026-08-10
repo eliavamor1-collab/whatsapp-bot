@@ -17,7 +17,7 @@ async function startWhatsApp() {
 
     sock.ev.on("creds.update", saveCreds);
 
-    sock.ev.on("connection.update", (update) => {
+    sock.ev.on("connection.update", async (update) => {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
@@ -30,36 +30,50 @@ async function startWhatsApp() {
         }
 
         if (connection === "close") {
+            const statusCode =
+                lastDisconnect?.error?.output?.statusCode;
+
             const shouldReconnect =
-                lastDisconnect?.error?.output?.statusCode !==
-                DisconnectReason.loggedOut;
+                statusCode !== DisconnectReason.loggedOut;
 
             console.log("WhatsApp התנתק.");
 
             if (shouldReconnect) {
                 console.log("מנסה להתחבר מחדש...");
-                startWhatsApp();
+                await startWhatsApp();
             }
         }
     });
 
     sock.ev.on("messages.upsert", async ({ messages }) => {
-        const message = messages[0];
+        for (const message of messages) {
+            if (!message.message) continue;
+            if (message.key.fromMe) continue;
 
-        if (!message.message) return;
-        if (message.key.fromMe) return;
+            const text =
+                message.message.conversation ||
+                message.message.extendedTextMessage?.text ||
+                "";
 
-        const text =
-            message.message.conversation ||
-            message.message.extendedTextMessage?.text ||
-            "";
+            console.log("התקבלה הודעה:", text);
 
-        console.log("התקבלה הודעה:", text);
+            if (text.toLowerCase().includes("rider")) {
+                try {
+                    await sock.sendMessage(
+                        message.key.remoteJid,
+                        {
+                            text: "📱 Rider זוהה! 🚀"
+                        }
+                    );
 
-        if (text.toLowerCase().includes("rider")) {
-            await sock.sendMessage(message.key.remoteJid, {
-                text: "📱 Rider זוהה! 🚀"
-            });
+                    console.log("נשלחה תגובה ל-Rider ✅");
+                } catch (error) {
+                    console.error(
+                        "שגיאה בשליחת התגובה:",
+                        error
+                    );
+                }
+            }
         }
     });
 }
