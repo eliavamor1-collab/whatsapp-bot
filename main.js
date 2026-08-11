@@ -1,3 +1,4 @@
+```javascript
 import http from "http";
 
 import makeWASocket, {
@@ -303,8 +304,8 @@ let starting =
     false;
 
 // ========================================
-// IDs of messages sent by the bot
-// Used to prevent response loops
+// Messages sent by the bot
+// Used only to prevent response loops
 // ========================================
 
 const botSentMessageIds =
@@ -555,10 +556,6 @@ async function startWhatsApp() {
                     starting =
                         false;
 
-                    console.log(
-                        `WhatsApp התנתק.`
-                    );
-
                     const statusCode =
                         lastDisconnect
                             ?.error
@@ -566,7 +563,7 @@ async function startWhatsApp() {
                             ?.statusCode;
 
                     console.log(
-                        `קוד: ${statusCode}`
+                        `WhatsApp התנתק. קוד: ${statusCode}`
                     );
 
                     sock =
@@ -643,7 +640,7 @@ async function startWhatsApp() {
                 try {
 
                     // ========================================
-                    // Ignore requestId events
+                    // Security
                     // ========================================
 
                     if (requestId) {
@@ -659,6 +656,7 @@ async function startWhatsApp() {
                         !messages ||
                         messages.length === 0
                     ) {
+
                         return;
                     }
 
@@ -674,6 +672,7 @@ async function startWhatsApp() {
                         if (
                             !message?.message
                         ) {
+
                             continue;
                         }
 
@@ -681,7 +680,7 @@ async function startWhatsApp() {
                             message.key?.id;
 
                         // ========================================
-                        // Ignore messages sent by the bot itself
+                        // Ignore messages created by this bot
                         // ========================================
 
                         if (
@@ -703,6 +702,7 @@ async function startWhatsApp() {
                                 ?.remoteJid;
 
                         if (!remoteJid) {
+
                             continue;
                         }
 
@@ -741,6 +741,7 @@ async function startWhatsApp() {
                             "";
 
                         if (!text) {
+
                             continue;
                         }
 
@@ -764,34 +765,15 @@ async function startWhatsApp() {
                             "========================================"
                         );
 
-                            // ========================================
-                            // Save sent message ID
-                            // Prevent bot response loop
-                            // ========================================
+                        // ========================================
+                        // כאן ייכנס בעתיד קובץ הפקודות
+                        // לדוגמה:
+                        //
+                        // /start
+                        // /rider
+                        // וכו'
+                        // ========================================
 
-                            if (
-                                sent?.key?.id
-                            ) {
-
-                                botSentMessageIds.add(
-                                    sent.key.id
-                                );
-
-                                // Keep memory clean
-                                setTimeout(
-                                    () => {
-                                        botSentMessageIds.delete(
-                                            sent.key.id
-                                        );
-                                    },
-                                    60000
-                                );
-                            }
-
-                            console.log(
-                                "תגובה נשלחה לקבוצת היעד ✅"
-                            );
-                        }
                     }
 
                 } catch (error) {
@@ -1172,3 +1154,4 @@ async function main() {
 }
 
 main();
+```
