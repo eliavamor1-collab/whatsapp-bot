@@ -69,7 +69,6 @@ pool.on(
 // ========================================
 
 async function initDatabase() {
-
     await pool.query(`
         CREATE TABLE IF NOT EXISTS whatsapp_auth (
             id TEXT PRIMARY KEY,
