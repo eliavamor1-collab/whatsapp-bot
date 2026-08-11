@@ -766,26 +766,6 @@ async function startWhatsApp() {
                             continue;
                         }
 
-                        console.log(
-                            "========================================"
-                        );
-
-                        console.log(
-                            `הודעה התקבלה בקבוצת היעד (${type})`
-                        );
-
-                        console.log(
-                            `fromMe: ${message.key?.fromMe}`
-                        );
-
-                        console.log(
-                            `text: ${text}`
-                        );
-
-                        console.log(
-                            "========================================"
-                        );
-
                         // ========================================
                         // Find command
                         // ========================================
