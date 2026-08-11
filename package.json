@@ -6,7 +6,7 @@
     "start": "node main.js"
   },
   "dependencies": {
-  "baileys": "latest",
+  "@whiskeysockets/baileys": "latest",
   "qrcode": "latest",
   "pg": "latest"
   }
