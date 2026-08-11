@@ -764,31 +764,6 @@ async function startWhatsApp() {
                             "========================================"
                         );
 
-                        // ========================================
-                        // Rider test
-                        // ========================================
-
-                        if (
-                            text
-                                .toLowerCase()
-                                .includes(
-                                    "rider"
-                                )
-                        ) {
-
-                            if (!sock) {
-                                continue;
-                            }
-
-                            const sent =
-                                await sock.sendMessage(
-                                    TARGET_GROUP_JID,
-                                    {
-                                        text:
-                                            "📱 Rider זוהה! 🚀"
-                                    }
-                                );
-
                             // ========================================
                             // Save sent message ID
                             // Prevent bot response loop
