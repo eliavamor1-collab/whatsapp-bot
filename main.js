@@ -1,4 +1,3 @@
-```javascript
 import http from "http";
 
 import makeWASocket, {
@@ -69,6 +68,7 @@ pool.on(
 // ========================================
 
 async function initDatabase() {
+
     await pool.query(`
         CREATE TABLE IF NOT EXISTS whatsapp_auth (
             id TEXT PRIMARY KEY,
@@ -304,7 +304,7 @@ let starting =
 
 // ========================================
 // Messages sent by the bot
-// Used only to prevent response loops
+// Prevent response loops
 // ========================================
 
 const botSentMessageIds =
@@ -639,7 +639,7 @@ async function startWhatsApp() {
                 try {
 
                     // ========================================
-                    // Security
+                    // Ignore requestId events
                     // ========================================
 
                     if (requestId) {
@@ -660,7 +660,7 @@ async function startWhatsApp() {
                     }
 
                     // ========================================
-                    // Process every message
+                    // Process messages
                     // ========================================
 
                     for (
@@ -679,7 +679,7 @@ async function startWhatsApp() {
                             message.key?.id;
 
                         // ========================================
-                        // Ignore messages created by this bot
+                        // Ignore bot's own sent messages
                         // ========================================
 
                         if (
@@ -765,13 +765,12 @@ async function startWhatsApp() {
                         );
 
                         // ========================================
-                        // כאן ייכנס בעתיד קובץ הפקודות
-                        // לדוגמה:
-                        //
+                        // COMMANDS WILL BE ADDED HERE
+                        // ========================================
+
                         // /start
                         // /rider
-                        // וכו'
-                        // ========================================
+                        // etc.
 
                     }
 
@@ -1153,4 +1152,3 @@ async function main() {
 }
 
 main();
-```
