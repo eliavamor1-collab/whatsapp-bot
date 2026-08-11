@@ -9,13 +9,6 @@ import makeWASocket, {
     proto
 } from "@whiskeysockets/baileys";
 
-import QRCode from "qrcode";
-import pg from "pg";
-
-// ========================================
-// Commands
-// ========================================
-
 import startCommand from "./commands/start.js";
 import riderCommand from "./commands/rider.js";
 
@@ -24,7 +17,6 @@ const { Pool } = pg;
 // ========================================
 // Configuration
 // ========================================
-
 const PORT = Number(
     process.env.PORT || 10000
 );
@@ -38,7 +30,6 @@ const TARGET_GROUP_JID =
 // ========================================
 // Commands Map
 // ========================================
-
 const commands = new Map();
 
 commands.set(
