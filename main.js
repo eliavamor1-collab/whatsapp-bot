@@ -12,6 +12,12 @@ import makeWASocket, {
 import QRCode from "qrcode";
 import pg from "pg";
 
+// ========================================
+// Commands
+// ========================================
+
+import startCommand from "./commands/start.js";
+
 const { Pool } = pg;
 
 // ========================================
@@ -27,6 +33,22 @@ const TARGET_GROUP_NAME =
 
 const TARGET_GROUP_JID =
     "120363410444900210@g.us";
+
+// ========================================
+// Commands Map
+// ========================================
+
+const commands = new Map();
+
+commands.set(
+    startCommand.trigger,
+    startCommand
+);
+
+console.log(
+    "פקודות נטענו:",
+    [...commands.keys()].join(", ")
+);
 
 // ========================================
 // Neon PostgreSQL
@@ -629,26 +651,17 @@ async function startWhatsApp() {
         // ========================================
 
         sock.ev.on(
-    "messages.upsert",
-    async ({
-        messages,
-        type,
-        requestId
-    }) => {
+            "messages.upsert",
+            async ({
+                messages,
+                type,
+                requestId
+            }) => {
 
-        console.log("📩 messages.upsert התקבל!");
-
-        for (const message of messages) {
-            console.log(
-                "📨 הודעה:",
-                JSON.stringify(message, null, 2)
-            );
-        }
-
-        try {
+                try {
 
                     // ========================================
-                    // Ignore requestId events
+                    // Security
                     // ========================================
 
                     if (requestId) {
@@ -669,7 +682,7 @@ async function startWhatsApp() {
                     }
 
                     // ========================================
-                    // Process messages
+                    // Process every message
                     // ========================================
 
                     for (
@@ -688,7 +701,7 @@ async function startWhatsApp() {
                             message.key?.id;
 
                         // ========================================
-                        // Ignore bot's own sent messages
+                        // Ignore messages created by this bot
                         // ========================================
 
                         if (
@@ -774,13 +787,52 @@ async function startWhatsApp() {
                         );
 
                         // ========================================
-                        // COMMANDS WILL BE ADDED HERE
+                        // Find command
                         // ========================================
 
-                        // /start
-                        // /rider
-                        // etc.
+                        const commandText =
+                            text.trim();
 
+                        const command =
+                            commands.get(
+                                commandText
+                            );
+
+                        if (!command) {
+
+                            console.log(
+                                `אין פקודה עבור: ${commandText}`
+                            );
+
+                            continue;
+                        }
+
+                        console.log(
+                            `פקודה נמצאה: ${command.trigger}`
+                        );
+
+                        // ========================================
+                        // Execute command
+                        // ========================================
+
+                        try {
+
+                            await command.execute(
+                                sock,
+                                message
+                            );
+
+                            console.log(
+                                `הפקודה ${command.trigger} בוצעה בהצלחה ✅`
+                            );
+
+                        } catch (error) {
+
+                            console.error(
+                                `שגיאה בהרצת הפקודה ${command.trigger}:`,
+                                error
+                            );
+                        }
                     }
 
                 } catch (error) {
