@@ -51,27 +51,54 @@ async function startWhatsApp() {
                 qr
             } = update;
 
-            if (qr) {
-                try {
-                    currentQR = await QRCode.toDataURL(qr);
-                    currentStatus = "ממתין לסריקת QR";
+          if (qr) {
+            try {
+                currentQR = await QRCode.toDataURL(qr);
+                currentStatus = "ממתין לסריקת QR";
 
-                    console.log("QR חדש מוכן בכתובת /qr");
-                } catch (error) {
-                    console.error(
-                        "שגיאה ביצירת QR:",
-                        error
+                console.log("QR חדש מוכן בכתובת /qr");
+            } catch (error) {
+                console.error(
+                    "שגיאה ביצירת QR:",
+                    error
+                );
+            }
+        }
+
+        if (connection === "connecting") {
+            currentStatus = "מתחבר...";
+            console.log("מתחבר ל-WhatsApp...");
+        }
+
+        if (connection === "open") {
+            currentQR = null;
+            currentStatus = "מחובר ✅";
+
+            console.log("WhatsApp מחובר! ✅");
+
+            // מציאת הקבוצות שהחשבון משתתף בהן
+            try {
+                const groups =
+                    await sock.groupFetchAllParticipating();
+
+                console.log("===== הקבוצות שלי =====");
+
+                for (const group of Object.values(groups)) {
+                    console.log(
+                        `שם: ${group.subject} | JID: ${group.id}`
                     );
                 }
+
+                console.log("========================");
+            } catch (error) {
+                console.error(
+                    "שגיאה בקבלת רשימת הקבוצות:",
+                    error
+                );
             }
 
-            if (connection === "connecting") {
-                currentStatus = "מתחבר...";
-                console.log("מתחבר ל-WhatsApp...");
-            }
-
-            if (connection === "open") {
-                currentQR = null;
+            reconnecting = false;
+        }
                 currentStatus = "מחובר ✅";
 
                 console.log("WhatsApp מחובר! ✅");
