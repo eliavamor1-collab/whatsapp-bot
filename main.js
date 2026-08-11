@@ -214,38 +214,9 @@ async function startWhatsApp() {
     try {
 
         console.log(
-            "טוען WhatsApp Auth מ-Neon..."
-        );
+    "בודק גרסת WhatsApp Web..."
+);
 
-        const {
-            state,
-            saveCreds
-        } = await usePostgresAuthState();
-
-        console.log(
-            "בודק גרסת WhatsApp Web..."
-        );
-
-        const {
-            version,
-            isLatest
-        } = await fetchLatestWaWebVersion();
-
-        console.log(
-            `WhatsApp Web Version: ${version.join(".")} | Latest: ${isLatest}`
-        );
-
-        sock = makeWASocket({
-
-            auth: state,
-
-            version,
-
-            browser:
-                Browsers.ubuntu("Chrome"),
-
-            printQRInTerminal: false
-        });
 
         sock.ev.on(
             "creds.update",
