@@ -1,12 +1,12 @@
-```javascript
 import http from "http";
 
 import makeWASocket, {
     DisconnectReason,
-    BufferJSON,
+    fetchLatestWaWebVersion,
+    Browsers,
     initAuthCreds,
-    proto,
-    Browsers
+    BufferJSON,
+    proto
 } from "@whiskeysockets/baileys";
 
 import QRCode from "qrcode";
@@ -14,50 +14,32 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-// =====================================================
-// CONFIG
-// =====================================================
-
 const PORT = Number(process.env.PORT || 10000);
 
-const DATABASE_URL = process.env.DATABASE_URL;
+// ========================================
+// Neon PostgreSQL
+// ========================================
 
-// אופציונלי:
-// אם תשים כאן JID של קבוצה, הבוט יגיב רק שם.
-// לדוגמה:
-// ALLOWED_GROUP_JID=120363xxxxxxxx@g.us
-const ALLOWED_GROUP_JID =
-    process.env.ALLOWED_GROUP_JID || "";
-
-if (!DATABASE_URL) {
-    console.error("❌ DATABASE_URL לא מוגדר ב-Render");
-    process.exit(1);
+if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is missing");
 }
 
-// =====================================================
-// NEON POSTGRESQL
-// =====================================================
-
 const pool = new Pool({
-    connectionString: DATABASE_URL,
-
+    connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false
-    },
-
-    max: 5,
-
-    idleTimeoutMillis: 30000,
-
-    connectionTimeoutMillis: 10000
+    }
 });
 
-// =====================================================
-// DATABASE INIT
-// =====================================================
+pool.on("error", (error) => {
+    console.error("PostgreSQL pool error:", error);
+});
+
+// ========================================
+// Database
+// ========================================
 
 async function initDatabase() {
-
     await pool.query(`
         CREATE TABLE IF NOT EXISTS whatsapp_auth (
             id TEXT PRIMARY KEY,
@@ -68,20 +50,15 @@ async function initDatabase() {
     console.log("Neon database ready ✅");
 }
 
-// =====================================================
-// POSTGRES AUTH STATE
-// =====================================================
+// ========================================
+// PostgreSQL Auth State
+// ========================================
 
 async function usePostgresAuthState() {
 
     async function readData(id) {
-
         const result = await pool.query(
-            `
-            SELECT data
-            FROM whatsapp_auth
-            WHERE id = $1
-            `,
+            "SELECT data FROM whatsapp_auth WHERE id = $1",
             [id]
         );
 
@@ -96,7 +73,6 @@ async function usePostgresAuthState() {
     }
 
     async function writeData(id, data) {
-
         const json = JSON.stringify(
             data,
             BufferJSON.replacer
@@ -115,26 +91,15 @@ async function usePostgresAuthState() {
     }
 
     async function removeData(id) {
-
         await pool.query(
-            `
-            DELETE FROM whatsapp_auth
-            WHERE id = $1
-            `,
+            "DELETE FROM whatsapp_auth WHERE id = $1",
             [id]
         );
     }
 
-    // =================================================
-    // CREDENTIALS
-    // =================================================
-
     let creds = await readData("creds");
 
     if (!creds) {
-
-        console.log("אין Auth קיים — יוצר Auth חדש...");
-
         creds = initAuthCreds();
 
         await writeData(
@@ -142,10 +107,6 @@ async function usePostgresAuthState() {
             creds
         );
     }
-
-    // =================================================
-    // KEY STORE
-    // =================================================
 
     const keys = {
 
@@ -162,26 +123,28 @@ async function usePostgresAuthState() {
                     const value =
                         await readData(key);
 
-                    if (!value) {
+                    if (value) {
 
-                        data[id] = null;
+                        if (
+                            type ===
+                            "app-state-sync-key"
+                        ) {
 
-                        return;
-                    }
+                            data[id] =
+                                proto.Message
+                                    .AppStateSyncKeyData
+                                    .fromObject(value);
 
-                    if (
-                        type ===
-                        "app-state-sync-key"
-                    ) {
+                        } else {
 
-                        data[id] =
-                            proto.Message
-                                .AppStateSyncKeyData
-                                .fromObject(value);
+                            data[id] = value;
+
+                        }
 
                     } else {
 
-                        data[id] = value;
+                        data[id] = null;
+
                     }
                 })
             );
@@ -219,6 +182,7 @@ async function usePostgresAuthState() {
                         await removeData(
                             key
                         );
+
                     }
                 }
             }
@@ -226,14 +190,12 @@ async function usePostgresAuthState() {
     };
 
     return {
-
         state: {
             creds,
             keys
         },
 
         saveCreds: async () => {
-
             await writeData(
                 "creds",
                 creds
@@ -242,29 +204,24 @@ async function usePostgresAuthState() {
     };
 }
 
-// =====================================================
-// WHATSAPP STATE
-// =====================================================
-
-let sock = null;
+// ========================================
+// WhatsApp
+// ========================================
 
 let currentQR = null;
-
-let currentStatus =
-    "מאתחל...";
+let currentStatus = "מתחבר...";
+let sock = null;
 
 let reconnectTimer = null;
-
 let starting = false;
 
-// =====================================================
-// START WHATSAPP
-// =====================================================
+// ========================================
+// Start WhatsApp
+// ========================================
 
 async function startWhatsApp() {
 
     if (starting) {
-
         console.log(
             "WhatsApp כבר בתהליך התחברות..."
         );
@@ -285,45 +242,90 @@ async function startWhatsApp() {
             saveCreds
         } = await usePostgresAuthState();
 
-        currentStatus =
-            "מתחבר ל-WhatsApp...";
-
         console.log(
-            "מתחבר ל-WhatsApp..."
+            "בודק גרסת WhatsApp Web..."
         );
 
-        // =================================================
-        // CREATE SOCKET
-        // =================================================
+        let version;
 
-        const newSock = makeWASocket({
+        try {
 
+            const result =
+                await fetchLatestWaWebVersion();
+
+            version = result.version;
+
+            console.log(
+                `WhatsApp Web Version: ${version.join(".")}`
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "לא הצלחנו לקבל גרסה עדכנית. ממשיך ללא version ידני."
+            );
+
+            console.warn(error.message);
+
+            version = undefined;
+        }
+
+        const socketConfig = {
             auth: state,
+            browser: Browsers.ubuntu(
+                "Chrome"
+            ),
+            printQRInTerminal: false
+        };
 
-            browser:
-                Browsers.ubuntu("Chrome"),
+        if (version) {
+            socketConfig.version = version;
+        }
 
-            printQRInTerminal: false,
+        // ========================================
+        // חשוב:
+        // יוצרים socket לפני שניגשים ל-sock.ev
+        // ========================================
 
-            markOnlineOnConnect: false,
-
-            syncFullHistory: false
-        });
+        const newSock =
+            makeWASocket(socketConfig);
 
         sock = newSock;
 
-        // =================================================
-        // SAVE CREDENTIAL CHANGES
-        // =================================================
+        console.log(
+            "Socket נוצר בהצלחה."
+        );
+
+        // ========================================
+        // Credentials
+        // ========================================
 
         sock.ev.on(
             "creds.update",
-            saveCreds
+            async () => {
+
+                try {
+
+                    await saveCreds();
+
+                    console.log(
+                        "WhatsApp Auth נשמר ב-Neon ✅"
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "שגיאה בשמירת Auth:",
+                        error
+                    );
+
+                }
+            }
         );
 
-        // =================================================
-        // CONNECTION
-        // =================================================
+        // ========================================
+        // Connection
+        // ========================================
 
         sock.ev.on(
             "connection.update",
@@ -335,9 +337,9 @@ async function startWhatsApp() {
                     qr
                 } = update;
 
-                // =========================================
+                // -----------------------------
                 // QR
-                // =========================================
+                // -----------------------------
 
                 if (qr) {
 
@@ -352,21 +354,22 @@ async function startWhatsApp() {
                             "ממתין לסריקת QR";
 
                         console.log(
-                            "📱 QR חדש זמין ב-/qr"
+                            "QR חדש מוכן ב-/qr"
                         );
 
                     } catch (error) {
 
                         console.error(
-                            "❌ שגיאה ביצירת QR:",
+                            "שגיאה ביצירת QR:",
                             error
                         );
+
                     }
                 }
 
-                // =========================================
-                // CONNECTING
-                // =========================================
+                // -----------------------------
+                // Connecting
+                // -----------------------------
 
                 if (
                     connection ===
@@ -381,37 +384,29 @@ async function startWhatsApp() {
                     );
                 }
 
-                // =========================================
-                // OPEN
-                // =========================================
+                // -----------------------------
+                // Open
+                // -----------------------------
 
                 if (
                     connection ===
                     "open"
                 ) {
 
-                    starting = false;
-
                     currentQR = null;
 
                     currentStatus =
                         "מחובר ✅";
 
-                    console.log(
-                        "================================"
-                    );
+                    starting = false;
 
                     console.log(
                         "WhatsApp מחובר! ✅"
                     );
 
-                    console.log(
-                        "================================"
-                    );
-
-                    // =====================================
-                    // SHOW GROUPS
-                    // =====================================
+                    // -----------------------------
+                    // הצגת קבוצות
+                    // -----------------------------
 
                     try {
 
@@ -431,6 +426,7 @@ async function startWhatsApp() {
                             console.log(
                                 `שם: ${group.subject} | JID: ${group.id}`
                             );
+
                         }
 
                         console.log(
@@ -440,27 +436,28 @@ async function startWhatsApp() {
                     } catch (error) {
 
                         console.error(
-                            "❌ שגיאה בקבלת קבוצות:",
+                            "שגיאה בקבלת קבוצות:",
                             error
                         );
+
                     }
                 }
 
-                // =========================================
-                // CLOSE
-                // =========================================
+                // -----------------------------
+                // Close
+                // -----------------------------
 
                 if (
                     connection ===
                     "close"
                 ) {
 
-                    starting = false;
-
                     currentQR = null;
 
                     currentStatus =
                         "מנותק";
+
+                    starting = false;
 
                     const statusCode =
                         lastDisconnect
@@ -472,9 +469,12 @@ async function startWhatsApp() {
                         `WhatsApp התנתק. קוד: ${statusCode}`
                     );
 
-                    // =====================================
-                    // LOGGED OUT
-                    // =====================================
+                    // Socket ישן
+                    sock = null;
+
+                    // -----------------------------
+                    // Logged out
+                    // -----------------------------
 
                     if (
                         statusCode ===
@@ -482,32 +482,37 @@ async function startWhatsApp() {
                     ) {
 
                         currentStatus =
-                            "התנתק לצמיתות — יש לסרוק QR מחדש";
+                            "התנתק לצמיתות — יש לחבר מחדש";
 
                         console.log(
-                            "❌ החשבון התנתק מ-WhatsApp."
+                            "WhatsApp נותק לצמיתות."
                         );
-
-                        sock = null;
 
                         return;
                     }
 
-                    // =====================================
-                    // RECONNECT
-                    // =====================================
+                    // -----------------------------
+                    // Restart required
+                    // -----------------------------
 
-                    console.log(
-                        "מנסה להתחבר מחדש בעוד 5 שניות..."
-                    );
+                    if (
+                        statusCode ===
+                        DisconnectReason.restartRequired
+                    ) {
 
-                    currentStatus =
-                        "מנותק — מנסה להתחבר מחדש...";
+                        console.log(
+                            "WhatsApp דורש אתחול. מתחבר מחדש..."
+                        );
 
-                    sock = null;
+                    } else {
+
+                        console.log(
+                            "מנסה להתחבר מחדש בעוד 5 שניות..."
+                        );
+
+                    }
 
                     if (reconnectTimer) {
-
                         clearTimeout(
                             reconnectTimer
                         );
@@ -529,9 +534,9 @@ async function startWhatsApp() {
             }
         );
 
-        // =================================================
-        // MESSAGES
-        // =================================================
+        // ========================================
+        // Messages
+        // ========================================
 
         sock.ev.on(
             "messages.upsert",
@@ -543,8 +548,8 @@ async function startWhatsApp() {
                 try {
 
                     if (
-                        type !==
-                        "notify"
+                        !messages ||
+                        messages.length === 0
                     ) {
                         return;
                     }
@@ -574,72 +579,38 @@ async function startWhatsApp() {
                             continue;
                         }
 
-                        // =================================
-                        // IGNORE STATUS
-                        // =================================
-
-                        if (
-                            remoteJid ===
-                            "status@broadcast"
-                        ) {
-                            continue;
-                        }
-
-                        // =================================
-                        // GROUP FILTER
-                        // =================================
-
-                        if (
-                            ALLOWED_GROUP_JID &&
-                            remoteJid !==
-                            ALLOWED_GROUP_JID
-                        ) {
-
-                            continue;
-                        }
-
-                        // =================================
-                        // TEXT EXTRACTION
-                        // =================================
-
                         const text =
                             message.message
                                 ?.conversation ||
-
                             message.message
                                 ?.extendedTextMessage
                                 ?.text ||
-
-                            message.message
-                                ?.imageMessage
-                                ?.caption ||
-
-                            message.message
-                                ?.videoMessage
-                                ?.caption ||
-
                             "";
 
                         if (!text) {
                             continue;
                         }
 
-                        const cleanText =
-                            text.trim();
-
                         console.log(
-                            `📩 הודעה מ-${remoteJid}: ${cleanText}`
+                            `התקבלה הודעה (${type}):`,
+                            text
                         );
 
-                        // =================================
-                        // RIDER
-                        // =================================
+                        // ========================================
+                        // בדיקה זמנית של Rider
+                        // ========================================
 
                         if (
-                            cleanText
+                            text
                                 .toLowerCase()
                                 .includes("rider")
                         ) {
+
+                            if (
+                                !sock
+                            ) {
+                                return;
+                            }
 
                             await sock.sendMessage(
                                 remoteJid,
@@ -650,7 +621,7 @@ async function startWhatsApp() {
                             );
 
                             console.log(
-                                "✅ תגובת Rider נשלחה"
+                                "תגובה נשלחה ✅"
                             );
                         }
                     }
@@ -658,9 +629,10 @@ async function startWhatsApp() {
                 } catch (error) {
 
                     console.error(
-                        "❌ שגיאה בעיבוד הודעה:",
+                        "שגיאה בעיבוד הודעה:",
                         error
                     );
+
                 }
             }
         );
@@ -675,12 +647,11 @@ async function startWhatsApp() {
             "שגיאה בחיבור";
 
         console.error(
-            "❌ שגיאה בהפעלת WhatsApp:",
+            "שגיאה בהפעלת WhatsApp:",
             error
         );
 
         if (reconnectTimer) {
-
             clearTimeout(
                 reconnectTimer
             );
@@ -701,17 +672,17 @@ async function startWhatsApp() {
     }
 }
 
-// =====================================================
-// HTTP SERVER
-// =====================================================
+// ========================================
+// HTTP Server
+// ========================================
 
 const server =
     http.createServer(
         async (req, res) => {
 
-            // =================================================
-            // HOME
-            // =================================================
+            // ========================================
+            // Home
+            // ========================================
 
             if (req.url === "/") {
 
@@ -729,7 +700,6 @@ const server =
                     <html lang="he">
 
                     <head>
-
                         <meta charset="UTF-8">
 
                         <meta
@@ -740,7 +710,6 @@ const server =
                         <title>
                             WhatsApp Bot
                         </title>
-
                     </head>
 
                     <body>
@@ -770,37 +739,9 @@ const server =
                 return;
             }
 
-            // =================================================
-            // STATUS
-            // =================================================
-
-            if (req.url === "/status") {
-
-                res.writeHead(
-                    200,
-                    {
-                        "Content-Type":
-                            "application/json; charset=utf-8"
-                    }
-                );
-
-                res.end(
-                    JSON.stringify({
-                        status:
-                            currentStatus,
-
-                        connected:
-                            currentStatus ===
-                            "מחובר ✅"
-                    })
-                );
-
-                return;
-            }
-
-            // =================================================
+            // ========================================
             // QR
-            // =================================================
+            // ========================================
 
             if (req.url === "/qr") {
 
@@ -878,11 +819,6 @@ const server =
                             content="width=device-width, initial-scale=1"
                         >
 
-                        <meta
-                            http-equiv="refresh"
-                            content="20"
-                        >
-
                         <title>
                             WhatsApp QR
                         </title>
@@ -907,12 +843,6 @@ const server =
 
                                 max-width:
                                     90%;
-
-                                border:
-                                    1px solid #ddd;
-
-                                border-radius:
-                                    12px;
                             }
 
                         </style>
@@ -931,7 +861,8 @@ const server =
                         >
 
                         <p>
-                            לאחר הסריקה ה-QR ייעלם.
+                            לאחר הסריקה אפשר
+                            לרענן את הדף.
                         </p>
 
                     </body>
@@ -942,9 +873,35 @@ const server =
                 return;
             }
 
-            // =================================================
+            // ========================================
+            // Health
+            // ========================================
+
+            if (req.url === "/health") {
+
+                res.writeHead(
+                    200,
+                    {
+                        "Content-Type":
+                            "application/json; charset=utf-8"
+                    }
+                );
+
+                res.end(
+                    JSON.stringify({
+                        status:
+                            currentStatus,
+                        whatsapp:
+                            Boolean(sock)
+                    })
+                );
+
+                return;
+            }
+
+            // ========================================
             // 404
-            // =================================================
+            // ========================================
 
             res.writeHead(
                 404,
@@ -960,9 +917,9 @@ const server =
         }
     );
 
-// =====================================================
-// START HTTP
-// =====================================================
+// ========================================
+// Start HTTP
+// ========================================
 
 server.listen(
     PORT,
@@ -972,12 +929,13 @@ server.listen(
         console.log(
             `Server is running on port ${PORT}`
         );
+
     }
 );
 
-// =====================================================
-// START APP
-// =====================================================
+// ========================================
+// Main
+// ========================================
 
 async function main() {
 
@@ -990,13 +948,11 @@ async function main() {
     } catch (error) {
 
         console.error(
-            "❌ שגיאה בהפעלת המערכת:",
+            "שגיאה בהפעלת המערכת:",
             error
         );
 
-        process.exit(1);
     }
 }
 
 main();
-```
