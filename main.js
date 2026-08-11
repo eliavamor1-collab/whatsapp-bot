@@ -1,26 +1,44 @@
 import http from "http";
+
 import makeWASocket, {
     DisconnectReason,
-    useMultiFileAuthState
+    useMultiFileAuthState,
+    fetchLatestWaWebVersion,
+    Browsers
 } from "baileys";
+
 import QRCode from "qrcode";
 
 const PORT = process.env.PORT || 10000;
 
 let currentQR = null;
-let whatsappConnected = false;
-let starting = false;
+let currentStatus = "מתחבר...";
+let sock = null;
+let reconnecting = false;
+
 
 async function startWhatsApp() {
-    if (starting) return;
-    starting = true;
+    if (reconnecting) return;
+
+    reconnecting = true;
 
     try {
         const { state, saveCreds } =
             await useMultiFileAuthState("./auth_info");
 
-        const sock = makeWASocket({
+        console.log("בודק גרסת WhatsApp Web...");
+
+        const { version, isLatest } =
+            await fetchLatestWaWebVersion();
+
+        console.log(
+            `WhatsApp Web Version: ${version.join(".")} | Latest: ${isLatest}`
+        );
+
+        sock = makeWASocket({
             auth: state,
+            version,
+            browser: Browsers.ubuntu("Chrome"),
             printQRInTerminal: false
         });
 
@@ -33,13 +51,10 @@ async function startWhatsApp() {
                 qr
             } = update;
 
-            // קיבלנו QR חדש
             if (qr) {
                 try {
-                    currentQR = await QRCode.toDataURL(qr, {
-                        width: 400,
-                        margin: 2
-                    });
+                    currentQR = await QRCode.toDataURL(qr);
+                    currentStatus = "ממתין לסריקת QR";
 
                     console.log("QR חדש מוכן בכתובת /qr");
                 } catch (error) {
@@ -50,126 +65,116 @@ async function startWhatsApp() {
                 }
             }
 
-            // התחברות הצליחה
-            if (connection === "open") {
-                whatsappConnected = true;
-                currentQR = null;
-                starting = false;
-
-                console.log("WhatsApp מחובר! ✅");
+            if (connection === "connecting") {
+                currentStatus = "מתחבר...";
+                console.log("מתחבר ל-WhatsApp...");
             }
 
-            // החיבור נסגר
+            if (connection === "open") {
+                currentQR = null;
+                currentStatus = "מחובר ✅";
+
+                console.log("WhatsApp מחובר! ✅");
+
+                reconnecting = false;
+            }
+
             if (connection === "close") {
-                whatsappConnected = false;
+                currentStatus = "מנותק";
 
                 const statusCode =
                     lastDisconnect?.error?.output?.statusCode;
 
                 console.log(
-                    "WhatsApp התנתק. קוד:",
-                    statusCode
+                    `WhatsApp התנתק. קוד: ${statusCode}`
                 );
 
-                starting = false;
+                reconnecting = false;
 
                 if (
-                    statusCode !==
-                    DisconnectReason.loggedOut
+                    statusCode !== DisconnectReason.loggedOut
                 ) {
                     console.log(
-                        "מנסה להתחבר מחדש..."
+                        "מנסה להתחבר מחדש בעוד 5 שניות..."
                     );
 
                     setTimeout(() => {
                         startWhatsApp();
-                    }, 3000);
+                    }, 5000);
                 } else {
-                    console.log(
-                        "החשבון נותק. צריך לחבר אותו מחדש."
-                    );
+                    currentStatus =
+                        "התנתק לצמיתות — יש לחבר מחדש";
                 }
             }
         });
 
-        // קבלת הודעות
         sock.ev.on(
             "messages.upsert",
             async ({ messages }) => {
+                const message = messages[0];
 
-                for (const message of messages) {
+                if (!message?.message) return;
+                if (message.key?.fromMe) return;
 
-                    if (!message.message) continue;
-                    if (message.key.fromMe) continue;
+                const text =
+                    message.message.conversation ||
+                    message.message.extendedTextMessage?.text ||
+                    "";
 
-                    const text =
-                        message.message.conversation ||
-                        message.message.extendedTextMessage?.text ||
-                        "";
+                if (!text) return;
 
-                    if (!text) continue;
+                console.log(
+                    "התקבלה הודעה:",
+                    text
+                );
 
-                    console.log(
-                        "התקבלה הודעה:",
-                        text
-                    );
-
-                    // Rider
-                    if (
-                        text
-                            .toLowerCase()
-                            .includes("rider")
-                    ) {
-                        try {
-                            await sock.sendMessage(
-                                message.key.remoteJid,
-                                {
-                                    text:
-                                        "📱 Rider זוהה! 🚀"
-                                }
-                            );
-
-                            console.log(
-                                "נשלחה תגובת Rider ✅"
-                            );
-
-                        } catch (error) {
-                            console.error(
-                                "שגיאה בשליחת תגובה:",
-                                error
-                            );
+                if (
+                    text
+                        .toLowerCase()
+                        .includes("rider")
+                ) {
+                    await sock.sendMessage(
+                        message.key.remoteJid,
+                        {
+                            text: "📱 Rider זוהה! 🚀"
                         }
-                    }
+                    );
                 }
             }
         );
 
     } catch (error) {
-        starting = false;
+        reconnecting = false;
 
         console.error(
             "שגיאה בהפעלת WhatsApp:",
             error
         );
 
+        currentStatus = "שגיאה בחיבור";
+
         setTimeout(() => {
             startWhatsApp();
-        }, 5000);
+        }, 10000);
     }
 }
 
 
-// --------------------------------
-// שרת HTTP של Render
-// --------------------------------
+/*
+    שרת HTTP של Render
+*/
 
 const server = http.createServer(
-    (req, res) => {
+    async (req, res) => {
 
-        // דף הבית
+        /*
+            דף הבית
+        */
+
         if (req.url === "/") {
             res.writeHead(200, {
-                "Content-Type": "text/html; charset=utf-8"
+                "Content-Type":
+                    "text/html; charset=utf-8"
             });
 
             res.end(`
@@ -179,16 +184,15 @@ const server = http.createServer(
                     <meta charset="UTF-8">
                     <title>WhatsApp Bot</title>
                 </head>
+
                 <body>
                     <h1>WhatsApp Bot 🤖</h1>
 
                     <p>
                         סטטוס:
-                        ${
-                            whatsappConnected
-                                ? "🟢 מחובר"
-                                : "🟡 ממתין לחיבור"
-                        }
+                        <strong>
+                            ${currentStatus}
+                        </strong>
                     </p>
 
                     <p>
@@ -204,31 +208,11 @@ const server = http.createServer(
         }
 
 
-        // QR
+        /*
+            QR
+        */
+
         if (req.url === "/qr") {
-
-            if (whatsappConnected) {
-                res.writeHead(200, {
-                    "Content-Type":
-                        "text/html; charset=utf-8"
-                });
-
-                res.end(`
-                    <!DOCTYPE html>
-                    <html lang="he">
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>WhatsApp מחובר</title>
-                    </head>
-                    <body>
-                        <h1>🟢 WhatsApp כבר מחובר!</h1>
-                    </body>
-                    </html>
-                `);
-
-                return;
-            }
-
 
             if (!currentQR) {
                 res.writeHead(200, {
@@ -244,8 +228,16 @@ const server = http.createServer(
                         <meta http-equiv="refresh" content="3">
                         <title>WhatsApp QR</title>
                     </head>
+
                     <body>
-                        <h1>⏳ מחכה ל-QR...</h1>
+                        <h2>
+                            ${currentStatus}
+                        </h2>
+
+                        <p>
+                            מחכה ל-QR...
+                        </p>
+
                         <p>
                             הדף יתרענן אוטומטית.
                         </p>
@@ -255,7 +247,6 @@ const server = http.createServer(
 
                 return;
             }
-
 
             res.writeHead(200, {
                 "Content-Type":
@@ -267,43 +258,40 @@ const server = http.createServer(
                 <html lang="he">
                 <head>
                     <meta charset="UTF-8">
-
                     <meta
                         name="viewport"
-                        content="width=device-width,
-                        initial-scale=1.0"
+                        content="width=device-width, initial-scale=1"
                     >
 
                     <title>WhatsApp QR</title>
+
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            text-align: center;
+                            padding: 30px;
+                        }
+
+                        img {
+                            width: 300px;
+                            max-width: 90%;
+                        }
+                    </style>
                 </head>
 
-                <body
-                    style="
-                        text-align:center;
-                        font-family:Arial;
-                    "
-                >
+                <body>
 
-                    <h1>
-                        📱 חבר את WhatsApp
-                    </h1>
-
-                    <p>
-                        WhatsApp → מכשירים מקושרים
-                        → קישור מכשיר
-                    </p>
+                    <h2>
+                        סרוק את ה-QR עם WhatsApp 📱
+                    </h2>
 
                     <img
                         src="${currentQR}"
-                        alt="WhatsApp QR"
-                        style="
-                            width:400px;
-                            max-width:90vw;
-                        "
+                        alt="WhatsApp QR Code"
                     >
 
                     <p>
-                        סרוק את הקוד עם הטלפון.
+                        לאחר הסריקה אפשר לרענן את הדף.
                     </p>
 
                 </body>
@@ -314,11 +302,23 @@ const server = http.createServer(
         }
 
 
-        res.writeHead(404);
+        /*
+            נתיב לא קיים
+        */
+
+        res.writeHead(404, {
+            "Content-Type":
+                "text/plain; charset=utf-8"
+        });
+
         res.end("Not found");
     }
 );
 
+
+/*
+    הפעלת השרת
+*/
 
 server.listen(
     PORT,
@@ -331,5 +331,8 @@ server.listen(
 );
 
 
-// הפעלת WhatsApp
+/*
+    הפעלת WhatsApp
+*/
+
 startWhatsApp();
