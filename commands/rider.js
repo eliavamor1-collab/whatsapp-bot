@@ -2,6 +2,8 @@ export default {
     trigger: "rider",
 
     async execute(sock, message) {
+        console.log("🚀 RIDER EXECUTE הופעל!");
+
         const jid = message.key.remoteJid;
 
         const imageUrl =
