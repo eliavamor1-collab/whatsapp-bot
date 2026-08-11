@@ -629,14 +629,23 @@ async function startWhatsApp() {
         // ========================================
 
         sock.ev.on(
-            "messages.upsert",
-            async ({
-                messages,
-                type,
-                requestId
-            }) => {
+    "messages.upsert",
+    async ({
+        messages,
+        type,
+        requestId
+    }) => {
 
-                try {
+        console.log("📩 messages.upsert התקבל!");
+
+        for (const message of messages) {
+            console.log(
+                "📨 הודעה:",
+                JSON.stringify(message, null, 2)
+            );
+        }
+
+        try {
 
                     // ========================================
                     // Ignore requestId events
