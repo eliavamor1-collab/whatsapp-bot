@@ -17,6 +17,7 @@ import pg from "pg";
 // ========================================
 
 import startCommand from "./commands/start.js";
+import riderCommand from "./commands/rider.js";
 
 const { Pool } = pg;
 
@@ -43,6 +44,11 @@ const commands = new Map();
 commands.set(
     startCommand.trigger,
     startCommand
+);
+
+commands.set(
+    riderCommand.trigger,
+    riderCommand
 );
 
 console.log(
