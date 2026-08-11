@@ -2,13 +2,10 @@ import http from "http";
 
 import makeWASocket, {
     DisconnectReason,
+    useMultiFileAuthState,
     fetchLatestWaWebVersion,
-    Browsers,
-    initAuthCreds,
-    BufferJSON,
-    proto
-} from "baileys";
-
+    Browsers
+} from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 import pg from "pg";
 
