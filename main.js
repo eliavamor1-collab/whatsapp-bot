@@ -2,7 +2,6 @@ import http from "http";
 
 import makeWASocket, {
     DisconnectReason,
-    fetchLatestWaWebVersion,
     Browsers,
     initAuthCreds,
     BufferJSON,
@@ -18,21 +17,29 @@ const { Pool } = pg;
 // Configuration
 // ========================================
 
-const PORT = Number(process.env.PORT || 10000);
+const PORT = Number(
+    process.env.PORT || 10000
+);
 
 const TARGET_GROUP_NAME =
-    process.env.TARGET_GROUP_NAME || "פרוץ בווצאפ";
+    "פרוץ בווצאפ";
+
+const TARGET_GROUP_JID =
+    "120363410444900210@g.us";
 
 // ========================================
 // Neon PostgreSQL
 // ========================================
 
 if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is missing");
+    throw new Error(
+        "DATABASE_URL is missing"
+    );
 }
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString:
+        process.env.DATABASE_URL,
 
     ssl: {
         rejectUnauthorized: false
@@ -45,18 +52,22 @@ const pool = new Pool({
     connectionTimeoutMillis: 10000
 });
 
-pool.on("error", (error) => {
-    console.error(
-        "PostgreSQL pool error:",
-        error
-    );
-});
+pool.on(
+    "error",
+    (error) => {
+        console.error(
+            "PostgreSQL pool error:",
+            error
+        );
+    }
+);
 
 // ========================================
 // Database initialization
 // ========================================
 
 async function initDatabase() {
+
     await pool.query(`
         CREATE TABLE IF NOT EXISTS whatsapp_auth (
             id TEXT PRIMARY KEY,
@@ -79,7 +90,11 @@ async function usePostgresAuthState() {
 
         const result =
             await pool.query(
-                "SELECT data FROM whatsapp_auth WHERE id = $1",
+                `
+                SELECT data
+                FROM whatsapp_auth
+                WHERE id = $1
+                `,
                 [id]
             );
 
@@ -131,7 +146,10 @@ async function usePostgresAuthState() {
     async function removeData(id) {
 
         await pool.query(
-            "DELETE FROM whatsapp_auth WHERE id = $1",
+            `
+            DELETE FROM whatsapp_auth
+            WHERE id = $1
+            `,
             [id]
         );
     }
@@ -290,103 +308,6 @@ let reconnectTimer =
 let starting =
     false;
 
-let targetGroupJid =
-    null;
-
-// ========================================
-// Find target group
-// ========================================
-
-async function findTargetGroup() {
-
-    if (!sock) {
-        return null;
-    }
-
-    try {
-
-        console.log(
-            `מחפש את הקבוצה: "${TARGET_GROUP_NAME}"`
-        );
-
-        const groups =
-            await sock.groupFetchAllParticipating();
-
-        const groupList =
-            Object.values(groups);
-
-        console.log(
-            `נמצאו ${groupList.length} קבוצות.`
-        );
-
-        for (
-            const group
-            of groupList
-        ) {
-
-            console.log(
-                `קבוצה: ${group.subject} | JID: ${group.id}`
-            );
-        }
-
-        const target =
-            groupList.find(
-                (group) =>
-                    group.subject ===
-                    TARGET_GROUP_NAME
-            );
-
-        if (!target) {
-
-            console.log(
-                `❌ הקבוצה "${TARGET_GROUP_NAME}" לא נמצאה.`
-            );
-
-            targetGroupJid =
-                null;
-
-            return null;
-        }
-
-        targetGroupJid =
-            target.id;
-
-        console.log(
-            "========================================"
-        );
-
-        console.log(
-            "🎯 קבוצת היעד נמצאה!"
-        );
-
-        console.log(
-            `שם: ${target.subject}`
-        );
-
-        console.log(
-            `JID: ${target.id}`
-        );
-
-        console.log(
-            "========================================"
-        );
-
-        return target.id;
-
-    } catch (error) {
-
-        console.error(
-            "שגיאה בחיפוש הקבוצה:",
-            error
-        );
-
-        targetGroupJid =
-            null;
-
-        return null;
-    }
-}
-
 // ========================================
 // Start WhatsApp
 // ========================================
@@ -416,39 +337,6 @@ async function startWhatsApp() {
         } =
             await usePostgresAuthState();
 
-        console.log(
-            "בודק גרסת WhatsApp Web..."
-        );
-
-        let version;
-
-        try {
-
-            const result =
-                await fetchLatestWaWebVersion();
-
-            version =
-                result.version;
-
-            console.log(
-                `WhatsApp Web Version: ${version.join(".")}`
-            );
-
-        } catch (error) {
-
-            console.warn(
-                "לא הצלחנו לקבל גרסת WhatsApp Web."
-            );
-
-            console.warn(
-                error?.message ||
-                error
-            );
-
-            version =
-                undefined;
-        }
-
         // ========================================
         // Socket configuration
         // ========================================
@@ -465,16 +353,9 @@ async function startWhatsApp() {
             printQRInTerminal:
                 false,
 
-            // מונע סנכרון היסטוריה מיותר
-            // ומקטין עומס על השירות.
             shouldSyncHistoryMessage:
                 () => false
         };
-
-        if (version) {
-            socketConfig.version =
-                version;
-        }
 
         // ========================================
         // Create socket
@@ -589,7 +470,7 @@ async function startWhatsApp() {
                         null;
 
                     currentStatus =
-                        "מחובר ✅";
+                        `מחובר ✅ | קבוצה: ${TARGET_GROUP_NAME}`;
 
                     starting =
                         false;
@@ -603,27 +484,20 @@ async function startWhatsApp() {
                     );
 
                     console.log(
-                        "========================================"
+                        `קבוצת יעד: ${TARGET_GROUP_NAME}`
                     );
 
-                    // ========================================
-                    // Find target group
-                    // ========================================
+                    console.log(
+                        `JID: ${TARGET_GROUP_JID}`
+                    );
 
-                    const jid =
-                        await findTargetGroup();
+                    console.log(
+                        "הבוט יגיב רק בקבוצה הזאת."
+                    );
 
-                    if (jid) {
-
-                        currentStatus =
-                            `מחובר ✅ | קבוצה: ${TARGET_GROUP_NAME}`;
-
-                    } else {
-
-                        currentStatus =
-                            `מחובר ✅ | הקבוצה "${TARGET_GROUP_NAME}" לא נמצאה`;
-
-                    }
+                    console.log(
+                        "========================================"
+                    );
                 }
 
                 // ========================================
@@ -643,9 +517,6 @@ async function startWhatsApp() {
 
                     starting =
                         false;
-
-                    targetGroupJid =
-                        null;
 
                     const statusCode =
                         lastDisconnect
@@ -731,8 +602,7 @@ async function startWhatsApp() {
                 try {
 
                     // ========================================
-                    // Security:
-                    // ignore requestId events
+                    // Ignore requestId events
                     // ========================================
 
                     if (requestId) {
@@ -752,7 +622,7 @@ async function startWhatsApp() {
                     }
 
                     // ========================================
-                    // Process every message
+                    // Process messages
                     // ========================================
 
                     for (
@@ -786,14 +656,8 @@ async function startWhatsApp() {
                         // ========================================
 
                         if (
-                            !targetGroupJid
-                        ) {
-                            continue;
-                        }
-
-                        if (
                             remoteJid !==
-                            targetGroupJid
+                            TARGET_GROUP_JID
                         ) {
 
                             continue;
@@ -850,7 +714,7 @@ async function startWhatsApp() {
                             }
 
                             await sock.sendMessage(
-                                targetGroupJid,
+                                TARGET_GROUP_JID,
                                 {
                                     text:
                                         "📱 Rider זוהה! 🚀"
@@ -879,9 +743,6 @@ async function startWhatsApp() {
             false;
 
         sock =
-            null;
-
-        targetGroupJid =
             null;
 
         currentStatus =
@@ -982,11 +843,14 @@ const server =
                         </p>
 
                         <p>
-                            ${
-                                targetGroupJid
-                                    ? "JID נמצא ✅"
-                                    : "JID עדיין לא נמצא"
-                            }
+                            JID:
+                            <strong>
+                                ${TARGET_GROUP_JID}
+                            </strong>
+                        </p>
+
+                        <p>
+                            הבוט מגיב רק בקבוצת היעד.
                         </p>
 
                         <p>
@@ -1173,7 +1037,7 @@ const server =
                                 TARGET_GROUP_NAME,
 
                             targetGroupJid:
-                                targetGroupJid,
+                                TARGET_GROUP_JID,
 
                             connected:
                                 Boolean(
