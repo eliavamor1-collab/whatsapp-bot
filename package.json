@@ -6,7 +6,8 @@
     "start": "node main.js"
   },
   "dependencies": {
-    "baileys": "6.7.23",
-    "qrcode": "latest"
+  "baileys": "latest",
+  "qrcode": "latest",
+  "pg": "latest"
   }
 }
