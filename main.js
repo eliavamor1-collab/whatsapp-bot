@@ -2,6 +2,7 @@ import http from "http";
 
 import makeWASocket, {
     DisconnectReason,
+    fetchLatestWaWebVersion,
     Browsers,
     initAuthCreds,
     BufferJSON,
@@ -90,11 +91,7 @@ async function usePostgresAuthState() {
 
         const result =
             await pool.query(
-                `
-                SELECT data
-                FROM whatsapp_auth
-                WHERE id = $1
-                `,
+                "SELECT data FROM whatsapp_auth WHERE id = $1",
                 [id]
             );
 
@@ -146,10 +143,7 @@ async function usePostgresAuthState() {
     async function removeData(id) {
 
         await pool.query(
-            `
-            DELETE FROM whatsapp_auth
-            WHERE id = $1
-            `,
+            "DELETE FROM whatsapp_auth WHERE id = $1",
             [id]
         );
     }
@@ -309,6 +303,14 @@ let starting =
     false;
 
 // ========================================
+// IDs of messages sent by the bot
+// Used to prevent response loops
+// ========================================
+
+const botSentMessageIds =
+    new Set();
+
+// ========================================
 // Start WhatsApp
 // ========================================
 
@@ -337,6 +339,39 @@ async function startWhatsApp() {
         } =
             await usePostgresAuthState();
 
+        console.log(
+            "בודק גרסת WhatsApp Web..."
+        );
+
+        let version;
+
+        try {
+
+            const result =
+                await fetchLatestWaWebVersion();
+
+            version =
+                result.version;
+
+            console.log(
+                `WhatsApp Web Version: ${version.join(".")}`
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "לא הצלחנו לקבל גרסת WhatsApp Web."
+            );
+
+            console.warn(
+                error?.message ||
+                error
+            );
+
+            version =
+                undefined;
+        }
+
         // ========================================
         // Socket configuration
         // ========================================
@@ -356,6 +391,12 @@ async function startWhatsApp() {
             shouldSyncHistoryMessage:
                 () => false
         };
+
+        if (version) {
+
+            socketConfig.version =
+                version;
+        }
 
         // ========================================
         // Create socket
@@ -492,10 +533,6 @@ async function startWhatsApp() {
                     );
 
                     console.log(
-                        "הבוט יגיב רק בקבוצה הזאת."
-                    );
-
-                    console.log(
                         "========================================"
                     );
                 }
@@ -518,6 +555,10 @@ async function startWhatsApp() {
                     starting =
                         false;
 
+                    console.log(
+                        `WhatsApp התנתק.`
+                    );
+
                     const statusCode =
                         lastDisconnect
                             ?.error
@@ -525,7 +566,7 @@ async function startWhatsApp() {
                             ?.statusCode;
 
                     console.log(
-                        `WhatsApp התנתק. קוד: ${statusCode}`
+                        `קוד: ${statusCode}`
                     );
 
                     sock =
@@ -622,7 +663,7 @@ async function startWhatsApp() {
                     }
 
                     // ========================================
-                    // Process messages
+                    // Process every message
                     // ========================================
 
                     for (
@@ -636,10 +677,24 @@ async function startWhatsApp() {
                             continue;
                         }
 
-                        // הודעות שנשלחו ע"י החשבון עצמו
+                        const messageId =
+                            message.key?.id;
+
+                        // ========================================
+                        // Ignore messages sent by the bot itself
+                        // ========================================
+
                         if (
-                            message.key?.fromMe
+                            messageId &&
+                            botSentMessageIds.has(
+                                messageId
+                            )
                         ) {
+
+                            botSentMessageIds.delete(
+                                messageId
+                            );
+
                             continue;
                         }
 
@@ -690,11 +745,23 @@ async function startWhatsApp() {
                         }
 
                         console.log(
-                            `הודעה התקבלה בקבוצת היעד (${type}):`
+                            "========================================"
                         );
 
                         console.log(
-                            text
+                            `הודעה התקבלה בקבוצת היעד (${type})`
+                        );
+
+                        console.log(
+                            `fromMe: ${message.key?.fromMe}`
+                        );
+
+                        console.log(
+                            `text: ${text}`
+                        );
+
+                        console.log(
+                            "========================================"
                         );
 
                         // ========================================
@@ -713,13 +780,38 @@ async function startWhatsApp() {
                                 continue;
                             }
 
-                            await sock.sendMessage(
-                                TARGET_GROUP_JID,
-                                {
-                                    text:
-                                        "📱 Rider זוהה! 🚀"
-                                }
-                            );
+                            const sent =
+                                await sock.sendMessage(
+                                    TARGET_GROUP_JID,
+                                    {
+                                        text:
+                                            "📱 Rider זוהה! 🚀"
+                                    }
+                                );
+
+                            // ========================================
+                            // Save sent message ID
+                            // Prevent bot response loop
+                            // ========================================
+
+                            if (
+                                sent?.key?.id
+                            ) {
+
+                                botSentMessageIds.add(
+                                    sent.key.id
+                                );
+
+                                // Keep memory clean
+                                setTimeout(
+                                    () => {
+                                        botSentMessageIds.delete(
+                                            sent.key.id
+                                        );
+                                    },
+                                    60000
+                                );
+                            }
 
                             console.log(
                                 "תגובה נשלחה לקבוצת היעד ✅"
@@ -847,10 +939,6 @@ const server =
                             <strong>
                                 ${TARGET_GROUP_JID}
                             </strong>
-                        </p>
-
-                        <p>
-                            הבוט מגיב רק בקבוצת היעד.
                         </p>
 
                         <p>
