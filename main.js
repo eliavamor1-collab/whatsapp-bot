@@ -465,5 +465,17 @@ async function main() {
     console.error("שגיאה בהפעלת המערכת:", error);
   }
 }
+// ========================================
+// Keep Alive (Self-Ping)
+// ========================================
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
+
+setInterval(() => {
+  http.get(`${RENDER_EXTERNAL_URL}/health`, (res) => {
+    console.log(`[Keep-Alive] Ping sent to /health — Status: ${res.statusCode}`);
+  }).on("error", (err) => {
+    console.error("[Keep-Alive] Ping failed:", err.message);
+  });
+}, 10 * 60 * 1000); // שולח בקשה כל 10 דקות
 
 main();
