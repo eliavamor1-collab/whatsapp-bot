@@ -27,26 +27,28 @@ const TARGET_GROUP_NAME = "פרוץ בווצאפ";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
 
 // ========================================
-// Commands Map (תמיכה מובנית בטריגרים וכינויים)
+// Commands Map (תמיכה מובנית בטריגרים, כינויים ו-Case-Insensitive)
 // ========================================
 const commands = new Map();
 
 function registerCommand(cmd) {
   if (!cmd || !cmd.trigger) return;
-  
+
+  const mainTrigger = cmd.trigger.toLowerCase();
+
   // רישום הטריגר הבסיסי (למשל "rider")
-  commands.set(cmd.trigger, cmd);
-  
+  commands.set(mainTrigger, cmd);
+
   // רישום הצירוף עם סלאש (למשל "/rider")
-  if (!cmd.trigger.startsWith("/")) {
-    commands.set(`/${cmd.trigger}`, cmd);
+  if (!mainTrigger.startsWith("/")) {
+    commands.set(`/${mainTrigger}`, cmd);
   } else {
-    commands.set(cmd.trigger.slice(1), cmd);
+    commands.set(mainTrigger.slice(1), cmd);
   }
 
   // רישום אליאסים נוספים במידה וקיימים
   if (Array.isArray(cmd.aliases)) {
-    cmd.aliases.forEach((alias) => commands.set(alias, cmd));
+    cmd.aliases.forEach((alias) => commands.set(alias.toLowerCase(), cmd));
   }
 }
 
@@ -326,7 +328,7 @@ async function startWhatsApp() {
         for (const message of messages) {
           if (!message?.message) continue;
 
-          // 1. סינון לפי JID הקבוצה (התעלמות שקטה מהודעות חיצוניות)
+          // 1. סינון לפי JID הקבוצה
           const remoteJid = message.key?.remoteJid;
           if (remoteJid !== TARGET_GROUP_JID) {
             continue;
@@ -351,7 +353,8 @@ async function startWhatsApp() {
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          const commandText = text.trim();
+          // המרת הקלט לאותיות קטנות לטובת Case-Insensitive Matching
+          const commandText = text.trim().toLowerCase();
           const command = commands.get(commandText);
 
           if (!command) {
