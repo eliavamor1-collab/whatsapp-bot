@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// שמירת ההודעה הראשונה שנשלחה
+let originalRiderMessage = null;
+
 export default {
   trigger: "rider",
   aliases: ["/rider"],
@@ -14,12 +17,16 @@ export default {
     const bodyText = 
 `📱 *שם האפליקציה:*
 *Rider*
+
 🔢 *גירסא:*
 v3.06.0.05
+
 📦 *גודל:*
 146.2 MB
+
 💾 *סוג:*
 משחק
+
 🎯 *תוכן:*
 משחק פעלולים עתידני וממכר, שבו נוהגים במסלולי ניאון מאתגרים ומנסים לא להתרסק.
 
@@ -30,12 +37,20 @@ v3.06.0.05
 ${downloadUrl}`;
 
     try {
-      // הורדת התמונה ל-Buffer לשליחה יציבה
+      // אם כבר שלחנו את ההודעה בעבר - מעבירים אותה (ווצאפ לא יוריד אותה מחדש בטלפון)
+      if (originalRiderMessage) {
+        console.log("🔄 מעביר את ההודעה הקיימת (חוסך הורדה בטלפון)...");
+        await sock.sendMessage(jid, { forward: originalRiderMessage });
+        console.log("✅ הודעת Rider הועברה בהצלחה!");
+        return;
+      }
+
+      // בפעם הראשונה: מורידים ושולחים תמונה חדשה
+      console.log("📸 שולח תמונה בפעם הראשונה...");
       const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
       const imageBuffer = Buffer.from(response.data, "binary");
 
-      // שליחת תמונה רגילה עם הטקסט והקישור בכתובית אחת
-      await sock.sendMessage(
+      originalRiderMessage = await sock.sendMessage(
         jid,
         {
           image: imageBuffer,
@@ -44,15 +59,12 @@ ${downloadUrl}`;
         { quoted: message }
       );
 
-      console.log("✅ הודעת Rider נשלחה בהצלחה!");
+      console.log("✅ הודעת Rider הראשונה שנשלחה נשמרה בזיכרון!");
     } catch (err) {
-      console.error("❌ שגיאה בשליחת התמונה, שולח טקסט בלבד:", err);
-
-      await sock.sendMessage(
-        jid,
-        { text: bodyText },
-        { quoted: message }
-      );
+      console.error("❌ שגיאה בשליחה:", err);
+      // אם הייתה שגיאה בהעברה, מאפסים ומנסים לשלוח טקסט
+      originalRiderMessage = null;
+      await sock.sendMessage(jid, { text: bodyText }, { quoted: message });
     }
   }
 };
