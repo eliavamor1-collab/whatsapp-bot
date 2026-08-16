@@ -172,7 +172,7 @@ async function usePostgresAuthState() {
 }
 
 // ========================================
-// WhatsApp State
+// WhatsApp State & Cleanup
 // ========================================
 let currentQR = null;
 let currentStatus = "מתחבר...";
@@ -180,6 +180,19 @@ let sock = null;
 let reconnectTimer = null;
 let starting = false;
 const botSentMessageIds = new Set();
+
+function cleanupSocket() {
+  if (sock) {
+    try {
+      sock.ev.removeAllListeners();
+      sock.ws?.close();
+      sock.end(undefined);
+    } catch (e) {
+      // להתעלם משגיאות לסגירה נקייה
+    }
+    sock = null;
+  }
+}
 
 // ========================================
 // Start WhatsApp
@@ -190,6 +203,9 @@ async function startWhatsApp() {
     return;
   }
   starting = true;
+
+  // הריסת Socket ישן לפני חיבור חדש למניעת כפילויות (קוד 440)
+  cleanupSocket();
 
   try {
     console.log("טוען WhatsApp Auth מ-Neon...");
@@ -213,6 +229,7 @@ async function startWhatsApp() {
       printQRInTerminal: false,
       connectTimeoutMs: 60000,
       defaultQueryTimeoutMs: 60000,
+      syncFullHistory: false,
       ...(version && { version })
     };
 
@@ -261,10 +278,11 @@ async function startWhatsApp() {
         currentQR = null;
         currentStatus = "מנותק";
         starting = false;
-        sock = null;
 
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         console.log(`WhatsApp התנתק. קוד: ${statusCode}`);
+
+        cleanupSocket();
 
         if (statusCode === DisconnectReason.loggedOut) {
           currentStatus = "התנתק לצמיתות — יש לחבר מחדש";
@@ -297,11 +315,12 @@ async function startWhatsApp() {
           }
 
           const remoteJid = message.key?.remoteJid;
+          const msgContent = message.message;
           const text =
-            message.message?.conversation ||
-            message.message?.extendedTextMessage?.text ||
-            message.message?.imageMessage?.caption ||
-            message.message?.videoMessage?.caption ||
+            msgContent?.conversation ||
+            msgContent?.extendedTextMessage?.text ||
+            msgContent?.imageMessage?.caption ||
+            msgContent?.videoMessage?.caption ||
             "";
 
           if (!text) continue;
@@ -336,7 +355,7 @@ async function startWhatsApp() {
     });
   } catch (error) {
     starting = false;
-    sock = null;
+    cleanupSocket();
     currentStatus = "שגיאה בחיבור";
     console.error("שגיאה בהפעלת WhatsApp:", error);
 
