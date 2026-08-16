@@ -1,5 +1,6 @@
 export default {
     trigger: "rider",
+    aliases: ["/rider"], // תמיכה גם עם סלאש
 
     async execute(sock, message) {
         console.log("🚀 RIDER EXECUTE הופעל!");
@@ -34,13 +35,18 @@ v3.06.0.05
 🔗 *קישור להורדה:*
 ${downloadUrl}`;
 
-        await sock.sendMessage(
-            jid,
-            {
-                image: { url: imageUrl },
-                caption: captionText
-            },
-            { quoted: message }
-        );
+        try {
+            await sock.sendMessage(
+                jid,
+                {
+                    image: { url: imageUrl },
+                    caption: captionText
+                },
+                { quoted: message }
+            );
+            console.log("✅ הודעת Rider נשלחה בהצלחה!");
+        } catch (error) {
+            console.error("❌ שגיאה בשליחת תמונת Rider:", error);
+        }
     }
 };
