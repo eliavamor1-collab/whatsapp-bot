@@ -12,7 +12,7 @@ import pg from "pg";
 import pino from "pino";
 
 // ========================================
-// Commands
+// Commands Import
 // ========================================
 import startCommand from "./commands/start.js";
 import riderCommand from "./commands/rider.js";
@@ -26,9 +26,10 @@ const { Pool } = pg;
 const PORT = Number(process.env.PORT || 10000);
 const TARGET_GROUP_NAME = "פרוץ בווצאפ";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
 // ========================================
-// Commands Map
+// Commands Map Registration
 // ========================================
 const commands = new Map();
 
@@ -45,7 +46,13 @@ function registerCommand(cmd) {
   }
 
   if (Array.isArray(cmd.aliases)) {
-    cmd.aliases.forEach((alias) => commands.set(alias.toLowerCase(), cmd));
+    cmd.aliases.forEach((alias) => {
+      const lowerAlias = alias.toLowerCase();
+      commands.set(lowerAlias, cmd);
+      if (!lowerAlias.startsWith("/")) {
+        commands.set(`/${lowerAlias}`, cmd);
+      }
+    });
   }
 }
 
@@ -53,13 +60,13 @@ registerCommand(startCommand);
 registerCommand(riderCommand);
 registerCommand(robloxCommand);
 
-console.log("פקודות נטענו:", [...new Set(commands.keys())].join(", "));
+console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
 // ========================================
 // Neon PostgreSQL Setup
 // ========================================
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is missing");
+  throw new Error("DATABASE_URL is missing in environment variables!");
 }
 
 const pool = new Pool({
@@ -71,7 +78,7 @@ const pool = new Pool({
 });
 
 pool.on("error", (error) => {
-  console.error("PostgreSQL pool error:", error);
+  console.error("PostgreSQL Pool Error:", error);
 });
 
 async function initDatabase() {
@@ -81,106 +88,87 @@ async function initDatabase() {
       data JSONB NOT NULL
     )
   `);
-  console.log("Neon database ready ✅");
+  console.log("Neon Database is ready ✅");
 }
 
 // ========================================
-// PostgreSQL Auth State
+// PostgreSQL Auth State Strategy
 // ========================================
 async function usePostgresAuthState() {
   const readData = async (id) => {
-    const result = await pool.query(
-      "SELECT data FROM whatsapp_auth WHERE id = $1",
-      [id]
-    );
-    if (result.rows.length === 0) return null;
-    return JSON.parse(JSON.stringify(result.rows[0].data), BufferJSON.reviver);
+    try {
+      const result = await pool.query("SELECT data FROM whatsapp_auth WHERE id = $1", [id]);
+      if (result.rows.length === 0) return null;
+      return JSON.parse(JSON.stringify(result.rows[0].data), BufferJSON.reviver);
+    } catch (err) {
+      console.error(`Error reading key ${id} from DB:`, err);
+      return null;
+    }
   };
 
   const writeData = async (id, data) => {
-    const json = JSON.stringify(data, BufferJSON.replacer);
-    await pool.query(
-      `INSERT INTO whatsapp_auth (id, data)
-       VALUES ($1, $2::jsonb)
-       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data`,
-      [id, json]
-    );
+    try {
+      const json = JSON.stringify(data, BufferJSON.replacer);
+      await pool.query(
+        `INSERT INTO whatsapp_auth (id, data)
+         VALUES ($1, $2::jsonb)
+         ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data`,
+        [id, json]
+      );
+    } catch (err) {
+      console.error(`Error writing key ${id} to DB:`, err);
+    }
+  };
+
+  const deleteData = async (id) => {
+    try {
+      await pool.query("DELETE FROM whatsapp_auth WHERE id = $1", [id]);
+    } catch (err) {
+      console.error(`Error deleting key ${id} from DB:`, err);
+    }
   };
 
   let creds = await readData("creds");
   if (!creds) {
-    console.log("אין Auth קיים — יוצר התחברות חדשה...");
+    console.log("אין סשן קיים — יוצר התחברות חדשה...");
     creds = initAuthCreds();
     await writeData("creds", creds);
   }
 
-  const keys = {
-    get: async (type, ids) => {
-      if (!ids.length) return {};
-      const keysToFetch = ids.map((id) => `key-${type}-${id}`);
-
-      const result = await pool.query(
-        "SELECT id, data FROM whatsapp_auth WHERE id = ANY($1)",
-        [keysToFetch]
-      );
-
-      const resultMap = new Map(
-        result.rows.map((row) => [
-          row.id,
-          JSON.parse(JSON.stringify(row.data), BufferJSON.reviver)
-        ])
-      );
-
-      const data = {};
-      for (const id of ids) {
-        const key = `key-${type}-${id}`;
-        const value = resultMap.get(key) || null;
-
-        if (!value) {
-          data[id] = null;
-        } else if (type === "app-state-sync-key") {
-          data[id] = proto.Message.AppStateSyncKeyData.fromObject(value);
-        } else {
-          data[id] = value;
-        }
-      }
-      return data;
-    },
-
-    set: async (data) => {
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN");
-        for (const category of Object.keys(data)) {
-          for (const id of Object.keys(data[category])) {
-            const value = data[category][id];
-            const key = `key-${category}-${id}`;
-
-            if (value) {
-              const json = JSON.stringify(value, BufferJSON.replacer);
-              await client.query(
-                `INSERT INTO whatsapp_auth (id, data)
-                 VALUES ($1, $2::jsonb)
-                 ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data`,
-                [key, json]
-              );
-            } else {
-              await client.query("DELETE FROM whatsapp_auth WHERE id = $1", [key]);
+  return {
+    state: {
+      creds,
+      keys: {
+        get: async (type, ids) => {
+          const data = {};
+          await Promise.all(
+            ids.map(async (id) => {
+              let value = await readData(`key-${type}-${id}`);
+              if (type === "app-state-sync-key" && value) {
+                value = proto.Message.AppStateSyncKeyData.fromObject(value);
+              }
+              data[id] = value;
+            })
+          );
+          return data;
+        },
+        set: async (data) => {
+          const tasks = [];
+          for (const category of Object.keys(data)) {
+            for (const id of Object.keys(data[category])) {
+              const value = data[category][id];
+              const key = `key-${category}-${id}`;
+              if (value) {
+                tasks.push(writeData(key, value));
+              } else {
+                tasks.push(deleteData(key));
+              }
             }
           }
+          await Promise.all(tasks);
         }
-        await client.query("COMMIT");
-      } catch (err) {
-        await client.query("ROLLBACK");
-        throw err;
-      } finally {
-        client.release();
       }
-    }
-  };
-
-  return {
-    state: { creds, keys },
+    },
     saveCreds: async () => {
       await writeData("creds", creds);
     }
@@ -188,7 +176,7 @@ async function usePostgresAuthState() {
 }
 
 // ========================================
-// WhatsApp State & Cleanup
+// Global State & Cleanups
 // ========================================
 let currentQR = null;
 let currentStatus = "מתחבר...";
@@ -203,13 +191,15 @@ function cleanupSocket() {
       sock.ev.removeAllListeners();
       sock.ws?.close();
       sock.end(undefined);
-    } catch (e) {}
+    } catch (e) {
+      // Ignore cleanup errors
+    }
     sock = null;
   }
 }
 
 // ========================================
-// Start WhatsApp
+// Main WhatsApp Engine
 // ========================================
 async function startWhatsApp() {
   if (starting) {
@@ -227,12 +217,11 @@ async function startWhatsApp() {
     console.log("בודק גרסת WhatsApp Web...");
     let version;
     try {
-      const result = await fetchLatestWaWebVersion();
+      const result = await fetchLatestWaWebVersion({});
       version = result.version;
       console.log(`WhatsApp Web Version: ${version.join(".")}`);
     } catch (error) {
-      console.warn("לא הצלחנו לקבל גרסת WhatsApp Web:", error?.message || error);
-      version = undefined;
+      console.warn("לא הצלחנו לקבל גרסת WhatsApp Web, משתמש בברירת מחדל:", error?.message || error);
     }
 
     const logger = pino({ level: "error" });
@@ -248,15 +237,14 @@ async function startWhatsApp() {
       ...(version && { version })
     };
 
-    const newSock = makeWASocket(socketConfig);
-    sock = newSock;
+    sock = makeWASocket(socketConfig);
     console.log("Socket נוצר בהצלחה.");
 
     sock.ev.on("creds.update", async () => {
       try {
         await saveCreds();
       } catch (error) {
-        console.error("שגיאה בשמירת Auth:", error);
+        console.error("שגיאה בשמירת Auth Creds:", error);
       }
     });
 
@@ -267,15 +255,15 @@ async function startWhatsApp() {
         try {
           currentQR = await QRCode.toDataURL(qr);
           currentStatus = "ממתין לסריקת QR";
-          console.log("QR חדש מוכן ב-/qr");
+          console.log("QR חדש זמין לצפייה ב-/qr");
         } catch (error) {
-          console.error("שגיאה ביצירת QR:", error);
+          console.error("שגיאה ביצירת QR Code:", error);
         }
       }
 
       if (connection === "connecting") {
         currentStatus = "מתחבר...";
-        console.log("מתחבר ל-WhatsApp...");
+        console.log("מתחבר לשרתי WhatsApp...");
       }
 
       if (connection === "open") {
@@ -283,9 +271,9 @@ async function startWhatsApp() {
         currentStatus = `מחובר ✅ | קבוצה: ${TARGET_GROUP_NAME}`;
         starting = false;
         console.log("========================================");
-        console.log("WhatsApp מחובר! ✅");
+        console.log("WhatsApp מחובר בהצלחה! ✅");
         console.log(`קבוצת יעד: ${TARGET_GROUP_NAME}`);
-        console.log(`JID: ${TARGET_GROUP_JID}`);
+        console.log(`JID יעד: ${TARGET_GROUP_JID}`);
         console.log("========================================");
       }
 
@@ -295,24 +283,24 @@ async function startWhatsApp() {
         starting = false;
 
         const statusCode = lastDisconnect?.error?.output?.statusCode;
-        console.log(`WhatsApp התנתק. קוד: ${statusCode}`);
+        console.log(`WhatsApp התנתק. קוד שגיאה: ${statusCode}`);
 
         cleanupSocket();
 
         if (statusCode === DisconnectReason.loggedOut) {
-          currentStatus = "התנתק לצמיתות — יש לחבר מחדש";
-          console.log("WhatsApp נותק לצמיתות.");
+          currentStatus = "התנתק לצמיתות — נדרשת סריקה מחדש";
+          console.log("החשבון נותק מ-WhatsApp (Logged Out).");
           return;
         }
 
         if (statusCode === 440 || statusCode === DisconnectReason.connectionReplaced) {
-          currentStatus = "התחברות נוספת פתוחה בשרת/מחשב אחר (קוד 440)";
-          console.error("⚠️ קונפליקט חיבורים (440): יש לוודא שאין Instance נוסף שרץ במקביל.");
+          currentStatus = "קונפליקט חיבורים (קוד 440)";
+          console.error("⚠️ קונפליקט חיבורים: וודא שאין תהליך נוסף שרץ במקביל.");
           return;
         }
 
         if (reconnectTimer) clearTimeout(reconnectTimer);
-        const delay = statusCode === DisconnectReason.restartRequired ? 1000 : 5000;
+        const delay = statusCode === DisconnectReason.restartRequired ? 2000 : 5000;
         console.log(`מנסה להתחבר מחדש בעוד ${delay / 1000} שניות...`);
 
         reconnectTimer = setTimeout(() => {
@@ -322,9 +310,9 @@ async function startWhatsApp() {
       }
     });
 
-    sock.ev.on("messages.upsert", async ({ messages }) => {
+    sock.ev.on("messages.upsert", async ({ messages, type }) => {
       try {
-        if (!messages || messages.length === 0) return;
+        if (type !== "notify" || !messages || messages.length === 0) return;
 
         for (const message of messages) {
           if (!message?.message) continue;
@@ -350,31 +338,33 @@ async function startWhatsApp() {
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          const commandText = text.trim().toLowerCase();
-          const command = commands.get(commandText);
+          const trimmedText = text.trim();
+          const firstWord = trimmedText.split(/\s+/)[0].toLowerCase();
+
+          const command = commands.get(firstWord);
 
           if (!command) {
-            console.log(`[No Match] No command matches string: "${commandText}"`);
+            console.log(`[No Match] No command found for trigger: "${firstWord}"`);
             continue;
           }
 
-          console.log(`[Executing] Trigger: ${command.trigger}`);
+          console.log(`[Executing] Executing trigger: ${command.trigger}`);
           try {
             await command.execute(sock, message);
-            console.log(`[Success] Command ${command.trigger} executed ✅`);
+            console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);
           } catch (error) {
-            console.error(`[Error] Failed executing command ${command.trigger}:`, error);
+            console.error(`[Error] Failed executing command "${command.trigger}":`, error);
           }
         }
       } catch (error) {
-        console.error("שגיאה בעיבוד הודעה:", error);
+        console.error("שגיאה בעיבוד הודעות נכנסות:", error);
       }
     });
   } catch (error) {
     starting = false;
     cleanupSocket();
     currentStatus = "שגיאה בחיבור";
-    console.error("שגיאה בהפעלת WhatsApp:", error);
+    console.error("שגיאה קריטית בהפעלת WhatsApp:", error);
 
     if (reconnectTimer) clearTimeout(reconnectTimer);
     reconnectTimer = setTimeout(() => {
@@ -392,19 +382,27 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     return res.end(`
       <!DOCTYPE html>
-      <html lang="he">
+      <html lang="he" dir="rtl">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>WhatsApp Bot</title>
+        <title>WhatsApp Bot Dashboard</title>
+        <style>
+          body { font-family: system-ui, sans-serif; padding: 2rem; background: #f4f4f9; color: #333; }
+          .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+          a { color: #007bff; text-decoration: none; }
+        </style>
       </head>
       <body>
-        <h1>WhatsApp Bot 🤖</h1>
-        <p>סטטוס: <strong>${currentStatus}</strong></p>
-        <p>קבוצה: <strong>${TARGET_GROUP_NAME}</strong></p>
-        <p>JID: <strong>${TARGET_GROUP_JID}</strong></p>
-        <p><a href="/qr">פתיחת QR</a></p>
-        <p><a href="/health">Health</a></p>
+        <div class="card">
+          <h1>WhatsApp Bot 🤖</h1>
+          <p>סטטוס: <strong>${currentStatus}</strong></p>
+          <p>קבוצה: <strong>${TARGET_GROUP_NAME}</strong></p>
+          <p>JID: <code>${TARGET_GROUP_JID}</code></p>
+          <hr />
+          <p><a href="/qr">📱 הצג QR להתחברות</a></p>
+          <p><a href="/health">❤️ בדיקת Health</a></p>
+        </div>
       </body>
       </html>
     `);
@@ -415,15 +413,18 @@ const server = http.createServer((req, res) => {
     if (!currentQR) {
       return res.end(`
         <!DOCTYPE html>
-        <html lang="he">
+        <html lang="he" dir="rtl">
         <head>
           <meta charset="UTF-8">
           <meta http-equiv="refresh" content="3">
           <title>WhatsApp QR</title>
+          <style>
+            body { font-family: system-ui, sans-serif; text-align: center; padding: 3rem; }
+          </style>
         </head>
         <body>
           <h2>${currentStatus}</h2>
-          <p>אין QR פעיל כרגע. הדף יבדוק שוב בעוד 3 שניות.</p>
+          <p>אין QR זמין לריענון כרגע. הדף יתרענן אוטומטית...</p>
         </body>
         </html>
       `);
@@ -431,20 +432,20 @@ const server = http.createServer((req, res) => {
 
     return res.end(`
       <!DOCTYPE html>
-      <html lang="he">
+      <html lang="he" dir="rtl">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>WhatsApp QR</title>
         <style>
-          body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
-          img { width: 300px; max-width: 90%; }
+          body { font-family: system-ui, sans-serif; text-align: center; padding: 2rem; }
+          img { width: 300px; max-width: 90%; border: 1px solid #ccc; border-radius: 8px; }
         </style>
       </head>
       <body>
-        <h2>סרוק את ה-QR עם WhatsApp 📱</h2>
+        <h2>סרוק את ה-QR Code באמצעות WhatsApp 📱</h2>
         <img src="${currentQR}" alt="WhatsApp QR Code">
-        <p>לאחר הסריקה אפשר לרענן.</p>
+        <p>רענן את הדף לאחר הסריקה.</p>
       </body>
       </html>
     `);
@@ -464,30 +465,12 @@ const server = http.createServer((req, res) => {
   }
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-  res.end("Not found");
+  res.end("Not Found");
 });
 
 // ========================================
-// Start HTTP Server & App
+// Keep Alive Ping Mechanism
 // ========================================
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-async function main() {
-  try {
-    await initDatabase();
-    await startWhatsApp();
-  } catch (error) {
-    console.error("שגיאה בהפעלת המערכת:", error);
-  }
-}
-
-// ========================================
-// Keep Alive (Self-Ping)
-// ========================================
-const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
-
 async function sendPing() {
   try {
     const res = await fetch(`${RENDER_EXTERNAL_URL}/health`);
@@ -497,7 +480,23 @@ async function sendPing() {
   }
 }
 
-sendPing();
-setInterval(sendPing, 10 * 60 * 1000);
+// ========================================
+// Application Lifecycle
+// ========================================
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`HTTP Server running on port ${PORT}`);
+});
+
+async function main() {
+  try {
+    await initDatabase();
+    await startWhatsApp();
+
+    sendPing();
+    setInterval(sendPing, 10 * 60 * 1000);
+  } catch (error) {
+    console.error("שגיאה קריטית בעליית השרת:", error);
+  }
+}
 
 main();
