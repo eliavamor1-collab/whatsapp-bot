@@ -15,6 +15,7 @@ import pino from "pino";
 // Commands Import
 // ========================================
 import startCommand from "./commands/start.js";
+import listCommand from "./commands/list.js";
 import riderCommand from "./commands/rider.js";
 import robloxCommand from "./commands/roblox.js";
 import subwayCommand from "./commands/subwaysurfers.js";
@@ -58,6 +59,7 @@ function registerCommand(cmd) {
 }
 
 registerCommand(startCommand);
+registerCommand(listCommand);
 registerCommand(riderCommand);
 registerCommand(robloxCommand);
 registerCommand(subwayCommand);
