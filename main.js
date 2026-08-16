@@ -226,16 +226,17 @@ async function startWhatsApp() {
 
     const logger = pino({ level: "error" });
 
-    const socketConfig = {
-      auth: state,
-      logger,
-      browser: Browsers.ubuntu("Chrome"),
-      printQRInTerminal: false,
-      connectTimeoutMs: 60000,
-      defaultQueryTimeoutMs: 60000,
-      syncFullHistory: false,
-      ...(version && { version })
-    };
+   const socketConfig = {
+  auth: state,
+  logger,
+  browser: Browsers.ubuntu("Chrome"),
+  printQRInTerminal: false,
+  connectTimeoutMs: 60000,
+  defaultQueryTimeoutMs: 60000,
+  syncFullHistory: false,
+  markOnlineOnConnect: false,
+  ...(version && { version })
+};
 
     sock = makeWASocket(socketConfig);
     console.log("Socket נוצר בהצלחה.");
