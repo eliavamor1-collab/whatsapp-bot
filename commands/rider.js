@@ -20,48 +20,37 @@ v3.06.0.05
 146.2 MB
 💾 *סוג:*
 משחק
-
 🎯 *תוכן:*
 משחק פעלולים עתידני וממכר, שבו נוהגים במסלולי ניאון מאתגרים ומנסים לא להתרסק.
 
 ℹ️ *הערות:*
-פשוט להתקין ולשחק`;
+פשוט להתקין ולשחק
+
+📲 *קישור להורדה:*
+${downloadUrl}`;
 
     try {
-      // 1. הורדת התמונה ל-Buffer במידה וצריך
+      // הורדת התמונה ל-Buffer לשליחה יציבה
       const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
       const imageBuffer = Buffer.from(response.data, "binary");
 
-      // 2. שליחה אחת נקייה כולל תמונה, כתובית וכפתור קישור
+      // שליחת תמונה רגילה עם הטקסט והקישור בכתובית אחת
       await sock.sendMessage(
         jid,
         {
           image: imageBuffer,
-          caption: bodyText,
-          footer: "לחץ למטה להורדה",
-          buttons: [
-            {
-              buttonId: "download_link",
-              buttonText: { displayText: "📥 הורד את המשחק" },
-              type: 1
-            }
-          ],
-          viewOnce: true
+          caption: bodyText
         },
         { quoted: message }
       );
 
       console.log("✅ הודעת Rider נשלחה בהצלחה!");
     } catch (err) {
-      console.error("❌ שגיאה בשליחה, שולח בפורמט טקסט ותמונה רגילים:", err);
+      console.error("❌ שגיאה בשליחת התמונה, שולח טקסט בלבד:", err);
 
-      // גיבוי למקרה שהכפתור נחסם - תמונה עם הטקסט והקישור יחד
       await sock.sendMessage(
         jid,
-        {
-          image: { url: imageUrl },
-          caption: `${bodyText}\n\n📲 *קישור להורדה:* ${downloadUrl}`
-        },
+        { text: bodyText },
         { quoted: message }
       );
     }
