@@ -43,13 +43,8 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is missing");
 }
 
-let connectionString = process.env.DATABASE_URL;
-if (!connectionString.includes("sslmode=")) {
-  connectionString += (connectionString.includes("?") ? "&" : "?") + "sslmode=verify-full";
-}
-
 const pool = new Pool({
-  connectionString,
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000,
@@ -74,7 +69,7 @@ async function initDatabase() {
 }
 
 // ========================================
-// PostgreSQL Auth State (Optimized Batch Operations)
+// PostgreSQL Auth State
 // ========================================
 async function usePostgresAuthState() {
   const readData = async (id) => {
@@ -96,10 +91,6 @@ async function usePostgresAuthState() {
     );
   };
 
-  const removeData = async (id) => {
-    await pool.query("DELETE FROM whatsapp_auth WHERE id = $1", [id]);
-  };
-
   let creds = await readData("creds");
   if (!creds) {
     console.log("אין Auth קיים — יוצר התחברות חדשה...");
@@ -112,7 +103,6 @@ async function usePostgresAuthState() {
       if (!ids.length) return {};
       const keysToFetch = ids.map((id) => `key-${type}-${id}`);
 
-      // Batch SELECT in a single query instead of N queries
       const result = await pool.query(
         "SELECT id, data FROM whatsapp_auth WHERE id = ANY($1)",
         [keysToFetch]
@@ -142,7 +132,6 @@ async function usePostgresAuthState() {
     },
 
     set: async (data) => {
-      // Transaction to save/delete multiple keys in batch
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
@@ -294,13 +283,8 @@ async function startWhatsApp() {
       }
     });
 
-    sock.ev.on("messages.upsert", async ({ messages, requestId }) => {
+    sock.ev.on("messages.upsert", async ({ messages }) => {
       try {
-        if (requestId) {
-          console.log("התעלמות מאירוע messages.upsert עם requestId.");
-          return;
-        }
-
         if (!messages || messages.length === 0) return;
 
         for (const message of messages) {
@@ -313,8 +297,6 @@ async function startWhatsApp() {
           }
 
           const remoteJid = message.key?.remoteJid;
-          if (remoteJid !== TARGET_GROUP_JID) continue;
-
           const text =
             message.message?.conversation ||
             message.message?.extendedTextMessage?.text ||
@@ -324,20 +306,28 @@ async function startWhatsApp() {
 
           if (!text) continue;
 
-          const commandText = text.trim();
-          const command = commands.get(commandText);
+          console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          if (!command) {
-            console.log(`אין פקודה עבור: ${commandText}`);
+          if (remoteJid !== TARGET_GROUP_JID) {
+            console.log(`[Ignored] Message JID does not match TARGET_GROUP_JID (${TARGET_GROUP_JID})`);
             continue;
           }
 
-          console.log(`פקודה נמצאה: ${command.trigger}`);
+          const commandText = text.trim();
+          const cleanKey = commandText.startsWith('/') ? commandText.slice(1) : commandText;
+          const command = commands.get(commandText) || commands.get(cleanKey) || commands.get(`/${cleanKey}`);
+
+          if (!command) {
+            console.log(`[No Match] No command matches string: "${commandText}"`);
+            continue;
+          }
+
+          console.log(`[Executing] Trigger: ${command.trigger}`);
           try {
             await command.execute(sock, message);
-            console.log(`הפקודה ${command.trigger} בוצעה בהצלחה ✅`);
+            console.log(`[Success] Command ${command.trigger} executed ✅`);
           } catch (error) {
-            console.error(`שגיאה בהרצת הפקודה ${command.trigger}:`, error);
+            console.error(`[Error] Failed executing command ${command.trigger}:`, error);
           }
         }
       } catch (error) {
