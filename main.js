@@ -489,12 +489,13 @@ async function main() {
 // ========================================
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
-function sendPing() {
-  http.get(`${RENDER_EXTERNAL_URL}/health`, (res) => {
-    console.log(`[Keep-Alive] Ping sent to /health — Status: ${res.statusCode}`);
-  }).on("error", (err) => {
+async function sendPing() {
+  try {
+    const res = await fetch(`${RENDER_EXTERNAL_URL}/health`);
+    console.log(`[Keep-Alive] Ping sent to /health — Status: ${res.status}`);
+  } catch (err) {
     console.error("[Keep-Alive] Ping failed:", err.message);
-  });
+  }
 }
 
 // פינג ראשוני מיד בעליית השרת, ולאחר מכן כל 10 דקות
