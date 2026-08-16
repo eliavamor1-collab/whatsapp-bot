@@ -357,13 +357,20 @@ async function startWhatsApp() {
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          const trimmedText = text.trim();
-          const firstWord = trimmedText.split(/\s+/)[0].toLowerCase();
+          const trimmedText = text.trim().toLowerCase();
 
-          const command = commands.get(firstWord);
+          // 1. ניסיון למצוא התאמה לפי המשפט המלא (למשל: "youtube music" או "יוטיוב מיוזיק")
+          let command = commands.get(trimmedText);
 
+          // 2. אם לא נמצאה התאמה למשפט המלא, בודקים לפי המילה הראשונה
           if (!command) {
-            console.log(`[No Match] No command found for trigger: "${firstWord}"`);
+            const firstWord = trimmedText.split(/\s+/)[0];
+            command = commands.get(firstWord);
+          }
+
+          // 3. אם עדיין לא נמצאה פקודה מתאימה
+          if (!command) {
+            console.log(`[No Match] No command found for trigger: "${trimmedText}"`);
             continue;
           }
 
