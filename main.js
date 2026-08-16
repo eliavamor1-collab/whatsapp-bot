@@ -12,6 +12,21 @@ import pg from "pg";
 import pino from "pino";
 
 // ========================================
+// Error Suppression (העלמת שגיאות מציקות בלוג)
+// ========================================
+process.on("uncaughtException", (err) => {
+  const msg = err?.message || String(err);
+  if (msg.includes("Bad MAC") || msg.includes("Session") || msg.includes("Closing session")) return;
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  const msg = reason?.message || String(reason);
+  if (msg.includes("Bad MAC") || msg.includes("Session") || msg.includes("Closing session")) return;
+  console.error("Unhandled Rejection:", reason);
+});
+
+// ========================================
 // Commands Import
 // ========================================
 import startCommand from "./commands/start.js";
@@ -77,7 +92,6 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is missing in environment variables!");
 }
 
-// תיקון אזהרת ה-SSL של PostgreSQL
 let dbUrl = process.env.DATABASE_URL;
 if (!dbUrl.includes("sslmode=")) {
   dbUrl += (dbUrl.includes("?") ? "&" : "?") + "sslmode=verify-full";
@@ -238,25 +252,24 @@ async function startWhatsApp() {
       console.warn("לא הצלחנו לקבל גרסת WhatsApp Web, משתמש בברירת מחדל:", error?.message || error);
     }
 
-    // רמת הלוג שונתה ל-fatal כדי למנוע הצפת שגיאות פיענוח מיותרות
+    // רמת הלוג מוגדרת ל-fatal בלבד למניעת הודעות שגיאה מיותרות בלוג
     const logger = pino({ level: "fatal" });
 
     const socketConfig = {
-  auth: state,
-  logger,
-  browser: Browsers.ubuntu("Chrome"),
-  printQRInTerminal: false,
-  connectTimeoutMs: 60000,
-  // מונע Timeout בשאילתות אתחול
-  defaultQueryTimeoutMs: undefined, 
-  syncFullHistory: false,
-  markOnlineOnConnect: false,
-  // מונע קריסה/הצפת לוגים בעקבות הודעות ישנות שלא ניתנות לפענוח (Bad MAC)
-  getMessage: async (key) => {
-    return { conversation: '' };
-  },
-  ...(version && { version })
-};
+      auth: state,
+      logger,
+      browser: Browsers.ubuntu("Chrome"),
+      printQRInTerminal: false,
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: undefined,
+      syncFullHistory: false,
+      markOnlineOnConnect: false,
+      shouldIgnoreJid: (jid) => jid?.endsWith("@broadcast"),
+      getMessage: async (key) => {
+        return { conversation: "" };
+      },
+      ...(version && { version })
+    };
 
     sock = makeWASocket(socketConfig);
     console.log("Socket נוצר בהצלחה.");
@@ -310,15 +323,13 @@ async function startWhatsApp() {
 
         if (statusCode === DisconnectReason.loggedOut) {
           currentStatus = "התנתק לצמיתות — נדרשת סריקה מחדש";
-          console.log("החשבון נותק מ-WhatsApp (Logged Out). מוחק מפתחות ישנים...");
-          
-          // אם החשבון נותק לצמיתות, מומלץ לאפס ידנית ב-DB לפני התחברות מחודשת.
-          return; 
+          console.log("החשבון נותק מ-WhatsApp (Logged Out).");
+          return;
         }
 
         if (statusCode === 440 || statusCode === DisconnectReason.connectionReplaced) {
           currentStatus = "קונפליקט חיבורים (קוד 440)";
-          console.error("⚠️ קונפליקט חיבורים: וודא שאין תהליך נוסף שרץ במקביל.");
+          console.error("⚠️ קונפליקט חיבורים: נעצרה התחברות מחודשת כדי למנוע לופים.");
           return;
         }
 
@@ -363,16 +374,13 @@ async function startWhatsApp() {
 
           const trimmedText = text.trim().toLowerCase();
 
-          // 1. ניסיון למצוא התאמה לפי המשפט המלא (למשל: "youtube music" או "יוטיוב מיוזיק")
           let command = commands.get(trimmedText);
 
-          // 2. אם לא נמצאה התאמה למשפט המלא, בודקים לפי המילה הראשונה
           if (!command) {
             const firstWord = trimmedText.split(/\s+/)[0];
             command = commands.get(firstWord);
           }
 
-          // 3. אם עדיין לא נמצאה פקודה מתאימה
           if (!command) {
             console.log(`[No Match] No command found for trigger: "${trimmedText}"`);
             continue;
