@@ -25,7 +25,7 @@ v18.8.0
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://viamaker.en.uptodown.com/android/download`;
+https://liteapks.com/capcut-video-editor.html`;
 
     try {
       if (savedMessage) {
