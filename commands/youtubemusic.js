@@ -7,9 +7,9 @@ export default {
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
-    console.log("🚀 פקודת youtube_music הופעלה!");
+    console.log("🚀 פקודת youtube music הופעלה!");
 
-    const captionText = 
+    const captionText =
 `📱 *שם האפליקציה:*
 *יוטיוב מיוזיק מורפ*
 🔢 *גירסא:*
@@ -31,11 +31,10 @@ https://morphe.software/`;
 
     try {
       if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת youtube_music...");
-        // מעביר את ההודעה השלמה ששמרנו
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת youtube music...");
         await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
       } else {
-        console.log("📸 שולח תמונת youtube_music בפעם הראשונה...");
+        console.log("📸 שולח תמונת youtube music בפעם הראשונה...");
         const sentMsg = await sock.sendMessage(
           jid,
           {
@@ -46,12 +45,12 @@ https://morphe.software/`;
         );
 
         if (sentMsg) {
-          savedMessage = sentMsg; // שומרים את *כל* ההודעה במקום רק את המפתח
-          console.log("✅ הודעת yotube_music הראשונה שנשלחה נשמרה בזיכרון!");
+          savedMessage = sentMsg;
+          console.log("✅ הודעת youtube music הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
     } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת yotube_music:", error);
+      console.error("❌ שגיאה בשליחת הודעת youtube music:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
     }
   }
