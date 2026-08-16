@@ -80,6 +80,7 @@ registerCommand(robloxCommand);
 registerCommand(subwayCommand);
 registerCommand(youtubeCommand);
 registerCommand(youtubemusicCommand);
+registerCommand(capcutCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
