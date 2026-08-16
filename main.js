@@ -242,17 +242,21 @@ async function startWhatsApp() {
     const logger = pino({ level: "fatal" });
 
     const socketConfig = {
-      auth: state,
-      logger,
-      browser: Browsers.ubuntu("Chrome"),
-      printQRInTerminal: false,
-      connectTimeoutMs: 60000,
-      // מונע Timeout בשאילתות אתחול
-      defaultQueryTimeoutMs: undefined, 
-      syncFullHistory: false,
-      markOnlineOnConnect: false,
-      ...(version && { version })
-    };
+  auth: state,
+  logger,
+  browser: Browsers.ubuntu("Chrome"),
+  printQRInTerminal: false,
+  connectTimeoutMs: 60000,
+  // מונע Timeout בשאילתות אתחול
+  defaultQueryTimeoutMs: undefined, 
+  syncFullHistory: false,
+  markOnlineOnConnect: false,
+  // מונע קריסה/הצפת לוגים בעקבות הודעות ישנות שלא ניתנות לפענוח (Bad MAC)
+  getMessage: async (key) => {
+    return { conversation: '' };
+  },
+  ...(version && { version })
+};
 
     sock = makeWASocket(socketConfig);
     console.log("Socket נוצר בהצלחה.");
