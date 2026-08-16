@@ -9,7 +9,7 @@ export default {
 
     console.log("🚀 פקודת roblox הופעלה!");
 
-    const captionText = 
+    const captionText =
 `📱 *שם האפליקציה:*
 *רובלוקס*
 🔢 *גירסא:*
@@ -30,7 +30,6 @@ https://liteapks.com/download/roblox-14564/1`;
     try {
       if (savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Roblox...");
-        // מעביר את ההודעה השלמה ששמרנו
         await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
       } else {
         console.log("📸 שולח תמונת Roblox בפעם הראשונה...");
@@ -44,7 +43,7 @@ https://liteapks.com/download/roblox-14564/1`;
         );
 
         if (sentMsg) {
-          savedMessage = sentMsg; // שומרים את *כל* ההודעה במקום רק את המפתח
+          savedMessage = sentMsg;
           console.log("✅ הודעת Roblox הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
