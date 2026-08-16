@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "roblox",
-  aliases: ["/roblox", "רובלוקס", "/רובלוקס"],
+  aliases: ["רובלוקס"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
