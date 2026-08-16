@@ -9,7 +9,7 @@ export default {
 
     console.log("🚀 פקודת youtube הופעלה!");
 
-    const captionText = 
+    const captionText =
 `📱 *שם האפליקציה:*
 *יוטיוב מורפ*
 🔢 *גירסא:*
@@ -32,7 +32,6 @@ https://morphe.software/`;
     try {
       if (savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת youtube...");
-        // מעביר את ההודעה השלמה ששמרנו
         await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
       } else {
         console.log("📸 שולח תמונת youtube בפעם הראשונה...");
@@ -46,12 +45,12 @@ https://morphe.software/`;
         );
 
         if (sentMsg) {
-          savedMessage = sentMsg; // שומרים את *כל* ההודעה במקום רק את המפתח
-          console.log("✅ הודעת yotube הראשונה שנשלחה נשמרה בזיכרון!");
+          savedMessage = sentMsg;
+          console.log("✅ הודעת youtube הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
     } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת yotube:", error);
+      console.error("❌ שגיאה בשליחת הודעת youtube:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
     }
   }
