@@ -7,11 +7,11 @@ export default {
 
     const jid = message.key.remoteJid;
 
-    const imageUrl =
-      "https://static-images.aptoide.com/_next/image?url=https%3A%2F%2Fcdn.aptoide.com%2Fimgs%2F6%2F9%2F7%2F69777a504b00c4646a330b3c4d468df2_fgraphic.png&w=3840&q=60";
+    // קישור לתמונה יציבה שלא חוסמת בקשות משרתים (Imgur)
+    const imageUrl = "https://i.imgur.com/7bQeX6j.png";
     const downloadUrl = "https://liteapks.com/download/rider-14435/1";
 
-    const text = 
+    const bodyText = 
 `📱 *שם האפליקציה:*
 *Rider*
 
@@ -28,32 +28,36 @@ v3.06.0.05
 משחק פעלולים עתידני וממכר, שבו נוהגים במסלולי ניאון מאתגרים ומנסים לא להתרסק.
 
 ℹ️ *הערות:*
-פשוט להתקין ולשחק
-
-📲 *קישור להורדה:*
-${downloadUrl}`;
+פשוט להתקין ולשחק`;
 
     try {
-      // שליחת תמונה עם טקסט וקישור ישיר
+      // שליחת הודעה עם תמונה וכפתור קישור מודרני
       await sock.sendMessage(
         jid,
         {
           image: { url: imageUrl },
-          caption: text
+          caption: bodyText,
+          footer: "לחץ על הכפתור למטה להורדה",
+          interactiveButtons: [
+            {
+              name: "cta_url",
+              buttonParamsJson: JSON.stringify({
+                display_text: "📥 הורד את המשחק",
+                url: downloadUrl,
+                merchant_url: downloadUrl
+              })
+            }
+          ]
         },
         { quoted: message }
       );
-      console.log("✅ הודעת Rider נשלחה בהצלחה!");
+      console.log("✅ הודעת Rider עם כפתור נשלחה בהצלחה!");
     } catch (err) {
-      console.error("❌ שגיאה בשליחת הודעת Rider עם תמונה:", err);
+      console.error("❌ שגיאה בשליחת הודעה עם כפתור, שולח טקסט בלבד:", err);
 
-      // גיבוי: שליחת טקסט בלבד במקרה של בעיה בטעינת התמונה
-      try {
-        await sock.sendMessage(jid, { text }, { quoted: message });
-        console.log("✅ הודעת Rider (טקסט בלבד) נשלחה בהצלחה!");
-      } catch (fallbackErr) {
-        console.error("❌ שגיאה בשליחת הודעת גיבוי:", fallbackErr);
-      }
+      // גיבוי מלא עם קישור בטקסט במקרה של חוסר תמיכה בלקוח
+      const fallbackText = `${bodyText}\n\n📲 *קישור להורדה:* ${downloadUrl}`;
+      await sock.sendMessage(jid, { text: fallbackText }, { quoted: message });
     }
   }
 };
