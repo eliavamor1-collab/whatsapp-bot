@@ -33,6 +33,7 @@ import robloxCommand from "./commands/roblox.js";
 import subwayCommand from "./commands/subwaysurfers.js";
 import youtubeCommand from "./commands/youtube.js";
 import youtubemusicCommand from "./commands/youtubemusic.js";
+import capcutCommand from "./commands/capcut.js";
 
 const { Pool } = pg;
 
