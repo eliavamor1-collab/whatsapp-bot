@@ -12,44 +12,49 @@ export default {
 
         const captionText = 
 `📱 *שם האפליקציה:*
-Rider
-
+*Rider*
 🔢 *גירסא:*
 v3.06.0.05
-
 📦 *גודל:*
 146.2 MB
-
 💾 *סוג:*
 משחק
-
 🎯 *תוכן:*
 משחק פעלולים עתידני וממכר, שבו נוהגים במסלולי ניאון מאתגרים ומנסים לא להתרסק.
 
 ℹ️ *הערות:*
-פשוט להתקין ולשחק
+פשוט להתקין ולשחק`;
 
-🔗 *קישור להורדה:*
-${downloadUrl}`;
+        // הגדרת הודעה עם כפתור קישור חיצוני
+        const buttonMessage = {
+            image: { url: imageUrl },
+            caption: captionText,
+            footer: "לחץ על הכפתור למטה להורדה ⬇️",
+            templateButtons: [
+                {
+                    index: 1,
+                    urlButton: {
+                        displayText: "📲 להורדת המשחק",
+                        url: downloadUrl
+                    }
+                }
+            ]
+        };
 
         try {
-            // ניסיון שליחה עם תמונה
+            // ניסיון שליחה עם תמונה וכפתור
+            await sock.sendMessage(jid, buttonMessage, { quoted: message });
+            console.log("✅ הודעת Rider עם כפתור נשלחה בהצלחה!");
+        } catch (error) {
+            console.error("❌ שגיאה בשליחת כפתור, שולח בפורמט טקסט רגיל:", error.message);
+            
+            // Fallback: שליחת הודעה רגילה אם המכשיר/השרת חוסם הודעות כפתורים
             await sock.sendMessage(
                 jid,
                 {
                     image: { url: imageUrl },
-                    caption: captionText
+                    caption: `${captionText}\n\n🔗 *קישור להורדה:*\n${downloadUrl}`
                 },
-                { quoted: message }
-            );
-            console.log("✅ הודעת Rider נשלחה בהצלחה!");
-        } catch (error) {
-            console.error("❌ שגיאה בשליחת תמונה, שולח טקסט בלבד:", error.message);
-            
-            // Fallback לשליחת טקסט בלבד במידה והתמונה נחסמה
-            await sock.sendMessage(
-                jid,
-                { text: captionText },
                 { quoted: message }
             );
         }
