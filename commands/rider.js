@@ -1,33 +1,42 @@
-let savedMessageKey = null;
+let savedMessage = null;
 
-export default {
-  trigger: "roblox",
-  aliases: ["/roblox", "רובלוקס", "/רובלוקס"],
+const riderCommand = {
+  trigger: "rider",
+  aliases: ["/rider", "ריידר", "/ריידר"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
-    console.log("🚀 פקודת roblox הופעלה!");
+    console.log("🚀 פקודת rider הופעלה!");
 
     const captionText = 
 `📱 *שם האפליקציה:*
-*רובלוקס*
+*ריידר (Rider)*
 🔢 *גירסא:*
-v2.732.1043
+v2.0.0
 📦 *גודל:*
-180 MB
+100 MB
 💾 *סוג:*
 משחק
 🎯 *תוכן:*
-עולם וירטואלי שבו תוכלו ליצור, לשתף חוויות ולשחק עם מיליוני שחקנים ברחבי העולם.
+משחק אקשן ופעלולים מלהיב עם מכוניות ניאון במסלולים מאתגרים!
 
 ℹ️ *הערות:*
 פשוט להתקין ולשחק
 
 📲 *קישור להורדה:*
-https://liteapks.com/download/roblox-14564/1`;
+https://liteapks.com/download/rider-1`;
 
     try {
+      // אם ההודעה כבר נשלחה בעבר - מעביר אותה במהירות מתוך הזיכרון
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Rider...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+        return;
+      }
+
+      // שליחה ראשונה של תמונה + טקסט
+      console.log("📸 שולח תמונת Rider בפעם הראשונה...");
       const sentMsg = await sock.sendMessage(
         jid,
         {
@@ -38,12 +47,14 @@ https://liteapks.com/download/roblox-14564/1`;
       );
 
       if (sentMsg) {
-        savedMessageKey = sentMsg.key;
-        console.log("✅ תמונה וטקסט של Roblox נשלחו בהצלחה!");
+        savedMessage = sentMsg;
+        console.log("✅ הודעת Rider הראשונה שנשלחה נשמרה בזיכרון!");
       }
     } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת roblox:", error);
+      console.error("❌ שגיאה בשליחת הודעת rider:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
     }
   }
 };
+
+export default riderCommand;
