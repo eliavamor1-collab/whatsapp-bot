@@ -16,6 +16,7 @@ import pino from "pino";
 // ========================================
 import startCommand from "./commands/start.js";
 import riderCommand from "./commands/rider.js";
+import robloxCommand from "./commands/roblox.js";
 
 const { Pool } = pg;
 
@@ -50,6 +51,7 @@ function registerCommand(cmd) {
 
 registerCommand(startCommand);
 registerCommand(riderCommand);
+registerCommand(robloxCommand);
 
 console.log("פקודות נטענו:", [...new Set(commands.keys())].join(", "));
 
