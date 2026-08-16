@@ -1,14 +1,20 @@
 export default {
-    trigger: "/start",
+  trigger: "/start",
 
-    async execute(sock, message) {
+  async execute(sock, message) {
+    const jid = message.key.remoteJid;
 
-        await sock.sendMessage(
-            message.key.remoteJid,
-            {
-                text: "👋 שלום! הבוט עובד ✅"
-            }
-        );
+    console.log("🚀 פקודת /start הופעלה!");
 
+    try {
+      await sock.sendMessage(
+        jid,
+        { text: "👋 שלום! הבוט עובד ✅" },
+        { quoted: message }
+      );
+      console.log("✅ הודעת start נשלחה בהצלחה!");
+    } catch (error) {
+      console.error("❌ שגיאה בשליחת הודעת start:", error);
     }
+  }
 };
