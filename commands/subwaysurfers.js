@@ -9,7 +9,7 @@ export default {
 
     console.log("🚀 פקודת subway הופעלה!");
 
-    const captionText = 
+    const captionText =
 `📱 *שם האפליקציה:*
 *Subway Surfers*
 🔢 *גירסא:*
@@ -30,7 +30,6 @@ https://liteapks.com/download/subway-surfers-14695/1`;
     try {
       if (savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Subway Surfers...");
-        // מעביר את ההודעה השלמה ששמרנו
         await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
       } else {
         console.log("📸 שולח תמונת Subway Surfers בפעם הראשונה...");
@@ -44,7 +43,7 @@ https://liteapks.com/download/subway-surfers-14695/1`;
         );
 
         if (sentMsg) {
-          savedMessage = sentMsg; // שומרים את כל ההודעה בזיכרון
+          savedMessage = sentMsg;
           console.log("✅ הודעת Subway Surfers הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
