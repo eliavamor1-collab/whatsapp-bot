@@ -1,15 +1,15 @@
 let savedMessage = null;
 
-const riderCommand = {
+export default {
   trigger: "rider",
   aliases: ["ריידר"],
-  
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
     console.log("🚀 פקודת rider הופעלה!");
 
-    const captionText = 
+    const captionText =
 `📱 *שם האפליקציה:*
 *ריידר (Rider)*
 🔢 *גירסא:*
@@ -31,22 +31,21 @@ https://liteapks.com/download/rider-14435/1`;
       if (savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Rider...");
         await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-        return;
-      }
+      } else {
+        console.log("📸 שולח תמונת Rider בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/06/rider-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
 
-      console.log("📸 שולח תמונת Rider בפעם הראשונה...");
-      const sentMsg = await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/06/rider-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
-
-      if (sentMsg) {
-        savedMessage = sentMsg;
-        console.log("✅ הודעת Rider הראשונה שנשלחה נשמרה בזיכרון!");
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Rider הראשונה שנשלחה נשמרה בזיכרון!");
+        }
       }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת rider:", error);
@@ -54,5 +53,3 @@ https://liteapks.com/download/rider-14435/1`;
     }
   }
 };
-
-export default riderCommand;
