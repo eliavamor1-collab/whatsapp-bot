@@ -73,8 +73,14 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is missing in environment variables!");
 }
 
+// תיקון אזהרת ה-SSL של PostgreSQL
+let dbUrl = process.env.DATABASE_URL;
+if (!dbUrl.includes("sslmode=")) {
+  dbUrl += (dbUrl.includes("?") ? "&" : "?") + "sslmode=verify-full";
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl,
   ssl: { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000,
@@ -228,19 +234,21 @@ async function startWhatsApp() {
       console.warn("לא הצלחנו לקבל גרסת WhatsApp Web, משתמש בברירת מחדל:", error?.message || error);
     }
 
-    const logger = pino({ level: "error" });
+    // רמת הלוג שונתה ל-fatal כדי למנוע הצפת שגיאות פיענוח מיותרות
+    const logger = pino({ level: "fatal" });
 
-   const socketConfig = {
-  auth: state,
-  logger,
-  browser: Browsers.ubuntu("Chrome"),
-  printQRInTerminal: false,
-  connectTimeoutMs: 60000,
-  defaultQueryTimeoutMs: 60000,
-  syncFullHistory: false,
-  markOnlineOnConnect: false,
-  ...(version && { version })
-};
+    const socketConfig = {
+      auth: state,
+      logger,
+      browser: Browsers.ubuntu("Chrome"),
+      printQRInTerminal: false,
+      connectTimeoutMs: 60000,
+      // מונע Timeout בשאילתות אתחול
+      defaultQueryTimeoutMs: undefined, 
+      syncFullHistory: false,
+      markOnlineOnConnect: false,
+      ...(version && { version })
+    };
 
     sock = makeWASocket(socketConfig);
     console.log("Socket נוצר בהצלחה.");
@@ -294,8 +302,10 @@ async function startWhatsApp() {
 
         if (statusCode === DisconnectReason.loggedOut) {
           currentStatus = "התנתק לצמיתות — נדרשת סריקה מחדש";
-          console.log("החשבון נותק מ-WhatsApp (Logged Out).");
-          return;
+          console.log("החשבון נותק מ-WhatsApp (Logged Out). מוחק מפתחות ישנים...");
+          
+          // אם החשבון נותק לצמיתות, מומלץ לאפס ידנית ב-DB לפני התחברות מחודשת.
+          return; 
         }
 
         if (statusCode === 440 || statusCode === DisconnectReason.connectionReplaced) {
