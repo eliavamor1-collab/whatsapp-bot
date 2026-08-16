@@ -6,8 +6,8 @@
     "start": "node main.js"
   },
   "dependencies": {
-  "@whiskeysockets/baileys": "latest",
-  "qrcode": "latest",
-  "pg": "latest"
+    "@whiskeysockets/baileys": "^6.7.18",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4"
   }
 }
