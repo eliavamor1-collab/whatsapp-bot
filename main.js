@@ -27,14 +27,33 @@ const TARGET_GROUP_NAME = "פרוץ בווצאפ";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
 
 // ========================================
-// Commands Map
+// Commands Map (תמיכה מובנית בטריגרים וכינויים)
 // ========================================
-const commands = new Map([
-  [startCommand.trigger, startCommand],
-  [riderCommand.trigger, riderCommand]
-]);
+const commands = new Map();
 
-console.log("פקודות נטענו:", [...commands.keys()].join(", "));
+function registerCommand(cmd) {
+  if (!cmd || !cmd.trigger) return;
+  
+  // רישום הטריגר הבסיסי (למשל "rider")
+  commands.set(cmd.trigger, cmd);
+  
+  // רישום הצירוף עם סלאש (למשל "/rider")
+  if (!cmd.trigger.startsWith("/")) {
+    commands.set(`/${cmd.trigger}`, cmd);
+  } else {
+    commands.set(cmd.trigger.slice(1), cmd);
+  }
+
+  // רישום אליאסים נוספים במידה וקיימים
+  if (Array.isArray(cmd.aliases)) {
+    cmd.aliases.forEach((alias) => commands.set(alias, cmd));
+  }
+}
+
+registerCommand(startCommand);
+registerCommand(riderCommand);
+
+console.log("פקודות נטענו:", [...new Set(commands.keys())].join(", "));
 
 // ========================================
 // Neon PostgreSQL Setup
@@ -204,7 +223,6 @@ async function startWhatsApp() {
   }
   starting = true;
 
-  // הריסת Socket ישן לפני חיבור חדש למניעת כפילויות (קוד 440)
   cleanupSocket();
 
   try {
@@ -308,13 +326,19 @@ async function startWhatsApp() {
         for (const message of messages) {
           if (!message?.message) continue;
 
+          // 1. סינון לפי JID הקבוצה (התעלמות שקטה מהודעות חיצוניות)
+          const remoteJid = message.key?.remoteJid;
+          if (remoteJid !== TARGET_GROUP_JID) {
+            continue;
+          }
+
+          // 2. התעלמות מהודעות שהבוט מניב בעצמו
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
             botSentMessageIds.delete(messageId);
             continue;
           }
 
-          const remoteJid = message.key?.remoteJid;
           const msgContent = message.message;
           const text =
             msgContent?.conversation ||
@@ -327,14 +351,8 @@ async function startWhatsApp() {
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          if (remoteJid !== TARGET_GROUP_JID) {
-            console.log(`[Ignored] Message JID does not match TARGET_GROUP_JID (${TARGET_GROUP_JID})`);
-            continue;
-          }
-
           const commandText = text.trim();
-          const cleanKey = commandText.startsWith('/') ? commandText.slice(1) : commandText;
-          const command = commands.get(commandText) || commands.get(cleanKey) || commands.get(`/${cleanKey}`);
+          const command = commands.get(commandText);
 
           if (!command) {
             console.log(`[No Match] No command matches string: "${commandText}"`);
@@ -465,17 +483,22 @@ async function main() {
     console.error("שגיאה בהפעלת המערכת:", error);
   }
 }
+
 // ========================================
 // Keep Alive (Self-Ping)
 // ========================================
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
-setInterval(() => {
+function sendPing() {
   http.get(`${RENDER_EXTERNAL_URL}/health`, (res) => {
     console.log(`[Keep-Alive] Ping sent to /health — Status: ${res.statusCode}`);
   }).on("error", (err) => {
     console.error("[Keep-Alive] Ping failed:", err.message);
   });
-}, 10 * 60 * 1000); // שולח בקשה כל 10 דקות
+}
+
+// פינג ראשוני מיד בעליית השרת, ולאחר מכן כל 10 דקות
+sendPing();
+setInterval(sendPing, 10 * 60 * 1000);
 
 main();
