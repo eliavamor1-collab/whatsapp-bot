@@ -11,9 +11,6 @@ import QRCode from "qrcode";
 import pg from "pg";
 import pino from "pino";
 
-// ========================================
-// Error Suppression (העלמת שגיאות מציקות בלוג)
-// ========================================
 process.on("uncaughtException", (err) => {
   const msg = err?.message || String(err);
   if (msg.includes("Bad MAC") || msg.includes("Session") || msg.includes("Closing session")) return;
