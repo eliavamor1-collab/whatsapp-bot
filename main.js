@@ -27,7 +27,7 @@ const TARGET_GROUP_NAME = "פרוץ בווצאפ";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
 
 // ========================================
-// Commands Map (תמיכה מובנית בטריגרים, כינויים ו-Case-Insensitive)
+// Commands Map
 // ========================================
 const commands = new Map();
 
@@ -35,18 +35,14 @@ function registerCommand(cmd) {
   if (!cmd || !cmd.trigger) return;
 
   const mainTrigger = cmd.trigger.toLowerCase();
-
-  // רישום הטריגר הבסיסי (למשל "rider")
   commands.set(mainTrigger, cmd);
 
-  // רישום הצירוף עם סלאש (למשל "/rider")
   if (!mainTrigger.startsWith("/")) {
     commands.set(`/${mainTrigger}`, cmd);
   } else {
     commands.set(mainTrigger.slice(1), cmd);
   }
 
-  // רישום אליאסים נוספים במידה וקיימים
   if (Array.isArray(cmd.aliases)) {
     cmd.aliases.forEach((alias) => commands.set(alias.toLowerCase(), cmd));
   }
@@ -76,9 +72,6 @@ pool.on("error", (error) => {
   console.error("PostgreSQL pool error:", error);
 });
 
-// ========================================
-// Database initialization
-// ========================================
 async function initDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS whatsapp_auth (
@@ -208,9 +201,7 @@ function cleanupSocket() {
       sock.ev.removeAllListeners();
       sock.ws?.close();
       sock.end(undefined);
-    } catch (e) {
-      // להתעלם משגיאות לסגירה נקייה
-    }
+    } catch (e) {}
     sock = null;
   }
 }
@@ -242,9 +233,12 @@ async function startWhatsApp() {
       version = undefined;
     }
 
+    // הגדרת Pino Logger ברמת Error בלבד כדי למנוע הצפת הלוג בשגיאות פיענוח
+    const logger = pino({ level: "error" });
+
     const socketConfig = {
       auth: state,
-      logger: pino({ level: "silent" }),
+      logger,
       browser: Browsers.ubuntu("Chrome"),
       printQRInTerminal: false,
       connectTimeoutMs: 60000,
@@ -310,6 +304,13 @@ async function startWhatsApp() {
           return;
         }
 
+        // טיפול בקוד 440 (סשן נדרס על ידי התחברות נוספת)
+        if (statusCode === 440 || statusCode === DisconnectReason.connectionReplaced) {
+          currentStatus = "התחברות נוספת פתוחה בשרת/מחשב אחר (קוד 440)";
+          console.error("⚠️ קונפליקט חיבורים (440): יש לוודא שאין Instance נוסף שרץ במקביל.");
+          return;
+        }
+
         if (reconnectTimer) clearTimeout(reconnectTimer);
         const delay = statusCode === DisconnectReason.restartRequired ? 1000 : 5000;
         console.log(`מנסה להתחבר מחדש בעוד ${delay / 1000} שניות...`);
@@ -328,13 +329,9 @@ async function startWhatsApp() {
         for (const message of messages) {
           if (!message?.message) continue;
 
-          // 1. סינון לפי JID הקבוצה
           const remoteJid = message.key?.remoteJid;
-          if (remoteJid !== TARGET_GROUP_JID) {
-            continue;
-          }
+          if (remoteJid !== TARGET_GROUP_JID) continue;
 
-          // 2. התעלמות מהודעות שהבוט מניב בעצמו
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
             botSentMessageIds.delete(messageId);
@@ -353,7 +350,6 @@ async function startWhatsApp() {
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
-          // המרת הקלט לאותיות קטנות לטובת Case-Insensitive Matching
           const commandText = text.trim().toLowerCase();
           const command = commands.get(commandText);
 
@@ -501,7 +497,6 @@ async function sendPing() {
   }
 }
 
-// פינג ראשוני מיד בעליית השרת, ולאחר מכן כל 10 דקות
 sendPing();
 setInterval(sendPing, 10 * 60 * 1000);
 
