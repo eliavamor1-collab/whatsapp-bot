@@ -11,6 +11,7 @@ import makeWASocket, {
 
 import QRCode from "qrcode";
 import pg from "pg";
+import pino from 'pino';
 
 // ========================================
 // Commands
@@ -18,14 +19,6 @@ import pg from "pg";
 
 import startCommand from "./commands/start.js";
 import riderCommand from "./commands/rider.js";
-
-import pino from 'pino';
-
-// הגדרת pino לרמת silent מבטלת את הודעות ההצפנה הפנימיות
-const sock = makeWASocket({
-    logger: pino({ level: 'silent' }), 
-    // ...שאר ההגדרות שלך
-});
 
 const { Pool } = pg;
 
@@ -420,6 +413,8 @@ async function startWhatsApp() {
         const socketConfig = {
 
             auth: state,
+
+            logger: pino({ level: 'silent' }),
 
             browser:
                 Browsers.ubuntu(
