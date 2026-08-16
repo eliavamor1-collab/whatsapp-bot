@@ -233,7 +233,6 @@ async function startWhatsApp() {
       version = undefined;
     }
 
-    // הגדרת Pino Logger ברמת Error בלבד כדי למנוע הצפת הלוג בשגיאות פיענוח
     const logger = pino({ level: "error" });
 
     const socketConfig = {
@@ -304,7 +303,6 @@ async function startWhatsApp() {
           return;
         }
 
-        // טיפול בקוד 440 (סשן נדרס על ידי התחברות נוספת)
         if (statusCode === 440 || statusCode === DisconnectReason.connectionReplaced) {
           currentStatus = "התחברות נוספת פתוחה בשרת/מחשב אחר (קוד 440)";
           console.error("⚠️ קונפליקט חיבורים (440): יש לוודא שאין Instance נוסף שרץ במקביל.");
