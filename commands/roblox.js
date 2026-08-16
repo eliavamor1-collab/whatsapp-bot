@@ -1,4 +1,4 @@
-let savedMessageKey = null;
+let savedMessage = null;
 
 export default {
   trigger: "roblox",
@@ -12,12 +12,16 @@ export default {
     const captionText = 
 `📱 *שם האפליקציה:*
 *רובלוקס*
+
 🔢 *גירסא:*
 v2.732.1043
+
 📦 *גודל:*
 180 MB
+
 💾 *סוג:*
 משחק
+
 🎯 *תוכן:*
 עולם וירטואלי שבו תוכלו ליצור, לשתף חוויות ולשחק עם מיליוני שחקנים ברחבי העולם.
 
@@ -28,16 +32,10 @@ v2.732.1043
 https://liteapks.com/download/roblox-14564/1`;
 
     try {
-      if (savedMessageKey) {
+      if (savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Roblox...");
-        await sock.sendMessage(
-          jid,
-          {
-            forward: { key: savedMessageKey },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+        // מעביר את ההודעה השלמה ששמרנו
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
       } else {
         console.log("📸 שולח תמונת Roblox בפעם הראשונה...");
         const sentMsg = await sock.sendMessage(
@@ -50,13 +48,12 @@ https://liteapks.com/download/roblox-14564/1`;
         );
 
         if (sentMsg) {
-          savedMessageKey = sentMsg.key;
+          savedMessage = sentMsg; // שומרים את *כל* ההודעה במקום רק את המפתח
           console.log("✅ הודעת Roblox הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת roblox:", error);
-      // גיבוי - שליחת הטקסט בלבד במידה והורדת/שליחת התמונה נכשלה
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
     }
   }
