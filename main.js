@@ -19,6 +19,8 @@ import listCommand from "./commands/list.js";
 import riderCommand from "./commands/rider.js";
 import robloxCommand from "./commands/roblox.js";
 import subwayCommand from "./commands/subwaysurfers.js";
+import youtubeCommand from "./commands/youtube.js";
+import youtubemusicCommand from "./commands/youtubemusic.js";
 
 const { Pool } = pg;
 
@@ -63,6 +65,8 @@ registerCommand(listCommand);
 registerCommand(riderCommand);
 registerCommand(robloxCommand);
 registerCommand(subwayCommand);
+registerCommand(youtubeCommand);
+registerCommand(youtubemusicCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
