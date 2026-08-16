@@ -66,9 +66,14 @@ if (!process.env.DATABASE_URL) {
     );
 }
 
+// התאמת מחרוזת החיבור/הגדרות ה-SSL למניעת אזהרת libpq
+let connectionString = process.env.DATABASE_URL;
+if (!connectionString.includes("sslmode=")) {
+    connectionString += (connectionString.includes("?") ? "&" : "?") + "sslmode=verify-full";
+}
+
 const pool = new Pool({
-    connectionString:
-        process.env.DATABASE_URL,
+    connectionString,
 
     ssl: {
         rejectUnauthorized: false
@@ -416,8 +421,9 @@ async function startWhatsApp() {
             printQRInTerminal:
                 false,
 
-            shouldSyncHistoryMessage:
-                () => false
+            // הגדלת זמני המתנה למניעת Pre-key upload timeout
+            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: 60000
         };
 
         if (version) {
