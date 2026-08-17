@@ -38,7 +38,7 @@ https://morphe.software/`;
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://1000logos.net/wp-content/uploads/2017/05/Youtube-Logo-500x281.png" },
+            image: { url: "https://images.icon-icons.com/1488/PNG/512/5295-youtube-i_102568.png" },
             caption: captionText
           },
           { quoted: message }
