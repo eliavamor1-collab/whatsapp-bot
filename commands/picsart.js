@@ -35,7 +35,7 @@ https://liteapks.com/download/picsart-studio-136/1
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/picsart-photo-studio-150x150.png" },
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/picsart-photo-video-editor-150x150.png" },
             caption: captionText
           },
           { quoted: message }
