@@ -23,8 +23,10 @@ export default {
 https://www.youtube.com/watch?v=yMbi9G861Ys&t=4s
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב מיוזיק הרגיל
 
-📲 *קישור להורדה:*
-https://morphe.software/`;
+━━━━━━━━━━━━━━━
+⬇️ *לחץ להורדה ישירה* ⬇️
+https://morphe.software/
+━━━━━━━━━━━━━━━`;
 
     try {
       if (savedMessage) {
