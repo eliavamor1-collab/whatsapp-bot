@@ -46,6 +46,17 @@ import youtuberevancedCommand from "./commands/youtuberevanced.js";
 import amazonprimeCommand from "./commands/amazonprime.js";
 import picsartCommand from "./commands/picsart.js";
 import alightmotionCommand from "./commands/alightmotion.js";
+import youtubevancedCommand from "./commands/youtubevanced.js";
+import lightroomCommand from "./commands/lightroom.js";
+import snaptubeCommand from "./commands/snaptube.js";
+import disneyCommand from "./commands/disney.js";
+import duolingoCommand from "./commands/duolingo.js";
+import telegramCommand from "./commands/telegram.js";
+import reminiCommand from "./commands/remini.js";
+import inshotCommand from "./commands/inshot.js";
+import netflixCommand from "./commands/netflix.js";
+import mxplayerCommand from "./commands/mxplayer.js";
+import flstudioCommand from "./commands/flstudio.js";
 
 const { Pool } = pg;
 
