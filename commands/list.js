@@ -63,7 +63,9 @@ export default {
 26. *\`ריידר\`* — כתוב:
 *ריידר* או *rider*
 27. *\`רובלוקס\`* — כתוב:
-*רובלוקס* או *roblox*`;
+*רובלוקס* או *roblox*
+28. *\`ריטוש תמונות AI\`* — כתוב:
+*ריטוש* או *pic retouch*`;
 
     try {
       await sock.sendMessage(
