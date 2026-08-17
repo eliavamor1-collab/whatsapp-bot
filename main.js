@@ -36,6 +36,14 @@ import youtubemusicCommand from "./commands/youtubemusic.js";
 import capcutCommand from "./commands/capcut.js";
 import truecallerCommand from "./commands/truecaller.js";
 import spotifyCommand from "./commands/spotify.js";
+import tiktokCommand from "./commands/tiktok.js";
+import instagramCommand from "./commands/instagram.js";
+import twitterCommand from "./commands/twitter.js";
+import nowhatsappCommand from "./commands/nowhatsapp.js";
+import youtuberevancedCommand from "./commands/youtuberevanced.js";
+import amazonprimeCommand from "./commands/amazonprime.js";
+import picsartCommand from "./commands/picsart.js";
+import alightmotionCommand from "./commands/alightmotion.js";
 
 const { Pool } = pg;
 
