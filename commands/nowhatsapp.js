@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/nowhatsapp-1.html`;
+https://liteapks.com/download/nowhatsapp-18045/1`;
 
     try {
       if (savedMessage) {
