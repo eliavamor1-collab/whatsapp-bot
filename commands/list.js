@@ -1,6 +1,6 @@
 export default {
   trigger: "list",
-  aliases: ["רשימה"],
+  aliases: ["רשימה", "תפריט"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
