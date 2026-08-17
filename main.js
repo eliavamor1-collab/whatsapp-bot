@@ -126,6 +126,7 @@ registerCommand(inshotCommand);
 registerCommand(netflixCommand);
 registerCommand(mxplayerCommand);
 registerCommand(flstudioCommand);
+registerCommand(picretouchCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
