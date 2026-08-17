@@ -23,7 +23,7 @@ export default {
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
-https://liteapks.com/download/instagram-267/1
+https://drive.google.com/file/d/1j50X-jUqXT_65fC2WJWcnEYig0nq_Tbx/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
