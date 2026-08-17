@@ -24,6 +24,12 @@ export default {
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
 https://liteapks.com/download/truecaller-app-89/1
+
+📲 *קישור הורדה נוסף 1:*
+https://fs20.uploadrar.com:183/d/mxsuai2yappay775m2h2vk67zf6zligmo4uuy36phrwcrejujp4wwe5nbef6hzjiz7sxvak5/Truecaller%20Spam%20Call%20Blocker%20v26.23.6%20_%20_%20Apk%20%7B_sHash%7D.apk
+
+📲 *קישור הורדה נוסף 2:*
+https://drive.google.com/file/d/1HifYPtci8cNWIh6AaTzluOOMPA0z9FKY/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
