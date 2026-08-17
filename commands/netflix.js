@@ -24,6 +24,9 @@ export default {
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
 https://liteapks.com/download/netflix-72/1
+
+📲 *להורדת התוסף:*
+https://liteapks.com/download/netflix-72/2
 ━━━━━━━━━━━━━━━`;
 
     try {
