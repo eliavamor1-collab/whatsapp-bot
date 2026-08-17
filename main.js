@@ -114,6 +114,17 @@ registerCommand(youtuberevancedCommand);
 registerCommand(amazonprimeCommand);
 registerCommand(picsartCommand);
 registerCommand(alightmotionCommand);
+registerCommand(youtubevancedCommand);
+registerCommand(lightroomCommand);
+registerCommand(snaptubeCommand);
+registerCommand(disneyCommand);
+registerCommand(duolingoCommand);
+registerCommand(telegramCommand);
+registerCommand(reminiCommand);
+registerCommand(inshotCommand);
+registerCommand(netflixCommand);
+registerCommand(mxplayerCommand);
+registerCommand(flstudioCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
