@@ -93,6 +93,14 @@ registerCommand(youtubemusicCommand);
 registerCommand(capcutCommand);
 registerCommand(truecallerCommand);
 registerCommand(spotifyCommand);
+registerCommand(tiktokCommand);
+registerCommand(instagramCommand);
+registerCommand(twitterCommand);
+registerCommand(nowhatsappCommand);
+registerCommand(youtuberevancedCommand);
+registerCommand(amazonprimeCommand);
+registerCommand(picsartCommand);
+registerCommand(alightmotionCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
