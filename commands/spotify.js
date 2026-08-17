@@ -23,7 +23,7 @@ export default {
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
-https://vexfile.com/d_bucket/G4Ciyoru8A
+https://drive.google.com/file/d/1NJdu2nIN9GDHKhltvJ08kLXveNHMNVkm/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
