@@ -21,8 +21,10 @@ export default {
 ℹ️ *הערות:*
 פשוט להתקין ולהשתמש
 
-📲 *קישור להורדה:*
-https://liteapks.com/download/twitter-78804/1`;
+━━━━━━━━━━━━━━━
+⬇️ *לחץ להורדה ישירה* ⬇️
+https://liteapks.com/download/twitter-78804/1
+━━━━━━━━━━━━━━━`;
 
     try {
       if (savedMessage) {
