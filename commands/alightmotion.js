@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/alight-motion.html`;
+https://liteapks.com/download/alight-motion-175/1`;
 
     try {
       if (savedMessage) {
