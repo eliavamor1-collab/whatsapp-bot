@@ -21,8 +21,10 @@ export default {
 ℹ️ *הערות:*
 פשוט להתקין ולשחק
 
-📲 *קישור להורדה:*
-https://liteapks.com/download/rider-14435/1`;
+━━━━━━━━━━━━━━━
+⬇️ *לחץ להורדה ישירה* ⬇️
+https://liteapks.com/download/rider-14435/1
+━━━━━━━━━━━━━━━`;
 
     try {
       if (savedMessage) {
