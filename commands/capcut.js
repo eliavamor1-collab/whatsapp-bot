@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "capcut",
-  aliases: ["קאפקאט", "cap cut"],
+  aliases: ["קאפקאט", "cap cut", "קאפ קאט"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
