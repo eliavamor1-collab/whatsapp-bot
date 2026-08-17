@@ -420,6 +420,12 @@ async function startWhatsApp() {
 
           const trimmedText = text.trim().toLowerCase();
 
+          // בדיקת קללות — לפני כל פקודה
+          if (containsCurse(text) && !message.key?.fromMe) {
+            await handleCurse(sock, message);
+            continue;
+          }
+
           let command = commands.get(trimmedText);
 
           if (!command) {
