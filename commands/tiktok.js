@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/tiktok-2.html`;
+https://liteapks.com/download/tiktok-81/1`;
 
     try {
       if (savedMessage) {

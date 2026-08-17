@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/amazon-prime-video.html`;
+https://liteapks.com/download/amazon-prime-video-285/1`;
 
     try {
       if (savedMessage) {
