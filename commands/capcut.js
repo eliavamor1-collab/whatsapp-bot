@@ -36,7 +36,7 @@ https://liteapks.com/capcut-video-editor.html`;
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/99/40/59/994059df-fb25-26e3-db8d-2b9e29db9f6b/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/150x150bb.jpg" },
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/capcut-video-editor-150x150.png" },
             caption: captionText
           },
           { quoted: message }
