@@ -34,6 +34,8 @@ import subwayCommand from "./commands/subwaysurfers.js";
 import youtubeCommand from "./commands/youtube.js";
 import youtubemusicCommand from "./commands/youtubemusic.js";
 import capcutCommand from "./commands/capcut.js";
+import truecallerCommand from "./commands/truecaller.js";
+import spotifyCommand from "./commands/spotify.js";
 
 const { Pool } = pg;
 
