@@ -5,7 +5,9 @@ import makeWASocket, {
   Browsers,
   initAuthCreds,
   BufferJSON,
-  proto
+  proto,
+  generateWAMessageFromContent,
+  isJidGroup
 } from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 import pg from "pg";
