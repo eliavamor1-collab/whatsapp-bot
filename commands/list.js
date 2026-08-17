@@ -18,6 +18,14 @@ export default {
 6. *CapCut* — לפקודה כתוב: *קאפקאט* או *capcut*
 7. *Truecaller Gold* — לפקודה כתוב: *טרוקולר* או *truecaller*
 8. *Spotify Music* — לפקודה כתוב: *ספוטיפי* או *spotify*
+9. *TikTok* — לפקודה כתוב: *טיקטוק* או *tiktok*
+10. *Instagram* — לפקודה כתוב: *אינסטגרם* או *instagram*
+11. *X (Twitter)* — לפקודה כתוב: *טוויטר* או *twitter*
+12. *NOWhatsApp* — לפקודה כתוב: *נוווצאפ* או *nowhatsapp*
+13. *YouTube ReVanced* — לפקודה כתוב: *ריוונסד* או *youtube revanced*
+14. *Amazon Prime Video* — לפקודה כתוב: *אמזון פריים* או *amazon prime*
+15. *Picsart Gold* — לפקודה כתוב: *פיקסארט* או *picsart*
+16. *Alight Motion* — לפקודה כתוב: *אלייט מושן* או *alight motion*
 
 💬 *לפרטים נוספים ופקודות נוספות תכתבו את שם המשחק.*`;
 
