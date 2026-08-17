@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/instagram.html`;
+https://liteapks.com/download/instagram-267/1`;
 
     try {
       if (savedMessage) {
