@@ -1,5 +1,3 @@
-import { proto, generateWAMessageFromContent, isJidGroup } from "@whiskeysockets/baileys";
-
 let savedMessage = null;
 
 const PRIVACY_MODE_TS_OFFSET = 77980457;
@@ -38,9 +36,10 @@ export default {
   trigger: "rider",
   aliases: ["ריידר"],
 
-  async execute(sock, message) {
+  async execute(sock, message, helpers) {
     const jid = message.key.remoteJid;
     const userJid = sock.user?.id;
+    const { proto, generateWAMessageFromContent, isJidGroup } = helpers;
 
     console.log("🚀 פקודת rider הופעלה!");
 
@@ -105,7 +104,6 @@ export default {
       console.log("✅ הודעת Rider עם כפתור נשלחה בהצלחה!");
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת rider:", error);
-      // fallback להודעה רגילה
       await sock.sendMessage(
         jid,
         {
