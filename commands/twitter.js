@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/twitter.html`;
+https://liteapks.com/download/twitter-78804/1`;
 
     try {
       if (savedMessage) {
