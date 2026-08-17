@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "remini",
-  aliases: ["רמיני", "ai retouch", "ai retuch", "שיפור תמונות"],
+  aliases: ["רמיני"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
