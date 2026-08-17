@@ -23,7 +23,7 @@ export default {
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
-https://liteapks.com/download/spotify-98/1
+https://vexfile.com/download/9Qwh4FVXJc/8efa9
 ━━━━━━━━━━━━━━━`;
 
     try {
