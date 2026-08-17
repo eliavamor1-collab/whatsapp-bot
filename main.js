@@ -57,6 +57,7 @@ import inshotCommand from "./commands/inshot.js";
 import netflixCommand from "./commands/netflix.js";
 import mxplayerCommand from "./commands/mxplayer.js";
 import flstudioCommand from "./commands/flstudio.js";
+import picretouchCommand from "./commands/picretouch.js";
 
 const { Pool } = pg;
 
