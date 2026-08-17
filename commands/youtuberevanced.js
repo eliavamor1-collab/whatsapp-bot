@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/youtube-revanced-2.html`;
+https://liteapks.com/download/youtube-revanced-71686/1`;
 
     try {
       if (savedMessage) {
