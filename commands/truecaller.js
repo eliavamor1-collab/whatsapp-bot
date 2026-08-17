@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/truecaller-app.html`;
+https://liteapks.com/download/truecaller-app-89/1`;
 
     try {
       if (savedMessage) {
