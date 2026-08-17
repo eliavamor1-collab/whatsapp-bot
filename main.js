@@ -83,6 +83,8 @@ registerCommand(subwayCommand);
 registerCommand(youtubeCommand);
 registerCommand(youtubemusicCommand);
 registerCommand(capcutCommand);
+registerCommand(truecallerCommand);
+registerCommand(spotifyCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
