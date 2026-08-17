@@ -22,7 +22,7 @@ export default {
 פשוט להתקין ולהשתמש
 
 📲 *קישור להורדה:*
-https://liteapks.com/picsart-studio.html`;
+https://liteapks.com/download/picsart-studio-136/1`;
 
     try {
       if (savedMessage) {
