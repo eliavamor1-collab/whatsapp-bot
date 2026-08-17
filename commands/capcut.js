@@ -21,8 +21,10 @@ export default {
 ℹ️ *הערות:*
 פשוט להתקין ולהשתמש
 
-📲 *קישור להורדה:*
-https://liteapks.com/download/capcut-video-editor-311/1`;
+━━━━━━━━━━━━━━━
+⬇️ *לחץ להורדה ישירה* ⬇️
+https://liteapks.com/download/capcut-video-editor-311/1
+━━━━━━━━━━━━━━━`;
 
     try {
       if (savedMessage) {
