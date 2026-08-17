@@ -36,7 +36,7 @@ https://liteapks.com/twitter.html`;
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://liteapks.com/wp-content/uploads/2023/08/x-twitter-150x150.png" },
+            image: { url: "https://liteapks.com/wp-content/uploads/2024/03/twitter-150x150.webp" },
             caption: captionText
           },
           { quoted: message }
