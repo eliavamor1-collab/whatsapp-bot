@@ -20,8 +20,11 @@ export default {
 
 ℹ️ *הערות:*
 עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
-https://www.youtube.com/watch?v=yMbi9G861Ys&t=4s
+https://drive.google.com/file/d/19Fr5FNOihNm2AMf3X3vaNY75xkSChZU-/view?usp=sharing
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב הרגיל
+
+📲 *הגדרות מומלצות:*
+https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
