@@ -131,6 +131,7 @@ registerCommand(mxplayerCommand);
 registerCommand(flstudioCommand);
 registerCommand(picretouchCommand);
 registerCommand(sportCommand);
+registerCommand(animefyCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
