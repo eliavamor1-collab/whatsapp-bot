@@ -1,5 +1,3 @@
-import { sendSuspended } from "./suspended.js";
-
 let savedMessage = null;
 
 export default {
@@ -10,9 +8,6 @@ export default {
     const jid = message.key.remoteJid;
 
     console.log("🚀 פקודת youtube הופעלה!");
-
-    // השעייה זמנית
-    return await sendSuspended(sock, message);
 
     const captionText =
 `📱 *שם האפליקציה:*
@@ -25,12 +20,15 @@ export default {
 
 ℹ️ *הערות:*
 עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
-https://drive.google.com/file/d/19Fr5FNOihNm2AMf3X3vaNY75xkSChZU-/view?usp=sharing
+https://youtube.com/shorts/y3WKhi2EfOU?si=TJVx-UNczW0RhuvJ
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב הרגיל
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדת Morphe* ⬇️
 https://morphe.software/
+
+📦 *לחץ להורדת Micro G* 📦
+https://drive.google.com/file/d/1G-sWLiTa5eIoGwxVsWH4sDjZWEgnbRUm/view?usp=sharing
 
 ⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️
 https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
