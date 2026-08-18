@@ -1,8 +1,15 @@
+import { sendSuspended } from "./suspended.js";
+
 let savedMessage = null;
 
 export default {
   trigger: "youtube",
   aliases: ["יוטיוב"],
+
+  async execute(sock, message) {
+    await sendSuspended(sock, message);
+  }
+};
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
