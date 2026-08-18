@@ -24,7 +24,7 @@ https://drive.google.com/file/d/19Fr5FNOihNm2AMf3X3vaNY75xkSChZU-/view?usp=shari
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב הרגיל
 
 ━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
+⬇️ *לחץ להורדת Morphe* ⬇️
 https://morphe.software/
 
 ⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️
