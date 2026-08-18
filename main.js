@@ -59,6 +59,7 @@ import mxplayerCommand from "./commands/mxplayer.js";
 import flstudioCommand from "./commands/flstudio.js";
 import picretouchCommand from "./commands/picretouch.js";
 import sportCommand from "./commands/sport.js";
+import animefyCommand from "./commands/animefy.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
