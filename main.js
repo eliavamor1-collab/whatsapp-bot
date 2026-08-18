@@ -121,7 +121,7 @@ registerCommand(lightroomCommand);
 registerCommand(snaptubeCommand);
 registerCommand(disneyCommand);
 registerCommand(duolingoCommand);
-registerCommand(telegramCommand);
+// registerCommand(telegramCommand);
 registerCommand(reminiCommand);
 registerCommand(inshotCommand);
 registerCommand(netflixCommand);
