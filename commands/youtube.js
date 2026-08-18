@@ -23,12 +23,12 @@ export default {
 https://drive.google.com/file/d/19Fr5FNOihNm2AMf3X3vaNY75xkSChZU-/view?usp=sharing
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב הרגיל
 
-📲 *הגדרות מומלצות:*
-https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
-
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
 https://morphe.software/
+
+⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️
+https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
