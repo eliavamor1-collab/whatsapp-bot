@@ -560,19 +560,20 @@ async function startWhatsApp() {
                   await command.execute(sock, message);
                 }
                 // ואז מעבירים את הקובץ
-                await sock.sendMessage(
-                  remoteJid,
-                  {
-                    forward: {
-                      key: {
-                        remoteJid: fileData.remote_jid,
-                        id: fileData.message_id
-                      }
-                    }
-                  },
-                  { quoted: message }
-                );
-                console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
+                try {
+                  await sock.copyNForward(remoteJid, {
+                    key: {
+                      remoteJid: fileData.remote_jid,
+                      id: fileData.message_id,
+                      fromMe: false
+                    },
+                    message: {}
+                  }, true, { quoted: message });
+                  console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
+                } catch (fwdErr) {
+                  console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
+                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
+                }
               } else {
                 // אין קובץ שמור — שולחים רק הודעת שגיאה
                 await sock.sendMessage(
