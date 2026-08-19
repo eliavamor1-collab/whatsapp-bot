@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "clash royale",
-  aliases: ["clashroyale", "קלאש רויאל", "קלאש"],
+  aliases: ["clashroyale", "קלאש רויאל"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
