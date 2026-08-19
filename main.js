@@ -61,6 +61,7 @@ import picretouchCommand from "./commands/picretouch.js";
 import sportCommand from "./commands/sport.js";
 import animefyCommand from "./commands/animefy.js";
 import clashRoyaleCommand from "./commands/clashroyale.js";
+import randomCommand from "./commands/random.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
