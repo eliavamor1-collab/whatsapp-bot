@@ -447,10 +447,7 @@ async function startWhatsApp() {
           // חיפוש בתוך המשפט — אם עדיין לא נמצאה פקודה
           if (!command) {
             // ממיינים את המפתחות מהארוך לקצר כדי לתת עדיפות לביטויים ארוכים יותר
-            // מסננים מפתחות קצרים מ-4 תווים כדי למנוע התאמות שגויות
-            const sortedKeys = [...commands.keys()]
-              .filter(key => key.length >= 4)
-              .sort((a, b) => b.length - a.length);
+            const sortedKeys = [...commands.keys()].sort((a, b) => b.length - a.length);
             for (const key of sortedKeys) {
               if (trimmedText.includes(key)) {
                 command = commands.get(key);
