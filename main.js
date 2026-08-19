@@ -589,26 +589,35 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים את הטקסט של האפליקציה
-                if (command.trigger === "random") {
-                  await command.execute(sock, message, commands);
-                } else {
-                  await command.execute(sock, message);
-                }
-                // ואז מעבירים את הקובץ
+                // שולחים רק את הקובץ — בלי טקסט/תמונה
                 try {
-                  await sock.copyNForward(remoteJid, {
-                    key: {
-                      remoteJid: fileData.remote_jid,
-                      id: fileData.message_id,
-                      fromMe: false
-                    },
-                    message: {}
-                  }, true, { quoted: message });
+                  const fwdMsg = await sock.sendMessage(remoteJid, {
+                    document: { url: `https://mmg.whatsapp.net` },
+                    forward: {
+                      key: {
+                        remoteJid: fileData.remote_jid,
+                        id: fileData.message_id,
+                        fromMe: false
+                      }
+                    }
+                  });
+                  if (!fwdMsg) throw new Error("forward failed");
                   console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
-                  console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
-                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
+                  // ניסיון שני עם relayMessage
+                  try {
+                    await sock.relayMessage(remoteJid, {
+                      forwardedNewsletterMessageInfo: undefined,
+                      contextInfo: {
+                        forwardingScore: 1,
+                        isForwarded: true,
+                        quotedMessage: fileData.raw_message
+                      }
+                    }, {});
+                  } catch (e) {
+                    console.error("❌ שגיאה בהעברת קובץ:", e);
+                    await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
+                  }
                 }
               } else {
                 // אין קובץ שמור — שולחים רק הודעת שגיאה
