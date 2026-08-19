@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "youtube revanced",
-  aliases: ["יוטיוב ריוונסד", "youtube revanced", "revanced", "ריוונסד"],
+  aliases: ["יוטיוב ריוונסד", "youtube revanced"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
