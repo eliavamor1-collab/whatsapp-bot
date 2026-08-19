@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "twitter",
-  aliases: ["טוויטר", "איקס"],
+  aliases: ["טוויטר"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
