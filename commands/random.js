@@ -1,6 +1,6 @@
 export default {
   trigger: "random",
-  aliases: ["אקראי", "הפתעה", "surprise"],
+  aliases: ["אקראי", "הפתעה"],
 
   async execute(sock, message, allCommands) {
     const jid = message.key.remoteJid;
