@@ -3,8 +3,8 @@ import { sendSuspended } from "./suspended.js";
 let savedMessage = null;
 
 export default {
-  trigger: "youtube music",
-  aliases: ["יוטיוב מיוזיק"],
+  trigger: "youtube music morphe",
+  aliases: ["יוטיוב מיוזיק מורפ", "youtube music morphe", "יוטיוב מיוזיק"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
