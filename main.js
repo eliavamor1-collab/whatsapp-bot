@@ -472,6 +472,28 @@ async function startWhatsApp() {
 
           const trimmedText = text.trim().toLowerCase();
 
+          // ========================================
+          // זיהוי reply עם "שמור" — שמירת קובץ
+          // ========================================
+          const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+          const quotedMsgId = message.message?.extendedTextMessage?.contextInfo?.stanzaId;
+          const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+
+          if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
+            const appName = trimmedText.replace("שמור ", "").trim();
+            if (appName.length === 0) {
+              await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
+              continue;
+            }
+            const saved = await saveFile(appName, quotedMsgId, remoteJid);
+            if (saved) {
+              await sock.sendMessage(remoteJid, { text: `✅ הקובץ נשמר בהצלחה תחת השם: *${appName}*` }, { quoted: message });
+            } else {
+              await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשמירת הקובץ, נסה שוב" }, { quoted: message });
+            }
+            continue;
+          }
+
           // בדיקת קללות — לפני כל פקודה
           if (containsCurse(text) && !message.key?.fromMe) {
             await handleCurse(sock, message);
