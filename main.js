@@ -494,6 +494,42 @@ async function startWhatsApp() {
             continue;
           }
 
+          // ========================================
+          // רשימת קבצים שמורים
+          // ========================================
+          if (trimmedText === "רשימת קבצים") {
+            try {
+              const result = await pool.query("SELECT app_name, saved_at FROM saved_files ORDER BY saved_at DESC");
+              if (result.rows.length === 0) {
+                await sock.sendMessage(remoteJid, { text: "📂 אין קבצים שמורים עדיין" }, { quoted: message });
+              } else {
+                const lines = result.rows.map((r, i) => `${i + 1}. *${r.app_name}* — נשמר: ${new Date(r.saved_at).toLocaleDateString("he-IL")}`);
+                await sock.sendMessage(remoteJid, { text: `📂 *קבצים שמורים:*\n\n${lines.join("\n")}\n\nכדי לקבל קובץ: כתוב שם האפליקציה + *קובץ*\nכדי למחוק: כתוב שם האפליקציה + *מחק*` }, { quoted: message });
+              }
+            } catch (err) {
+              console.error("❌ שגיאה בשליפת רשימת קבצים:", err);
+            }
+            continue;
+          }
+
+          // ========================================
+          // מחיקת קובץ שמור
+          // ========================================
+          if (trimmedText.endsWith(" מחק")) {
+            const appName = trimmedText.replace(/ מחק$/, "").trim();
+            try {
+              const result = await pool.query("DELETE FROM saved_files WHERE app_name = $1 RETURNING app_name", [appName]);
+              if (result.rows.length > 0) {
+                await sock.sendMessage(remoteJid, { text: `🗑️ הקובץ *${appName}* נמחק בהצלחה` }, { quoted: message });
+              } else {
+                await sock.sendMessage(remoteJid, { text: `❌ לא נמצא קובץ בשם *${appName}*` }, { quoted: message });
+              }
+            } catch (err) {
+              console.error("❌ שגיאה במחיקת קובץ:", err);
+            }
+            continue;
+          }
+
           // בדיקת קללות — לפני כל פקודה
           if (containsCurse(text) && !message.key?.fromMe) {
             await handleCurse(sock, message);
