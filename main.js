@@ -133,6 +133,7 @@ registerCommand(flstudioCommand);
 registerCommand(picretouchCommand);
 registerCommand(sportCommand);
 registerCommand(animefyCommand);
+registerCommand(clashRoyaleCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
