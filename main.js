@@ -479,6 +479,7 @@ async function startWhatsApp() {
           const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
           const quotedMsgId = message.message?.extendedTextMessage?.contextInfo?.stanzaId;
           const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+          const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
             const appName = trimmedText.replace("שמור ", "").trim();
@@ -486,7 +487,17 @@ async function startWhatsApp() {
               await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
               continue;
             }
-            const saved = await saveFile(appName, quotedMsgId, remoteJid, quotedMsg);
+            // שומרים את ה-raw message ביחד עם ה-key המלא
+            const rawData = {
+              message: quotedMsg,
+              key: {
+                remoteJid: remoteJid,
+                id: quotedMsgId,
+                fromMe: false,
+                participant: quotedParticipant
+              }
+            };
+            const saved = await saveFile(appName, quotedMsgId, remoteJid, rawData);
             if (saved) {
               await sock.sendMessage(remoteJid, { text: `✅ הקובץ נשמר בהצלחה תחת השם: *${appName}*` }, { quoted: message });
             } else {
@@ -505,7 +516,7 @@ async function startWhatsApp() {
                 await sock.sendMessage(remoteJid, { text: "📂 אין קבצים שמורים עדיין" }, { quoted: message });
               } else {
                 const lines = result.rows.map((r, i) => `${i + 1}. *${r.app_name}* — נשמר: ${new Date(r.saved_at).toLocaleDateString("he-IL")}`);
-                await sock.sendMessage(remoteJid, { text: `📂 *קבצים שמורים:*\n\n${lines.join("\n")}\n\nכדי לקבל קובץ: כתוב שם האפליקציה + *קובץ*\nכדי למחוק: כתוב שם האפליקציה + *מחק*` }, { quoted: message });
+                await sock.sendMessage(remoteJid, { text: `📂 *קבצים שמורים:*\n\n${lines.join("\n")}\n\nכדי לקבל קובץ: כתוב שם האפליקציה + *קובץ*\nכדי למחוק: כתוב *מחק* + שם האפליקציה` }, { quoted: message });
               }
             } catch (err) {
               console.error("❌ שגיאה בשליפת רשימת קבצים:", err);
@@ -516,8 +527,8 @@ async function startWhatsApp() {
           // ========================================
           // מחיקת קובץ שמור
           // ========================================
-          if (trimmedText.endsWith(" מחק")) {
-            const appName = trimmedText.replace(/ מחק$/, "").trim();
+          if (trimmedText.startsWith("מחק ")) {
+            const appName = trimmedText.replace(/^מחק /, "").trim();
             try {
               const result = await pool.query("DELETE FROM saved_files WHERE app_name = $1 RETURNING app_name", [appName]);
               if (result.rows.length > 0) {
@@ -595,12 +606,8 @@ async function startWhatsApp() {
                   await sock.copyNForward(
                     remoteJid,
                     {
-                      key: {
-                        remoteJid: fileData.remote_jid,
-                        id: fileData.message_id,
-                        fromMe: false
-                      },
-                      message: fileData.raw_message
+                      key: fileData.raw_message.key,
+                      message: fileData.raw_message.message
                     },
                     false
                   );
