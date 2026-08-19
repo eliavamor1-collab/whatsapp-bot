@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "nowhatsapp",
-  aliases: ["נוווצאפ", "no whatsapp"],
+  aliases: ["נוווצאפ"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
