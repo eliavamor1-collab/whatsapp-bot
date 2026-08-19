@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "lightroom",
-  aliases: ["לייטרום", "adobe lightroom"],
+  aliases: ["לייטרום"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
