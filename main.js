@@ -496,7 +496,8 @@ const server = http.createServer((req, res) => {
         <div class="card">
           <h1>WhatsApp Bot 🤖</h1>
           <p>סטטוס: <strong>${currentStatus}</strong></p>
-          <p>קבוצה: <strong>${TARGET_GROUP_NAME}</strong></p>
+          <p>קבוצה 1: <strong>${TARGET_GROUP_NAME}</strong></p>
+          <p>קבוצה 2: <strong>${TARGET_GROUP_NAME_2}</strong></p>
           <p>JID: <code>${TARGET_GROUP_JID}</code></p>
           <hr />
           <p><a href="/qr">📱 הצג QR להתחברות</a></p>
