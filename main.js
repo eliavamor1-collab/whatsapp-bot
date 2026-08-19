@@ -188,13 +188,13 @@ async function initDatabase() {
 // ========================================
 // File Storage Functions
 // ========================================
-async function saveFile(appName, messageId, remoteJid) {
+async function saveFile(appName, messageId, remoteJid, rawMessage) {
   try {
     await pool.query(
-      `INSERT INTO saved_files (app_name, message_id, remote_jid)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (app_name) DO UPDATE SET message_id = EXCLUDED.message_id, remote_jid = EXCLUDED.remote_jid, saved_at = NOW()`,
-      [appName.toLowerCase().trim(), messageId, remoteJid]
+      `INSERT INTO saved_files (app_name, message_id, remote_jid, raw_message)
+       VALUES ($1, $2, $3, $4::jsonb)
+       ON CONFLICT (app_name) DO UPDATE SET message_id = EXCLUDED.message_id, remote_jid = EXCLUDED.remote_jid, raw_message = EXCLUDED.raw_message, saved_at = NOW()`,
+      [appName.toLowerCase().trim(), messageId, remoteJid, JSON.stringify(rawMessage)]
     );
     console.log(`✅ קובץ נשמר: ${appName} → ${messageId}`);
     return true;
