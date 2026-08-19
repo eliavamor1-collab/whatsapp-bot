@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "fl studio",
-  aliases: ["אפאל סטודיו", "פלאל סטודיו", "fl studio mobile"],
+  aliases: ["אפאל סטודיו", "fl studio mobile"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
