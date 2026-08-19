@@ -357,7 +357,7 @@ async function startWhatsApp() {
 
       if (connection === "open") {
         currentQR = null;
-        currentStatus = `מחובר ✅ | קבוצה: ${TARGET_GROUP_NAME}`;
+        currentStatus = `מחובר ✅ | קבוצות: ${TARGET_GROUP_NAME} | ${TARGET_GROUP_NAME_2}`;
         starting = false;
         console.log("========================================");
         console.log("WhatsApp מחובר בהצלחה! ✅");
