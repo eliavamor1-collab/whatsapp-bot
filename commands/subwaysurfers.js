@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "subway",
-  aliases: ["סאבווי", "סאבווי סארפרס"],
+  aliases: ["סאבווי"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
