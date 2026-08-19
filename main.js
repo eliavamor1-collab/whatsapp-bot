@@ -463,7 +463,12 @@ async function startWhatsApp() {
 
           console.log(`[Executing] Executing trigger: ${command.trigger}`);
           try {
-            await command.execute(sock, message);
+            // אם זה random, מעבירים את כל הפקודות
+            if (command.trigger === "random") {
+              await command.execute(sock, message, commands);
+            } else {
+              await command.execute(sock, message);
+            }
             console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);
           } catch (error) {
             console.error(`[Error] Failed executing command "${command.trigger}":`, error);
