@@ -138,6 +138,7 @@ registerCommand(picretouchCommand);
 registerCommand(sportCommand);
 registerCommand(animefyCommand);
 registerCommand(clashRoyaleCommand);
+registerCommand(randomCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
