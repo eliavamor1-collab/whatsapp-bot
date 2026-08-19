@@ -442,6 +442,18 @@ async function startWhatsApp() {
             command = commands.get(firstWord);
           }
 
+          // בדיקת יוטיוב — אם כתבו רק "יוטיוב" או "youtube" בלי לציין סוג
+          if (!command && (trimmedText === "יוטיוב" || trimmedText === "youtube")) {
+            await sock.sendMessage(
+              remoteJid,
+              {
+                text: `איזה יוטיוב אתה רוצה? 🎬\n\n▶️ *יוטיוב מורפ* — כתוב: *יוטיוב מורפ* או *youtube morphe*\n🔄 *יוטיוב ריוונסד* — כתוב: *יוטיוב ריוונסד* או *youtube revanced*\n⚡ *יוטיוב ונסד* — כתוב: *יוטיוב ונסד* או *youtube vanced*`
+              },
+              { quoted: message }
+            );
+            continue;
+          }
+
           if (!command) {
             console.log(`[No Match] No command found for trigger: "${trimmedText}"`);
             continue;
