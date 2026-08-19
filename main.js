@@ -185,6 +185,39 @@ async function initDatabase() {
 }
 
 // ========================================
+// File Storage Functions
+// ========================================
+async function saveFile(appName, messageId, remoteJid) {
+  try {
+    await pool.query(
+      `INSERT INTO saved_files (app_name, message_id, remote_jid)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (app_name) DO UPDATE SET message_id = EXCLUDED.message_id, remote_jid = EXCLUDED.remote_jid, saved_at = NOW()`,
+      [appName.toLowerCase().trim(), messageId, remoteJid]
+    );
+    console.log(`✅ קובץ נשמר: ${appName} → ${messageId}`);
+    return true;
+  } catch (err) {
+    console.error("❌ שגיאה בשמירת קובץ:", err);
+    return false;
+  }
+}
+
+async function getFile(appName) {
+  try {
+    const result = await pool.query(
+      "SELECT message_id, remote_jid FROM saved_files WHERE app_name = $1",
+      [appName.toLowerCase().trim()]
+    );
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
+  } catch (err) {
+    console.error("❌ שגיאה בשליפת קובץ:", err);
+    return null;
+  }
+}
+
+// ========================================
 // PostgreSQL Auth State Strategy
 // ========================================
 async function usePostgresAuthState() {
