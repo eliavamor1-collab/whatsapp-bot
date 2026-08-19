@@ -178,6 +178,7 @@ async function initDatabase() {
       app_name TEXT PRIMARY KEY,
       message_id TEXT NOT NULL,
       remote_jid TEXT NOT NULL,
+      raw_message JSONB,
       saved_at TIMESTAMP DEFAULT NOW()
     )
   `);
