@@ -35,7 +35,7 @@ https://9mod.com/download/ai-video-maker-animefy-156525/1
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://play-lh.googleusercontent.com/5oT6CudF6PKzKJqFjADzq4m8dCbzFNv5BQ5p1OC3KWh1h1RWKlFEMaHdUGLxXFdMBg=w240-h480" },
+            image: { url: "https://9mod.com/wp-content/uploads/2025/05/ai-video-maker-animefy-150x150.webp" },
             caption: captionText
           },
           { quoted: message }
