@@ -173,6 +173,14 @@ async function initDatabase() {
       data JSONB NOT NULL
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS saved_files (
+      app_name TEXT PRIMARY KEY,
+      message_id TEXT NOT NULL,
+      remote_jid TEXT NOT NULL,
+      saved_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
   console.log("Neon Database is ready ✅");
 }
 
