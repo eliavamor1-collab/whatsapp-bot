@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "snaptube",
-  aliases: ["סנאפטיוב", "סנאפ"],
+  aliases: ["סנאפטיוב", "snapchat", "סנפצ'אט"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
