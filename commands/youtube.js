@@ -1,8 +1,8 @@
 let savedMessage = null;
 
 export default {
-  trigger: "youtube",
-  aliases: ["יוטיוב"],
+  trigger: "youtube morphe",
+  aliases: ["יוטיוב מורפ", "youtube morphe"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
