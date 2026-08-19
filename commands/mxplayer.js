@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "mx player",
-  aliases: ["מקס פלייר", "mx"],
+  aliases: ["מקס פלייר"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
