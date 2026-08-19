@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "pic retouch",
-  aliases: ["ai retouch", "פיק ריטוש", "ריטוש", "retouch", "פיק ריטאצ", "פיק ריטאצ'"],
+  aliases: ["ai retouch", "פיק ריטוש", "פיק ריטאצ", "פיק ריטאצ'"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
