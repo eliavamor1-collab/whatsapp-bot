@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "animefy",
-  aliases: ["אנימפי", "אנימה וידאו", "anime video"],
+  aliases: ["אנימפי"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
