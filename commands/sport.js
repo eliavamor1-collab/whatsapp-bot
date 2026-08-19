@@ -1,6 +1,6 @@
 export default {
   trigger: "ספורט",
-  aliases: ["sport", "צפייה בספורט", "ערוצי ספורט", "liveball"],
+  aliases: ["sport", "liveball"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
