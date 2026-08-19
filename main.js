@@ -539,11 +539,53 @@ async function startWhatsApp() {
 
           console.log(`[Executing] Executing trigger: ${command.trigger}`);
           try {
-            // אם זה random, מעבירים את כל הפקודות
-            if (command.trigger === "random") {
-              await command.execute(sock, message, commands);
+            // בדיקה אם המשתמש ביקש קובץ
+            const wantsFile = trimmedText.includes("קובץ");
+
+            if (wantsFile) {
+              // מחפשים קובץ שמור לפי שם האפליקציה
+              const fileData = await getFile(command.trigger);
+              if (fileData) {
+                // שולחים את הטקסט של האפליקציה
+                if (command.trigger === "random") {
+                  await command.execute(sock, message, commands);
+                } else {
+                  await command.execute(sock, message);
+                }
+                // ואז מעבירים את הקובץ
+                await sock.sendMessage(
+                  remoteJid,
+                  {
+                    forward: {
+                      key: {
+                        remoteJid: fileData.remote_jid,
+                        id: fileData.message_id
+                      }
+                    }
+                  },
+                  { quoted: message }
+                );
+                console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
+              } else {
+                // אין קובץ שמור — שולחים רגיל + הודעה
+                if (command.trigger === "random") {
+                  await command.execute(sock, message, commands);
+                } else {
+                  await command.execute(sock, message);
+                }
+                await sock.sendMessage(
+                  remoteJid,
+                  { text: `⚠️ אין קובץ שמור עבור *${command.trigger}*` },
+                  { quoted: message }
+                );
+              }
             } else {
-              await command.execute(sock, message);
+              // בקשה רגילה בלי קובץ
+              if (command.trigger === "random") {
+                await command.execute(sock, message, commands);
+              } else {
+                await command.execute(sock, message);
+              }
             }
             console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);
           } catch (error) {
