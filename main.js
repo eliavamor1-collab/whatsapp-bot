@@ -592,33 +592,22 @@ async function startWhatsApp() {
               if (fileData) {
                 // שולחים רק את הקובץ — בלי טקסט/תמונה
                 try {
-                  const fwdMsg = await sock.sendMessage(remoteJid, {
-                    document: { url: `https://mmg.whatsapp.net` },
-                    forward: {
+                  await sock.copyNForward(
+                    remoteJid,
+                    {
                       key: {
                         remoteJid: fileData.remote_jid,
                         id: fileData.message_id,
                         fromMe: false
-                      }
-                    }
-                  });
-                  if (!fwdMsg) throw new Error("forward failed");
+                      },
+                      message: fileData.raw_message
+                    },
+                    false
+                  );
                   console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
-                  // ניסיון שני עם relayMessage
-                  try {
-                    await sock.relayMessage(remoteJid, {
-                      forwardedNewsletterMessageInfo: undefined,
-                      contextInfo: {
-                        forwardingScore: 1,
-                        isForwarded: true,
-                        quotedMessage: fileData.raw_message
-                      }
-                    }, {});
-                  } catch (e) {
-                    console.error("❌ שגיאה בהעברת קובץ:", e);
-                    await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
-                  }
+                  console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
+                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
                 }
               } else {
                 // אין קובץ שמור — שולחים רק הודעת שגיאה
