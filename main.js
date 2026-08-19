@@ -543,8 +543,15 @@ async function startWhatsApp() {
             const wantsFile = trimmedText.includes("קובץ");
 
             if (wantsFile) {
-              // מחפשים קובץ שמור לפי שם האפליקציה
-              const fileData = await getFile(command.trigger);
+              // מחפשים קובץ שמור — קודם לפי trigger, אחר כך לפי aliases
+              const namesToTry = [command.trigger, ...(command.aliases || [])];
+              let fileData = null;
+              let foundName = null;
+              for (const name of namesToTry) {
+                fileData = await getFile(name);
+                if (fileData) { foundName = name; break; }
+              }
+
               if (fileData) {
                 // שולחים את הטקסט של האפליקציה
                 if (command.trigger === "random") {
