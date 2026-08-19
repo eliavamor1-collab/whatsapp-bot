@@ -36,7 +36,7 @@ https://9mod.com/download/roblox-123/1
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://liteapks.com/wp-content/uploads/2025/08/download-150x150.png" },
+            image: { url: "https://9mod.com/wp-content/uploads/2024/05/roblox-150x150.webp" },
             caption: captionText
           },
           { quoted: message }
