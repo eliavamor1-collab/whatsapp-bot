@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "instagram",
-  aliases: ["אינסטגרם", "instagram"],
+  aliases: ["אינסטגרם"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
