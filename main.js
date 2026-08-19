@@ -574,17 +574,12 @@ async function startWhatsApp() {
                 );
                 console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
               } else {
-                // אין קובץ שמור — שולחים רגיל + הודעה
+                // אין קובץ שמור — שולחים רגיל בלי הודעה
                 if (command.trigger === "random") {
                   await command.execute(sock, message, commands);
                 } else {
                   await command.execute(sock, message);
                 }
-                await sock.sendMessage(
-                  remoteJid,
-                  { text: `⚠️ אין קובץ שמור עבור *${command.trigger}*` },
-                  { quoted: message }
-                );
               }
             } else {
               // בקשה רגילה בלי קובץ
