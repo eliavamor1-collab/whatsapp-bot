@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "inshot",
-  aliases: ["אינשוט", "inshot pro"],
+  aliases: ["אינשוט"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
