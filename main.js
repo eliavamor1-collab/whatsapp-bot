@@ -444,6 +444,19 @@ async function startWhatsApp() {
             command = commands.get(firstWord);
           }
 
+          // חיפוש בתוך המשפט — אם עדיין לא נמצאה פקודה
+          if (!command) {
+            // ממיינים את המפתחות מהארוך לקצר כדי לתת עדיפות לביטויים ארוכים יותר
+            const sortedKeys = [...commands.keys()].sort((a, b) => b.length - a.length);
+            for (const key of sortedKeys) {
+              if (trimmedText.includes(key)) {
+                command = commands.get(key);
+                console.log(`[Partial Match] נמצאה פקודה "${key}" בתוך המשפט: "${trimmedText}"`);
+                break;
+              }
+            }
+          }
+
           // בדיקת יוטיוב — אם כתבו רק "יוטיוב" או "youtube" בלי לציין סוג
           if (!command && (trimmedText === "יוטיוב" || trimmedText === "youtube")) {
             await sock.sendMessage(
