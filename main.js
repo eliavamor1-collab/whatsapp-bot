@@ -486,7 +486,7 @@ async function startWhatsApp() {
               await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
               continue;
             }
-            const saved = await saveFile(appName, quotedMsgId, remoteJid);
+            const saved = await saveFile(appName, quotedMsgId, remoteJid, quotedMsg);
             if (saved) {
               await sock.sendMessage(remoteJid, { text: `✅ הקובץ נשמר בהצלחה תחת השם: *${appName}*` }, { quoted: message });
             } else {
