@@ -71,6 +71,9 @@ const { Pool } = pg;
 const PORT = Number(process.env.PORT || 10000);
 const TARGET_GROUP_NAME = "פרוץ בווצאפ";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
+const TARGET_GROUP_NAME_2 = "פרוץ בווצאפ (איחסון)";
+const TARGET_GROUP_JID_2 = "120363408996332000@g.us";
+const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2]);
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
 // ========================================
