@@ -407,8 +407,7 @@ async function startWhatsApp() {
           if (!message?.message) continue;
 
           const remoteJid = message.key?.remoteJid;
-          console.log(`[DEBUG] הודעה מ-JID: ${remoteJid}`);
-          if (remoteJid !== TARGET_GROUP_JID) continue;
+          if (!ALLOWED_GROUPS.has(remoteJid)) continue;
 
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
