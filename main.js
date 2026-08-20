@@ -7,8 +7,7 @@ import makeWASocket, {
   BufferJSON,
   proto,
   generateWAMessageFromContent,
-  isJidGroup,
-  downloadMediaMessage
+  isJidGroup
 } from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 import pg from "pg";
@@ -616,43 +615,14 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים את הקובץ עם הטקסט כ-caption
+                // שולחים רק את הקובץ
                 try {
                   const rawMsg = fileData.raw_message;
-                  const fullMsg = { key: rawMsg.key, message: rawMsg.message };
-
-                  // שולפים את הטקסט מה-command
-                  let captionText = "";
-                  const originalSend = sock.sendMessage.bind(sock);
-                  sock.sendMessage = async (jid, content, opts) => {
-                    if (content?.image?.caption || content?.caption) {
-                      captionText = content.caption || content.image?.caption || "";
-                    }
-                    if (content?.text) captionText = content.text;
-                    return { key: {} };
-                  };
-                  try { await command.execute(sock, message); } catch(e) {}
-                  sock.sendMessage = originalSend;
-
-                  // מורידים את הקובץ ושולחים מחדש עם caption
-                  const buffer = await downloadMediaMessage(fullMsg, "buffer", {}, { logger: { info: ()=>{}, error: ()=>{}, warn: ()=>{} }, reuploadRequest: sock.updateMediaMessage });
-                  const docMsg = rawMsg.message?.documentMessage;
-                  await sock.sendMessage(remoteJid, {
-                    document: buffer,
-                    fileName: docMsg?.fileName || "file.apk",
-                    mimetype: docMsg?.mimetype || "application/vnd.android.package-archive",
-                    caption: captionText
-                  }, { quoted: message });
+                  await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
                   console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
                   console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
-                  // fallback — שולחים forward בלי caption
-                  try {
-                    const rawMsg = fileData.raw_message;
-                    await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
-                  } catch(e) {
-                    await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
-                  }
+                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
                 }
               } else {
                 // אין קובץ שמור — שולחים רק הודעת שגיאה
