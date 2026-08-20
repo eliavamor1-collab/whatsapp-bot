@@ -63,6 +63,7 @@ import animefyCommand from "./commands/animefy.js";
 import clashRoyaleCommand from "./commands/clashroyale.js";
 import randomCommand from "./commands/random.js";
 import fakeGpsCommand from "./commands/fakegps.js";
+import idleMinerCommand from "./commands/idleminer.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -141,6 +142,7 @@ registerCommand(animefyCommand);
 registerCommand(clashRoyaleCommand);
 registerCommand(randomCommand);
 registerCommand(fakeGpsCommand);
+registerCommand(idleMinerCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
