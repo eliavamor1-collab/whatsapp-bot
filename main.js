@@ -623,26 +623,26 @@ async function startWhatsApp() {
               if (fileData) {
                 // שולפים את הטקסט בלי קישור
                 let captionText = "";
-                console.log(`[File Debug] getCaptionText קיים: ${typeof command.getCaptionText === "function"}`);
                 if (typeof command.getCaptionText === "function") {
-                  // אם יש getCaptionText — משתמשים בו ישירות
                   captionText = command.getCaptionText();
                 } else {
-                  // fallback — intercept
+                  // fallback — חותכים מה-captionText הרגיל לפני ━━━
+                  // מריצים execute עם sock מזויף שלא שולח כלום
                   const originalSend = sock.sendMessage.bind(sock);
                   sock.sendMessage = async (jid, content, opts) => {
-                    captionText = content?.caption || content?.text || content?.image?.caption || "";
-                    return { key: { id: "intercepted" } };
+                    const text = content?.caption || content?.text || content?.image?.caption || "";
+                    if (text) captionText = text;
+                    return null;
                   };
-                  const prevSaved = command.savedMessage ?? null;
-                  if ("savedMessage" in command) command.savedMessage = null;
                   try { await command.execute(sock, message); } catch(e) {}
                   sock.sendMessage = originalSend;
-                  if ("savedMessage" in command) command.savedMessage = prevSaved;
+                  captionText = captionText.split("━━━")[0].trimEnd();
                 }
 
-                // חותכים את הקישור (מהשורה ━━━ ומטה)
-                const textWithoutLink = captionText.split("━━━")[0].trimEnd();
+                // חותכים את הקישור רק אם לא השתמשנו ב-getCaptionText
+                const textWithoutLink = typeof command.getCaptionText === "function"
+                  ? captionText
+                  : captionText.split("━━━")[0].trimEnd();
 
                 // שולחים טקסט בלי קישור
                 if (textWithoutLink) {
