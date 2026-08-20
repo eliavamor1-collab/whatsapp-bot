@@ -3,6 +3,7 @@ let savedMessage = null;
 export default {
   trigger: "capcut",
   aliases: ["קאפקאט", "cap cut", "קאפ קאט"],
+  savedMessage: null,
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*
@@ -40,9 +41,9 @@ https://liteapks.com/download/capcut-video-editor-311/1
 ━━━━━━━━━━━━━━━`;
 
     try {
-      if (savedMessage) {
+      if (this.savedMessage) {
         console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת CapCut...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+        await sock.sendMessage(jid, { forward: this.savedMessage }, { quoted: message });
       } else {
         console.log("📸 שולח תמונת CapCut בפעם הראשונה...");
         const sentMsg = await sock.sendMessage(
@@ -55,7 +56,7 @@ https://liteapks.com/download/capcut-video-editor-311/1
         );
 
         if (sentMsg) {
-          savedMessage = sentMsg;
+          this.savedMessage = sentMsg;
           console.log("✅ הודעת CapCut הראשונה שנשלחה נשמרה בזיכרון!");
         }
       }
