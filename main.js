@@ -489,18 +489,6 @@ async function startWhatsApp() {
           // ========================================
           // זיהוי reply עם "שמור" — שמירת קובץ
           // ========================================
-          const contextInfo =
-            msgContent?.extendedTextMessage?.contextInfo ||
-            msgContent?.imageMessage?.contextInfo ||
-            msgContent?.videoMessage?.contextInfo ||
-            msgContent?.documentMessage?.contextInfo ||
-            msgContent?.audioMessage?.contextInfo ||
-            msgContent?.stickerMessage?.contextInfo ||
-            null;
-
-          const quotedMsg = contextInfo?.quotedMessage;
-          const quotedMsgId = contextInfo?.stanzaId;
-          const quotedParticipant = contextInfo?.participant;
           const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
