@@ -615,23 +615,24 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולפים את הטקסט מה-command בלי קישור
+                // שולפים את הטקסט בלי קישור
                 let captionText = "";
-                const originalSend = sock.sendMessage.bind(sock);
-                sock.sendMessage = async (jid, content, opts) => {
-                  // caption יכול להיות ישירות או בתוך image/video/document
-                  captionText = 
-                    content?.caption || 
-                    content?.text || 
-                    content?.image?.caption ||
-                    content?.video?.caption ||
-                    content?.document?.caption ||
-                    "";
-                  console.log(`[File Intercept] תפסתי טקסט: "${captionText.substring(0, 50)}..."`);
-                  return { key: { id: "intercepted" } };
-                };
-                try { await command.execute(sock, message); } catch(e) {}
-                sock.sendMessage = originalSend;
+                if (typeof command.getCaptionText === "function") {
+                  // אם יש getCaptionText — משתמשים בו ישירות
+                  captionText = command.getCaptionText();
+                } else {
+                  // fallback — intercept
+                  const originalSend = sock.sendMessage.bind(sock);
+                  sock.sendMessage = async (jid, content, opts) => {
+                    captionText = content?.caption || content?.text || content?.image?.caption || "";
+                    return { key: { id: "intercepted" } };
+                  };
+                  const prevSaved = command.savedMessage ?? null;
+                  if ("savedMessage" in command) command.savedMessage = null;
+                  try { await command.execute(sock, message); } catch(e) {}
+                  sock.sendMessage = originalSend;
+                  if ("savedMessage" in command) command.savedMessage = prevSaved;
+                }
 
                 // חותכים את הקישור (מהשורה ━━━ ומטה)
                 const textWithoutLink = captionText.split("━━━")[0].trimEnd();

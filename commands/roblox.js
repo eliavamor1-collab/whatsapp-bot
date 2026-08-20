@@ -4,6 +4,20 @@ export default {
   trigger: "roblox",
   aliases: ["רובלוקס"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*רובלוקס*
+🔢 *גירסא:* V2.732.1043
+📦 *גודל:* 180 MB
+💾 *סוג:* משחק
+🎯 *תוכן:*
+עולם וירטואלי שבו יוצרים, משתפים ומשחקים עם מיליוני שחקנים ברחבי העולם.
+אבל מקבלים גם: Mega Menu, Fly, Jump, Teleport ועוד...
+
+ℹ️ *הערות:*
+פשוט להתקין ולשחק`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
