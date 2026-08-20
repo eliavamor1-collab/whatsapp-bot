@@ -617,14 +617,8 @@ async function startWhatsApp() {
               if (fileData) {
                 // שולחים רק את הקובץ — בלי טקסט/תמונה
                 try {
-                  await sock.copyNForward(
-                    remoteJid,
-                    {
-                      key: fileData.raw_message.key,
-                      message: fileData.raw_message.message
-                    },
-                    false
-                  );
+                  const rawMsg = fileData.raw_message;
+                  await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
                   console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
                   console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
