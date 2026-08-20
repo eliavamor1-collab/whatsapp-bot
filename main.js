@@ -531,7 +531,9 @@ async function startWhatsApp() {
               if (result.rows.length === 0) {
                 await sock.sendMessage(remoteJid, { text: "📂 אין קבצים שמורים עדיין" }, { quoted: message });
               } else {
-                const lines = result.rows.map((r, i) => `${i + 1}. *${r.app_name}*`);
+                // מסירים suffix מספרי (כמו " 1", " 2") ומציגים שם אחד לכל אפליקציה
+                const uniqueNames = [...new Set(result.rows.map(r => r.app_name.replace(/ \d+$/, "")))];
+                const lines = uniqueNames.map((name, i) => `${i + 1}. *${name}*`);
                 await sock.sendMessage(remoteJid, { text: `📂 *קבצים שמורים:*\n\n${lines.join("\n")}` }, { quoted: message });
               }
             } catch (err) {
