@@ -210,12 +210,13 @@ async function saveFile(appName, messageId, remoteJid, rawMessage) {
 
 async function getFile(appName) {
   try {
+    // מחפשים קובץ מדויק או קבצים עם suffix (למשל "נטפליקס 1", "נטפליקס 2")
     const result = await pool.query(
-      "SELECT message_id, remote_jid, raw_message FROM saved_files WHERE app_name = $1",
-      [appName.toLowerCase().trim()]
+      "SELECT message_id, remote_jid, raw_message FROM saved_files WHERE app_name = $1 OR app_name LIKE $2 ORDER BY app_name",
+      [appName.toLowerCase().trim(), `${appName.toLowerCase().trim()} %`]
     );
     if (result.rows.length === 0) return null;
-    return result.rows[0];
+    return result.rows; // מחזירים מערך
   } catch (err) {
     console.error("❌ שגיאה בשליפת קובץ:", err);
     return null;
@@ -611,10 +612,9 @@ async function startWhatsApp() {
               // מחפשים קובץ שמור — קודם לפי trigger, אחר כך לפי aliases
               const namesToTry = [command.trigger, ...(command.aliases || [])];
               let fileData = null;
-              let foundName = null;
               for (const name of namesToTry) {
                 fileData = await getFile(name);
-                if (fileData) { foundName = name; break; }
+                if (fileData) break;
               }
 
               if (fileData) {
@@ -645,11 +645,13 @@ async function startWhatsApp() {
                   await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
                 }
 
-                // ואז שולחים את הקובץ
+                // שולחים את כל הקבצים אחד אחרי השני
                 try {
-                  const rawMsg = fileData.raw_message;
-                  await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
-                  console.log(`[File] קובץ נשלח עבור ${command.trigger} ✅`);
+                  for (const file of fileData) {
+                    const rawMsg = file.raw_message;
+                    await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
+                  }
+                  console.log(`[File] ${fileData.length} קבצים נשלחו עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
                   console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
                   await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
