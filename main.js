@@ -619,8 +619,16 @@ async function startWhatsApp() {
                 let captionText = "";
                 const originalSend = sock.sendMessage.bind(sock);
                 sock.sendMessage = async (jid, content, opts) => {
-                  captionText = content?.caption || content?.image?.caption || content?.text || "";
-                  return { key: {} };
+                  // caption יכול להיות ישירות או בתוך image/video/document
+                  captionText = 
+                    content?.caption || 
+                    content?.text || 
+                    content?.image?.caption ||
+                    content?.video?.caption ||
+                    content?.document?.caption ||
+                    "";
+                  console.log(`[File Intercept] תפסתי טקסט: "${captionText.substring(0, 50)}..."`);
+                  return { key: { id: "intercepted" } };
                 };
                 try { await command.execute(sock, message); } catch(e) {}
                 sock.sendMessage = originalSend;
