@@ -182,6 +182,10 @@ async function initDatabase() {
       saved_at TIMESTAMP DEFAULT NOW()
     )
   `);
+  // הוספת עמודת raw_message אם לא קיימת (לטבלות ישנות)
+  await pool.query(`
+    ALTER TABLE saved_files ADD COLUMN IF NOT EXISTS raw_message JSONB
+  `);
   console.log("Neon Database is ready ✅");
 }
 
