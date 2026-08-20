@@ -4,6 +4,19 @@ export default {
   trigger: "capcut",
   aliases: ["קאפקאט", "cap cut", "קאפ קאט"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*CapCut – עורך וידאו*
+🔢 *גירסא:* v18.8.0
+📦 *גודל:* 297.84 MB
+💾 *סוג:* עריכת וידאו
+🎯 *תוכן:*
+עורך הוידאו המוביל של TikTok — חתוך, ערוך, הוסף מוזיקה, אפקטים ומדבקות ליצירת סרטונים מקצועיים בקלות.
+
+ℹ️ *הערות:*
+פשוט להתקין ולהשתמש`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
