@@ -4,6 +4,19 @@ export default {
   trigger: "netflix",
   aliases: ["נטפליקס"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*Netflix*
+🔢 *גירסא:* v9.78.0
+📦 *גודל:* 21 MB
+💾 *סוג:* סטרימינג סרטים
+🎯 *תוכן:*
+פלטפורמת הסטרימינג הגדולה בעולם — סרטים, סדרות ותכנים מקוריים באיכות 4K HDR, פתוחים לגמרי.
+
+ℹ️ *הערות:*
+פשוט להתקין ולהשתמש`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
