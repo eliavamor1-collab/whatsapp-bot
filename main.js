@@ -615,7 +615,25 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים רק את הקובץ
+                // שולפים את הטקסט מה-command בלי קישור
+                let captionText = "";
+                const originalSend = sock.sendMessage.bind(sock);
+                sock.sendMessage = async (jid, content, opts) => {
+                  captionText = content?.caption || content?.image?.caption || content?.text || "";
+                  return { key: {} };
+                };
+                try { await command.execute(sock, message); } catch(e) {}
+                sock.sendMessage = originalSend;
+
+                // חותכים את הקישור (מהשורה ━━━ ומטה)
+                const textWithoutLink = captionText.split("━━━")[0].trimEnd();
+
+                // שולחים טקסט בלי קישור
+                if (textWithoutLink) {
+                  await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
+                }
+
+                // ואז שולחים את הקובץ
                 try {
                   const rawMsg = fileData.raw_message;
                   await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
