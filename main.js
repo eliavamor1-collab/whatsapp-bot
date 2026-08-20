@@ -615,18 +615,7 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים קודם את האפליקציה כרגיל (עם תמונה)
-                try {
-                  if (command.trigger === "random") {
-                    await command.execute(sock, message, commands);
-                  } else {
-                    await command.execute(sock, message);
-                  }
-                } catch (e) {
-                  console.error("שגיאה בשליחת אפליקציה:", e);
-                }
-
-                // ואז שולחים את הקובץ
+                // שולחים רק את הקובץ
                 try {
                   const rawMsg = fileData.raw_message;
                   await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
