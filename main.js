@@ -623,6 +623,7 @@ async function startWhatsApp() {
               if (fileData) {
                 // שולפים את הטקסט בלי קישור
                 let captionText = "";
+                console.log(`[File Debug] getCaptionText קיים: ${typeof command.getCaptionText === "function"}`);
                 if (typeof command.getCaptionText === "function") {
                   // אם יש getCaptionText — משתמשים בו ישירות
                   captionText = command.getCaptionText();
