@@ -467,6 +467,19 @@ async function startWhatsApp() {
             msgContent?.videoMessage?.caption ||
             "";
 
+          const contextInfo =
+            msgContent?.extendedTextMessage?.contextInfo ||
+            msgContent?.imageMessage?.contextInfo ||
+            msgContent?.videoMessage?.contextInfo ||
+            msgContent?.documentMessage?.contextInfo ||
+            msgContent?.audioMessage?.contextInfo ||
+            msgContent?.stickerMessage?.contextInfo ||
+            null;
+
+          const quotedMsg = contextInfo?.quotedMessage;
+          const quotedMsgId = contextInfo?.stanzaId;
+          const quotedParticipant = contextInfo?.participant;
+
           if (!text) continue;
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
@@ -476,9 +489,18 @@ async function startWhatsApp() {
           // ========================================
           // זיהוי reply עם "שמור" — שמירת קובץ
           // ========================================
-          const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-          const quotedMsgId = message.message?.extendedTextMessage?.contextInfo?.stanzaId;
-          const quotedParticipant = message.message?.extendedTextMessage?.contextInfo?.participant;
+          const contextInfo =
+            msgContent?.extendedTextMessage?.contextInfo ||
+            msgContent?.imageMessage?.contextInfo ||
+            msgContent?.videoMessage?.contextInfo ||
+            msgContent?.documentMessage?.contextInfo ||
+            msgContent?.audioMessage?.contextInfo ||
+            msgContent?.stickerMessage?.contextInfo ||
+            null;
+
+          const quotedMsg = contextInfo?.quotedMessage;
+          const quotedMsgId = contextInfo?.stanzaId;
+          const quotedParticipant = contextInfo?.participant;
           const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
