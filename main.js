@@ -615,29 +615,15 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים קודם את הטקסט של האפליקציה (בלי תמונה)
-                let sentAppMsg = null;
+                // שולחים קודם את האפליקציה כרגיל (עם תמונה)
                 try {
                   if (command.trigger === "random") {
                     await command.execute(sock, message, commands);
                   } else {
-                    // מריצים את הפקודה אבל מיירטים את ה-captionText
-                    const originalSendMessage = sock.sendMessage.bind(sock);
-                    let captureText = null;
-                    sock.sendMessage = async (jid, content, opts) => {
-                      // שולחים רק טקסט, לא תמונה
-                      if (content?.image) {
-                        captureText = content.caption || "";
-                        sentAppMsg = await originalSendMessage(jid, { text: captureText }, opts);
-                        return sentAppMsg;
-                      }
-                      return originalSendMessage(jid, content, opts);
-                    };
                     await command.execute(sock, message);
-                    sock.sendMessage = originalSendMessage;
                   }
                 } catch (e) {
-                  console.error("שגיאה בשליחת טקסט:", e);
+                  console.error("שגיאה בשליחת אפליקציה:", e);
                 }
 
                 // ואז שולחים את הקובץ
