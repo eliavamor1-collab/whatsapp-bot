@@ -496,6 +496,7 @@ async function startWhatsApp() {
           const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
+            if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace("שמור ", "").trim();
             if (appName.length === 0) {
               await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
@@ -521,9 +522,10 @@ async function startWhatsApp() {
           }
 
           // ========================================
-          // רשימת קבצים שמורים
+          // רשימת קבצים שמורים — רק בקבוצת האיחסון
           // ========================================
           if (trimmedText === "רשימת קבצים") {
+            if (remoteJid !== TARGET_GROUP_JID_2) continue;
             try {
               const result = await pool.query("SELECT app_name, saved_at FROM saved_files ORDER BY saved_at DESC");
               if (result.rows.length === 0) {
@@ -539,9 +541,10 @@ async function startWhatsApp() {
           }
 
           // ========================================
-          // מחיקת קובץ שמור
+          // מחיקת קובץ שמור — רק בקבוצת האיחסון
           // ========================================
           if (trimmedText.startsWith("מחק ")) {
+            if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace(/^מחק /, "").trim();
             try {
               const result = await pool.query("DELETE FROM saved_files WHERE app_name = $1 RETURNING app_name", [appName]);
