@@ -62,6 +62,7 @@ import sportCommand from "./commands/sport.js";
 import animefyCommand from "./commands/animefy.js";
 import clashRoyaleCommand from "./commands/clashroyale.js";
 import randomCommand from "./commands/random.js";
+import fakeGpsCommand from "./commands/fakegps.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -139,6 +140,7 @@ registerCommand(sportCommand);
 registerCommand(animefyCommand);
 registerCommand(clashRoyaleCommand);
 registerCommand(randomCommand);
+registerCommand(fakeGpsCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
