@@ -35,7 +35,7 @@ export default {
 https://liteapks.com/download/call-recorder-cube-acr-78937/1
 
 📲 *להורדת התוסף Talker:*
-https://liteapks.com/download/talker-acr-220773/2
+https://liteapks.com/download/call-recorder-cube-acr-78937/2
 ━━━━━━━━━━━━━━━`;
 
     try {
