@@ -12,7 +12,7 @@ export default {
 מקליט השיחות המתקדם ביותר לאנדרואיד — מקליט שיחות נכנסות ויוצאות אוטומטית, כולל שיחות WhatsApp, Viber, Skype ועוד אפליקציות VoIP.
 
 ℹ️ *הערות:*
-⚠️ האפליקציה לא עובדת בהרבה טלפונים עקב מגבלות של אנדרואיד 10+ שחוסם הקלטת שיחות. יש להוריד גם את התוסף של Cube ACR לתמיכה מלאה`;
+⚠️ האפליקציה לא עובדת בהרבה טלפונים עקב מגבלות של אנדרואיד 10+ שחוסם הקלטת שיחות. יש להוריד גם את התוסף של Cube ACR Helper לתמיכה מלאה`;
   },
 
   async execute(sock, message) {
@@ -34,7 +34,7 @@ export default {
 ⬇️ *לחץ להורדה ישירה* ⬇️
 https://liteapks.com/download/call-recorder-cube-acr-78937/1
 
-📲 *להורדת תוסף Cube ACR:*
+📲 *להורדת תוסף Cube ACR Helper:*
 https://liteapks.com/download/call-recorder-cube-acr-78937/2
 ━━━━━━━━━━━━━━━`;
 
