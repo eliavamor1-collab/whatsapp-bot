@@ -64,6 +64,7 @@ import clashRoyaleCommand from "./commands/clashroyale.js";
 import randomCommand from "./commands/random.js";
 import fakeGpsCommand from "./commands/fakegps.js";
 import idleMinerCommand from "./commands/idleminer.js";
+import simpMusicCommand from "./commands/simpmusic.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -143,6 +144,7 @@ registerCommand(clashRoyaleCommand);
 registerCommand(randomCommand);
 registerCommand(fakeGpsCommand);
 registerCommand(idleMinerCommand);
+registerCommand(simpMusicCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
