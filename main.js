@@ -65,6 +65,7 @@ import randomCommand from "./commands/random.js";
 import fakeGpsCommand from "./commands/fakegps.js";
 import idleMinerCommand from "./commands/idleminer.js";
 import simpMusicCommand from "./commands/simpmusic.js";
+import callRecorderCommand from "./commands/callrecorder.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -145,6 +146,7 @@ registerCommand(randomCommand);
 registerCommand(fakeGpsCommand);
 registerCommand(idleMinerCommand);
 registerCommand(simpMusicCommand);
+registerCommand(callRecorderCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
