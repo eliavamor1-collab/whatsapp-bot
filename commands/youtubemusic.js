@@ -6,6 +6,20 @@ export default {
   trigger: "youtube music",
   aliases: ["יוטיוב מיוזיק", "youtube music"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*יוטיוב מיוזיק מורפ*
+🔢 *גירסא:* v9.15.51
+📦 *גודל:* 70.98 MB
+💾 *סוג:* סטרימינג מוזיקה
+🎯 *תוכן:*
+פלטפורמת הזרמת מוזיקה עולמית שבה תוכלו להאזין, לשתף שירים וליצור פלייליסטים מתוך קטלוג של מיליוני אמנים ברחבי העולם.
+
+ℹ️ *הערות:*
+עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
+https://youtube.com/shorts/PSjKGzsOzVs?si=O9UdvOMJm17gCV_N`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 

@@ -4,6 +4,20 @@ export default {
   trigger: "youtube morphe",
   aliases: ["יוטיוב מורפ", "youtube morphe"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*יוטיוב מורפ*
+🔢 *גירסא:* v1.25.0
+📦 *גודל:* 17.64 MB
+💾 *סוג:* סטרימינג וידאו
+🎯 *תוכן:*
+פלטפורמת וידאו עולמית שבה תוכלו ליצור, לשתף סרטונים ולצפות בתכנים עם מיליארדי משתמשים ברחבי העולם.
+
+ℹ️ *הערות:*
+עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
+https://youtube.com/shorts/y3WKhi2EfOU?si=TJVx-UNczW0RhuvJ`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
