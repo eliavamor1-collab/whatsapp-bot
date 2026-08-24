@@ -16,8 +16,8 @@ export default {
 פלטפורמת הזרמת מוזיקה עולמית שבה תוכלו להאזין, לשתף שירים וליצור פלייליסטים מתוך קטלוג של מיליוני אמנים ברחבי העולם.
 
 ℹ️ *הערות:*
-עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
-https://youtube.com/shorts/PSjKGzsOzVs?si=O9UdvOMJm17gCV_N`;
+צפו במדריך מדקה 1:30 כדי להבין איך להתקין את הקבצים:
+https://youtu.be/PSjKGzsOzVs?si=Z8bnBFOPUofU0x7i&t=90`;
   },
 
   async execute(sock, message) {

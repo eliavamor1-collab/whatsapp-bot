@@ -14,8 +14,8 @@ export default {
 פלטפורמת וידאו עולמית שבה תוכלו ליצור, לשתף סרטונים ולצפות בתכנים עם מיליארדי משתמשים ברחבי העולם.
 
 ℹ️ *הערות:*
-עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
-https://youtube.com/shorts/y3WKhi2EfOU?si=TJVx-UNczW0RhuvJ`;
+צפו במדריך מדקה 1:24 כדי להבין איך להתקין את הקבצים:
+https://youtu.be/y3WKhi2EfOU?si=eTdlHR_hp9eTl94H&t=84`;
   },
 
   async execute(sock, message) {
