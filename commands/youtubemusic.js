@@ -23,11 +23,16 @@ export default {
 ℹ️ *הערות:*
 עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
 https://youtube.com/shorts/PSjKGzsOzVs?si=O9UdvOMJm17gCV_N
-אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב מיוזיק הרגיל
 
 ━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
+⬇️ *לחץ להורדת Morphe* ⬇️
 https://morphe.software/
+
+📦 *לחץ להורדת Micro G* 📦
+https://drive.google.com/file/d/1G-sWLiTa5eIoGwxVsWH4sDjZWEgnbRUm/view?usp=sharing
+
+⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️
+https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
