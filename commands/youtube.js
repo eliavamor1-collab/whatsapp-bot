@@ -44,7 +44,7 @@ https://morphe.software/
 https://drive.google.com/file/d/1G-sWLiTa5eIoGwxVsWH4sDjZWEgnbRUm/view?usp=sharing
 
 ⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️
-https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
+https://drive.google.com/file/d/1AV3MrVokAxK1t20qRPLeZ3DkqSTlKwEH/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
     try {
