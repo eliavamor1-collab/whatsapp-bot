@@ -11,9 +11,6 @@ export default {
 
     console.log("🚀 פקודת youtube music הופעלה!");
 
-    // השעייה זמנית
-    return await sendSuspended(sock, message);
-
     const captionText =
 `📱 *שם האפליקציה:*
 *יוטיוב מיוזיק מורפ*
@@ -25,7 +22,7 @@ export default {
 
 ℹ️ *הערות:*
 עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:
-https://www.youtube.com/watch?v=yMbi9G861Ys&t=4s
+https://youtube.com/shorts/PSjKGzsOzVs?si=O9UdvOMJm17gCV_N
 אפשר אחרי ההתקנה לשנות את האייקון של האפליקציה כמו ליוטיוב מיוזיק הרגיל
 
 ━━━━━━━━━━━━━━━
