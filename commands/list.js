@@ -68,8 +68,38 @@ export default {
 📍 *מיקום:*
 36. *\`מזייף מיקום\`* — כתוב: *מזייף מיקום* או *fake gps*
 
+🎵 *זיהוי שירים:*
+37. *\`Shazam\`* — כתוב: *שאזם* או *shazam*
+
+🎌 *אנימה:*
+38. *\`Crunchyroll\`* — כתוב: *קראנצ'ירול* או *crunchyroll*
+
+🎬 *סרטים וסדרות:*
+39. *\`MovieBox\`* — כתוב: *מובי בוקס* או *moviebox*
+
+📷 *צילום:*
+40. *\`OldRoll\`* — כתוב: *אולדרול* או *oldroll*
+
+🔒 *VPN ואבטחה:*
+41. *\`Proton VPN\`* — כתוב: *פרוטון* או *proton vpn*
+42. *\`Photo Vault PRIVARY\`* — כתוב: *כספת תמונות* או *photo vault*
+
+📚 *לימוד:*
+43. *\`Busuu\`* — כתוב: *בוסו* או *busuu*
+44. *\`Mimo\`* — כתוב: *מימו* או *mimo*
+
+🌤️ *מזג אוויר:*
+45. *\`AccuWeather\`* — כתוב: *מזג אוויר* או *accuweather*
+
+🌐 *תרגום:*
+46. *\`Speak & Translate\`* — כתוב: *מתרגם* או *speak translate*
+
+🎮 *משחקים:*
+47. *\`Friday Night Funkin'\`* — כתוב: *fnf* או *friday night funkin*
+48. *\`Slay the Spire 2\`* — כתוב: *slay the spire* או *סליי דה ספייר*
+
 🎲 *אחרים:*
-37. *\`אפליקציה אקראית\`* — כתוב: *אקראי* או *random*`;
+49. *\`אפליקציה אקראית\`* — כתוב: *אקראי* או *random*`;
 
     try {
       await sock.sendMessage(

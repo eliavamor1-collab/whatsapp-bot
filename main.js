@@ -67,6 +67,18 @@ import idleMinerCommand from "./commands/idleminer.js";
 import simpMusicCommand from "./commands/simpmusic.js";
 import callRecorderCommand from "./commands/callrecorder.js";
 import meldCommand from "./commands/meld.js";
+import shazamCommand from "./commands/shazam.js";
+import crunchyrollCommand from "./commands/crunchyroll.js";
+import movieboxCommand from "./commands/moviebox.js";
+import oldrollCommand from "./commands/oldroll.js";
+import protonvpnCommand from "./commands/protonvpn.js";
+import photovaultCommand from "./commands/photovault.js";
+import busuuCommand from "./commands/busuu.js";
+import mimoCommand from "./commands/mimo.js";
+import accuweatherCommand from "./commands/accuweather.js";
+import speaktranslateCommand from "./commands/speaktranslate.js";
+import fnfCommand from "./commands/fnf.js";
+import slaythespireCommand from "./commands/slaythespire.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -149,6 +161,18 @@ registerCommand(idleMinerCommand);
 registerCommand(simpMusicCommand);
 registerCommand(callRecorderCommand);
 registerCommand(meldCommand);
+registerCommand(shazamCommand);
+registerCommand(crunchyrollCommand);
+registerCommand(movieboxCommand);
+registerCommand(oldrollCommand);
+registerCommand(protonvpnCommand);
+registerCommand(photovaultCommand);
+registerCommand(busuuCommand);
+registerCommand(mimoCommand);
+registerCommand(accuweatherCommand);
+registerCommand(speaktranslateCommand);
+registerCommand(fnfCommand);
+registerCommand(slaythespireCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
