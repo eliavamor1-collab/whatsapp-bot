@@ -16,6 +16,8 @@ export default {
 3. *\`סאבווי סארפרס\`* — כתוב: *סאבווי* או *subway*
 4. *\`קלאש רויאל\`* — כתוב: *קלאש רויאל* או *clash royale*
 5. *\`Idle Miner Tycoon\`* — כתוב: *איידל מיינר* או *idle miner*
+6. *\`Friday Night Funkin'\`* — כתוב: *fnf* או *friday night funkin*
+7. *\`Slay the Spire 2\`* — כתוב: *slay the spire* או *סליי דה ספייר*
 
 📱 *רשתות חברתיות:*
 6. *\`אינסטגרם\`* — כתוב: *אינסטגרם* או *instagram*
@@ -58,6 +60,8 @@ export default {
 
 📚 *לימוד שפות:*
 33. *\`דואולינגו\`* — כתוב: *דואולינגו* או *duolingo*
+34. *\`Busuu\`* — כתוב: *בוסו* או *busuu*
+35. *\`Mimo\`* — כתוב: *מימו* או *mimo*
 
 🎹 *ייצור מוזיקה:*
 34. *\`אפאל סטודיו\`* — כתוב: *אפאל סטודיו* או *fl studio*
@@ -84,22 +88,14 @@ export default {
 41. *\`Proton VPN\`* — כתוב: *פרוטון* או *proton vpn*
 42. *\`Photo Vault PRIVARY\`* — כתוב: *כספת תמונות* או *photo vault*
 
-📚 *לימוד:*
-43. *\`Busuu\`* — כתוב: *בוסו* או *busuu*
-44. *\`Mimo\`* — כתוב: *מימו* או *mimo*
-
 🌤️ *מזג אוויר:*
 45. *\`AccuWeather\`* — כתוב: *מזג אוויר* או *accuweather*
 
 🌐 *תרגום:*
 46. *\`Speak & Translate\`* — כתוב: *מתרגם* או *speak translate*
 
-🎮 *משחקים:*
-47. *\`Friday Night Funkin'\`* — כתוב: *fnf* או *friday night funkin*
-48. *\`Slay the Spire 2\`* — כתוב: *slay the spire* או *סליי דה ספייר*
-
 🎲 *אחרים:*
-49. *\`אפליקציה אקראית\`* — כתוב: *אקראי* או *random*`;
+47. *\`אפליקציה אקראית\`* — כתוב: *אקראי* או *random*`;
 
     try {
       await sock.sendMessage(
