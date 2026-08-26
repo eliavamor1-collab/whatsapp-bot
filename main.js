@@ -66,6 +66,7 @@ import fakeGpsCommand from "./commands/fakegps.js";
 import idleMinerCommand from "./commands/idleminer.js";
 import simpMusicCommand from "./commands/simpmusic.js";
 import callRecorderCommand from "./commands/callrecorder.js";
+import meldCommand from "./commands/meld.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -74,7 +75,7 @@ const { Pool } = pg;
 // Configuration
 // ========================================
 const PORT = Number(process.env.PORT || 10000);
-const TARGET_GROUP_NAME = "פרוץ בווצאפ";
+const TARGET_GROUP_NAME = "פרוץ בווצאפ (אפליקציות)";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
 const TARGET_GROUP_NAME_2 = "פרוץ בווצאפ (איחסון)";
 const TARGET_GROUP_JID_2 = "120363408996332000@g.us";
@@ -147,6 +148,7 @@ registerCommand(fakeGpsCommand);
 registerCommand(idleMinerCommand);
 registerCommand(simpMusicCommand);
 registerCommand(callRecorderCommand);
+registerCommand(meldCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
@@ -825,7 +827,7 @@ async function main() {
     await startWhatsApp();
 
     sendPing();
-    setInterval(sendPing, 10 * 60 * 1000);
+    setInterval(sendPing, 12 * 60 * 1000);
   } catch (error) {
     console.error("שגיאה קריטית בעליית השרת:", error);
   }
