@@ -9,12 +9,12 @@ export default {
 *Meld*
 🔢 *גירסא:* v0.8.8
 📦 *גודל:* 23.4 MB
-💾 *סוג:* כלי עריכה
+💾 *סוג:* סטרימינג מוזיקה ואודיו
 🎯 *תוכן:*
 אפליקציית Meld — כלי עריכה והשוואת קבצים מתקדם.
 
 ℹ️ *הערות:*
-פשוט להתקין ולהשתמש`;
+📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o`;
   },
 
   async execute(sock, message) {
@@ -27,19 +27,16 @@ export default {
 *Meld*
 🔢 *גירסא:* v0.8.8
 📦 *גודל:* 23.4 MB
-💾 *סוג:* כלי עריכה
+💾 *סוג:* סטרימינג מוזיקה ואודיו
 🎯 *תוכן:*
 אפליקציית Meld — כלי עריכה והשוואת קבצים מתקדם.
 
 ℹ️ *הערות:*
-פשוט להתקין ולהשתמש
+📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
 https://drive.google.com/file/d/1OA4n2XHR7ymJc6qZG_dXzrghP34khCFm/view?usp=sharing
-
-📺 *מדריך התקנה:*
-https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o
 ━━━━━━━━━━━━━━━`;
 
     try {
