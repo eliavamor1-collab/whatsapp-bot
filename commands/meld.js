@@ -36,7 +36,7 @@ export default {
 
 ━━━━━━━━━━━━━━━
 ⬇️ *לחץ להורדה ישירה* ⬇️
-https://drive.google.com/file/d/1OA4n2XHR7ymJc6qZG_dXzrghP34khCFm/view?usp=sharing
+https://drive.google.com/file/d/1ZhrYBpt06IsUVbs3woFTEjScvEbMNJtl/view?usp=drivesdk
 ━━━━━━━━━━━━━━━`;
 
     try {
