@@ -79,6 +79,9 @@ import accuweatherCommand from "./commands/accuweather.js";
 import speaktranslateCommand from "./commands/speaktranslate.js";
 import fnfCommand from "./commands/fnf.js";
 import slaythespireCommand from "./commands/slaythespire.js";
+import soundcloudCommand from "./commands/soundcloud.js";
+import powerampCommand from "./commands/poweramp.js";
+import pixivCommand from "./commands/pixiv.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
 
 const { Pool } = pg;
@@ -173,6 +176,9 @@ registerCommand(accuweatherCommand);
 registerCommand(speaktranslateCommand);
 registerCommand(fnfCommand);
 registerCommand(slaythespireCommand);
+registerCommand(soundcloudCommand);
+registerCommand(powerampCommand);
+registerCommand(pixivCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 
