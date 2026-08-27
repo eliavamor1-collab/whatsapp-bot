@@ -12,9 +12,23 @@ const CURSE_WORDS = [
   "יא זונה", "יא שרמוטה", "יא מניאק",
 ];
 
+// תווים שנחשבים "אות" ולכן חלק ממילה (עברית + אנגלית + ספרות + גרש/גרשיים)
+const WORD_CHAR = "[a-zA-Z\\u0590-\\u05FF0-9'\"]";
+
+// בונים לכל קללה regex שמחייב גבול מילה משני הצדדים,
+// כדי ש-"זין" לא יזוהה בתוך "מגזין" / "מזין" וכו'
+const CURSE_PATTERNS = CURSE_WORDS.map((word) => {
+  const escaped = word
+    .toLowerCase()
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // בריחה מתווים מיוחדים ב-regex
+    .replace(/\s+/g, "\\s+");                // רווח = רווח אחד או יותר
+  // (?<!אות) לפני, ו-(?!אות) אחרי — כלומר המילה עומדת בפני עצמה
+  return new RegExp(`(?<!${WORD_CHAR})${escaped}(?!${WORD_CHAR})`, "i");
+});
+
 export function containsCurse(text) {
-  const lower = text.toLowerCase();
-  return CURSE_WORDS.some(word => lower.includes(word.toLowerCase()));
+  if (!text) return false;
+  return CURSE_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 export async function handleCurse(sock, message) {
