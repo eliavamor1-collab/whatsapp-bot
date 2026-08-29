@@ -4,6 +4,19 @@ export default {
   trigger: "disney",
   aliases: ["דיסני", "disney+", "דיסני פלוס"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*Disney+*
+🔢 *גירסא:* v26.7.0
+📦 *גודל:* 50 MB
+💾 *סוג:* סטרימינג סרטים
+🎯 *תוכן:*
+כל הקסם של Disney, Pixar, Marvel ו-Star Wars במקום אחד — פרימיום פתוח לכל האזורים.
+
+ℹ️ *הערות:*
+פשוט להתקין ולהשתמש`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
