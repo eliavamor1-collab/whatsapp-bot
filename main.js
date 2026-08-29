@@ -614,7 +614,7 @@ async function startWhatsApp() {
             await sock.sendMessage(
               remoteJid,
               {
-                text: `איזה ספוטיפי אתה רוצה? 🎵\n\n🟢 *ספוטיפי חלופה* — כתוב: *ספוטיפי חלופה* או *spotify*\n🔓 *ספוטילול* — כתוב: *ספוטילול* או *spotilol*`
+                text: `איזה ספוטיפי אתה רוצה? 🎵\n\n🔓 *ספוטילול (מומלץ)* — כתוב: *ספוטילול* או *spotilol*\n🟢 *ספוטיפי חלופה* — כתוב: *ספוטיפי חלופה* או *spotify*`
               },
               { quoted: message }
             );
