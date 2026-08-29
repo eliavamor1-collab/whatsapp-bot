@@ -1,13 +1,18 @@
+import { sendSuspended } from "./suspended.js";
+
 let savedMessage = null;
 
 export default {
   trigger: "nowhatsapp",
-  aliases: ["נוווצאפ"],
+  aliases: ["נוווצאפ", "נווצאפ"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
     console.log("🚀 פקודת nowhatsapp הופעלה!");
+
+    // השעייה זמנית
+    return await sendSuspended(sock, message);
 
     const captionText =
 `📱 *שם האפליקציה:*
