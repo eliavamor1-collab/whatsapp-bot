@@ -35,7 +35,7 @@ https://liteapks.com/download/nowhatsapp-18045/1
         const sentMsg = await sock.sendMessage(
           jid,
           {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/nowhatsapp-150x150.png" },
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/07/nowhatsapp-150x150.png" },
             caption: captionText
           },
           { quoted: message }

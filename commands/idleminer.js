@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "idle miner",
-  aliases: ["idle miner tycoon", "איידל מיינר", "מכרה"],
+  aliases: ["idle miner tycoon", "איידל מיינר"],
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*

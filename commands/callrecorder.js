@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "cube acr",
-  aliases: ["מקליט שיחות", "call recorder", "קיוב אקר", "מקליט"],
+  aliases: ["מקליט שיחות", "call recorder", "קיוב אקר"],
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*

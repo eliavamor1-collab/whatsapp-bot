@@ -38,6 +38,7 @@ import youtubemusicCommand from "./commands/youtubemusic.js";
 import capcutCommand from "./commands/capcut.js";
 import truecallerCommand from "./commands/truecaller.js";
 import spotifyCommand from "./commands/spotify.js";
+import spotilolCommand from "./commands/spotilol.js";
 import tiktokCommand from "./commands/tiktok.js";
 import instagramCommand from "./commands/instagram.js";
 import twitterCommand from "./commands/twitter.js";
@@ -135,6 +136,7 @@ registerCommand(youtubemusicCommand);
 registerCommand(capcutCommand);
 registerCommand(truecallerCommand);
 registerCommand(spotifyCommand);
+registerCommand(spotilolCommand);
 registerCommand(tiktokCommand);
 registerCommand(instagramCommand);
 registerCommand(twitterCommand);
@@ -604,6 +606,18 @@ async function startWhatsApp() {
           // בדיקת קללות — לפני כל פקודה
           if (containsCurse(text) && !message.key?.fromMe) {
             await handleCurse(sock, message);
+            continue;
+          }
+
+          // בדיקת ספוטיפי — אם כתבו רק "ספוטיפי" / "ספוטיפיי" בלי לציין סוג
+          if (trimmedText === "ספוטיפי" || trimmedText === "ספוטיפיי") {
+            await sock.sendMessage(
+              remoteJid,
+              {
+                text: `איזה ספוטיפי אתה רוצה? 🎵\n\n🟢 *ספוטיפי חלופה* — כתוב: *ספוטיפי חלופה* או *spotify*\n🔓 *ספוטילול* — כתוב: *ספוטילול* או *spotilol*`
+              },
+              { quoted: message }
+            );
             continue;
           }
 

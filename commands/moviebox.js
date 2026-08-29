@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "moviebox",
-  aliases: ["מובי בוקס", "מוביבוקס", "סרטים"],
+  aliases: ["מובי בוקס", "מוביבוקס"],
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*

@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "spotify",
-  aliases: ["ספוטיפיי", "ספוטיפי"],
+  aliases: ["ספוטיפי חלופה", "ספוטיפיי חלופה"],
 
   async execute(sock, message) {
     const jid = message.key.remoteJid;

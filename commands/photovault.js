@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "photo vault",
-  aliases: ["photovault", "כספת תמונות", "כספת"],
+  aliases: ["photovault", "כספת תמונות"],
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*

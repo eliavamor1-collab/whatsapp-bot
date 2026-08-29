@@ -2,7 +2,7 @@ let savedMessage = null;
 
 export default {
   trigger: "speak translate",
-  aliases: ["speaktranslate", "מתרגם", "תרגום", "translate"],
+  aliases: ["speaktranslate", "translate"],
 
   getCaptionText() {
     return `📱 *שם האפליקציה:*
