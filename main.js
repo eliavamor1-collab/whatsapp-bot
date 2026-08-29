@@ -39,6 +39,7 @@ import capcutCommand from "./commands/capcut.js";
 import truecallerCommand from "./commands/truecaller.js";
 import spotifyCommand from "./commands/spotify.js";
 import spotilolCommand from "./commands/spotilol.js";
+import spotuiCommand from "./commands/spotui.js";
 import tiktokCommand from "./commands/tiktok.js";
 import instagramCommand from "./commands/instagram.js";
 import twitterCommand from "./commands/twitter.js";
@@ -137,6 +138,7 @@ registerCommand(capcutCommand);
 registerCommand(truecallerCommand);
 registerCommand(spotifyCommand);
 registerCommand(spotilolCommand);
+registerCommand(spotuiCommand);
 registerCommand(tiktokCommand);
 registerCommand(instagramCommand);
 registerCommand(twitterCommand);
@@ -614,7 +616,7 @@ async function startWhatsApp() {
             await sock.sendMessage(
               remoteJid,
               {
-                text: `איזה ספוטיפי אתה רוצה? 🎵\n\n🔓 *ספוטילול (מומלץ)* — כתוב: *ספוטילול* או *spotilol*\n🟢 *ספוטיפי חלופה* — כתוב: *ספוטיפי חלופה* או *spotify*`
+                text: `איזה ספוטיפי אתה רוצה? 🎵\n\n🔓 *ספוטילול (מומלץ)* — כתוב: *ספוטילול* או *spotilol*\n🎧 *ספוטוי* — כתוב: *ספוטוי* או *spotui*\n🟢 *ספוטיפי חלופה* — כתוב: *ספוטיפי חלופה* או *spotify*`
               },
               { quoted: message }
             );
