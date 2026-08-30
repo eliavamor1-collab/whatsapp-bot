@@ -4,6 +4,19 @@ export default {
   trigger: "subway",
   aliases: ["סאבווי"],
 
+  getCaptionText() {
+    return `📱 *שם האפליקציה:*
+*Subway Surfers*
+🔢 *גירסא:* v3.67.1
+📦 *גודל:* 229.8 MB
+💾 *סוג:* משחק
+🎯 *תוכן:*
+רצו, התחמקו מרכבות ועזרו ל-Jake והחבורה לברוח מהמפקח והכלב שלו במשחק הריצה המפורסם בעולם!
+
+ℹ️ *הערות:*
+פשוט להתקין ולשחק`;
+  },
+
   async execute(sock, message) {
     const jid = message.key.remoteJid;
 
