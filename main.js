@@ -377,6 +377,99 @@ function cleanupSocket() {
 }
 
 // ========================================
+// GitHub Releases Sync — סנכרון קבצים חסרים עם GitHub Releases
+// ========================================
+const GITHUB_REPO = "eliavamor1-collab/whatsapp-bot";
+const GITHUB_RELEASE_TAG = "apps";
+
+async function syncReleasesOnStartup() {
+  console.log("[Sync] בודק קבצים חסרים מ-GitHub Releases...");
+
+  // בונים map מ-fileName לפקודה
+  const fileNameToCommand = new Map();
+  for (const cmd of commands.values()) {
+    if (cmd.fileName) {
+      fileNameToCommand.set(cmd.fileName.toLowerCase(), cmd);
+    }
+  }
+
+  if (fileNameToCommand.size === 0) {
+    console.log("[Sync] אין פקודות עם fileName — מדלג");
+    return;
+  }
+
+  // שולפים את ה-assets מה-Release
+  let assets;
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${GITHUB_RELEASE_TAG}`,
+      { headers: { "User-Agent": "whatsapp-bot", "Accept": "application/vnd.github+json" } }
+    );
+    if (!response.ok) {
+      console.error(`[Sync] לא הצלחנו לשלוף את ה-Release: ${response.status}`);
+      return;
+    }
+    const data = await response.json();
+    assets = data.assets || [];
+  } catch (err) {
+    console.error("[Sync] שגיאה בשליפת GitHub Releases:", err.message);
+    return;
+  }
+
+  console.log(`[Sync] נמצאו ${assets.length} assets ב-Release "${GITHUB_RELEASE_TAG}"`);
+
+  for (const asset of assets) {
+    const assetName = asset.name;
+    const command = fileNameToCommand.get(assetName.toLowerCase());
+
+    if (!command) {
+      console.log(`[Sync] לא נמצאה פקודה עבור: ${assetName} — מדלג`);
+      continue;
+    }
+
+    // בודק אם הקובץ כבר קיים ב-DB
+    const existing = await getFile(command.trigger);
+    if (existing) {
+      console.log(`[Sync] ${assetName} כבר קיים ב-DB — מדלג`);
+      continue;
+    }
+
+    // מעלה לקבוצת האיחסון ושומר ב-DB
+    console.log(`[Sync] מעלה קובץ חסר: ${assetName}...`);
+    try {
+      const sentMsg = await sock.sendMessage(TARGET_GROUP_JID_2, {
+        document: { url: asset.browser_download_url },
+        fileName: assetName,
+        mimetype: "application/vnd.android.package-archive"
+      });
+
+      if (sentMsg) {
+        const rawData = {
+          message: sentMsg.message,
+          key: {
+            remoteJid: TARGET_GROUP_JID_2,
+            id: sentMsg.key?.id,
+            fromMe: true,
+            participant: undefined
+          }
+        };
+        const saved = await saveFile(command.trigger, sentMsg.key?.id, TARGET_GROUP_JID_2, rawData);
+        if (saved) {
+          console.log(`[Sync] ✅ ${assetName} הועלה ונשמר עבור "${command.trigger}"`);
+        }
+      }
+    } catch (err) {
+      console.error(`[Sync] ❌ שגיאה בהעלאת ${assetName}:`, err.message);
+    }
+
+    // המתנה קצרה בין קבצים כדי לא להעמיס
+    await new Promise(r => setTimeout(r, 3000));
+  }
+
+  console.log("[Sync] סנכרון הושלם ✅");
+}
+
+// ========================================
 // Main WhatsApp Engine
 // ========================================
 async function startWhatsApp() {
@@ -459,6 +552,9 @@ async function startWhatsApp() {
         console.log(`קבוצת יעד: ${TARGET_GROUP_NAME}`);
         console.log(`JID יעד: ${TARGET_GROUP_JID}`);
         console.log("========================================");
+
+        // סנכרון אוטומטי עם GitHub Releases — מעלה קבצים שחסרים ב-DB
+        syncReleasesOnStartup().catch(err => console.error("[Sync] שגיאה בסנכרון:", err));
       }
 
       if (connection === "close") {
