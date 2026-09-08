@@ -678,7 +678,52 @@ async function startWhatsApp() {
             const wantsFile = trimmedText.includes("קובץ");
 
             if (wantsFile) {
-              // מחפשים קובץ שמור — קודם לפי trigger, אחר כך לפי aliases
+              // שולפים את הטקסט בלי קישור
+              let captionText = "";
+              if (typeof command.getCaptionText === "function") {
+                captionText = command.getCaptionText();
+              } else {
+                // fallback — חותכים מה-captionText הרגיל לפני ━━━
+                // מריצים execute עם sock מזויף שלא שולח כלום
+                const originalSend = sock.sendMessage.bind(sock);
+                sock.sendMessage = async (jid, content, opts) => {
+                  const text = content?.caption || content?.text || content?.image?.caption || "";
+                  if (text) captionText = text;
+                  return null;
+                };
+                try { await command.execute(sock, message); } catch (e) {}
+                sock.sendMessage = originalSend;
+                captionText = captionText.split("━━━")[0].trimEnd();
+              }
+              const textWithoutLink = captionText.split("━━━")[0].trimEnd();
+
+              // ========================================
+              // אפשרות A — שליחת קובץ ישירות מ-URL (GitHub Releases וכו')
+              // אם לפקודה יש fileUrl, שולחים את ה-APK כמסמך ישירות מהקישור
+              // ========================================
+              if (command.fileUrl) {
+                if (textWithoutLink) {
+                  await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
+                }
+                try {
+                  const fileName = command.fileName || `${command.trigger}.apk`;
+                  await sock.sendMessage(remoteJid, {
+                    document: { url: command.fileUrl },
+                    fileName,
+                    mimetype: "application/vnd.android.package-archive"
+                  }, { quoted: message });
+                  console.log(`[File] קובץ נשלח מ-URL עבור ${command.trigger} ✅`);
+                } catch (urlErr) {
+                  console.error("❌ שגיאה בשליחת קובץ מ-URL:", urlErr);
+                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשליחת הקובץ, נסה שוב" }, { quoted: message });
+                }
+                console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);
+                continue;
+              }
+
+              // ========================================
+              // מנגנון ישן — קובץ שמור ב-DB (forward)
+              // ========================================
               const namesToTry = [command.trigger, ...(command.aliases || [])];
               let fileData = null;
               for (const name of namesToTry) {
@@ -687,29 +732,6 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולפים את הטקסט בלי קישור
-                let captionText = "";
-                if (typeof command.getCaptionText === "function") {
-                  captionText = command.getCaptionText();
-                } else {
-                  // fallback — חותכים מה-captionText הרגיל לפני ━━━
-                  // מריצים execute עם sock מזויף שלא שולח כלום
-                  const originalSend = sock.sendMessage.bind(sock);
-                  sock.sendMessage = async (jid, content, opts) => {
-                    const text = content?.caption || content?.text || content?.image?.caption || "";
-                    if (text) captionText = text;
-                    return null;
-                  };
-                  try { await command.execute(sock, message); } catch(e) {}
-                  sock.sendMessage = originalSend;
-                  captionText = captionText.split("━━━")[0].trimEnd();
-                }
-
-                // חותכים את הקישור רק אם לא השתמשנו ב-getCaptionText
-                const textWithoutLink = typeof command.getCaptionText === "function"
-                  ? captionText
-                  : captionText.split("━━━")[0].trimEnd();
-
                 // שולחים טקסט בלי קישור
                 if (textWithoutLink) {
                   await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
