@@ -502,6 +502,12 @@ async function startWhatsApp() {
           const remoteJid = message.key?.remoteJid;
           if (!ALLOWED_GROUPS.has(remoteJid)) continue;
 
+          // ========================================
+          // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
+          // קבוצת האיחסון ממשיכה לעבוד רגיל
+          // ========================================
+          if (remoteJid === TARGET_GROUP_JID) continue;
+
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
             botSentMessageIds.delete(messageId);
@@ -593,9 +599,15 @@ async function startWhatsApp() {
             if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace(/^מחק /, "").trim();
             try {
-              const result = await pool.query("DELETE FROM saved_files WHERE app_name = $1 RETURNING app_name", [appName]);
+              // מוחקים גם את השם המדויק וגם גרסאות עם suffix מספרי (למשל "סאבווי 1", "סאבווי 2")
+              const result = await pool.query(
+                "DELETE FROM saved_files WHERE app_name = $1 OR app_name LIKE $2 RETURNING app_name",
+                [appName, `${appName} %`]
+              );
               if (result.rows.length > 0) {
-                await sock.sendMessage(remoteJid, { text: `🗑️ הקובץ *${appName}* נמחק בהצלחה` }, { quoted: message });
+                const count = result.rows.length;
+                const suffix = count > 1 ? ` (${count} קבצים)` : "";
+                await sock.sendMessage(remoteJid, { text: `🗑️ הקובץ *${appName}* נמחק בהצלחה${suffix}` }, { quoted: message });
               } else {
                 await sock.sendMessage(remoteJid, { text: `❌ לא נמצא קובץ בשם *${appName}*` }, { quoted: message });
               }
