@@ -598,7 +598,13 @@ async function startWhatsApp() {
           if (!message?.message) continue;
 
           const remoteJid = message.key?.remoteJid;
-          if (!ALLOWED_GROUPS.has(remoteJid)) continue;
+          if (!ALLOWED_GROUPS.has(remoteJid)) {
+            // לוג זמני לאיתור JID של קבוצות חדשות
+            if (remoteJid?.endsWith("@g.us")) {
+              console.log(`[JID Discovery] קבוצה לא מוכרת: ${remoteJid}`);
+            }
+            continue;
+          }
 
           // ========================================
           // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
