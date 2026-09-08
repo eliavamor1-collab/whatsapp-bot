@@ -96,7 +96,9 @@ const TARGET_GROUP_NAME = "פרוץ בווצאפ (אפליקציות)";
 const TARGET_GROUP_JID = "120363410444900210@g.us";
 const TARGET_GROUP_NAME_2 = "פרוץ בווצאפ (איחסון)";
 const TARGET_GROUP_JID_2 = "120363408996332000@g.us";
-const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2]);
+const TARGET_GROUP_NAME_3 = "פרוץ בוווצאפ (בדיקה)";
+const TARGET_GROUP_JID_3 = "120363430372014043@g.us";
+const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2, TARGET_GROUP_JID_3]);
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
 // ========================================
@@ -598,13 +600,7 @@ async function startWhatsApp() {
           if (!message?.message) continue;
 
           const remoteJid = message.key?.remoteJid;
-          if (!ALLOWED_GROUPS.has(remoteJid)) {
-            // לוג זמני לאיתור JID של קבוצות חדשות
-            if (remoteJid?.endsWith("@g.us")) {
-              console.log(`[JID Discovery] קבוצה לא מוכרת: ${remoteJid}`);
-            }
-            continue;
-          }
+          if (!ALLOWED_GROUPS.has(remoteJid)) continue;
 
           // ========================================
           // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
