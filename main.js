@@ -1090,6 +1090,43 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ========================================
+  // Mod Updater Webhook — התראת עדכון גרסה
+  // ========================================
+  if (req.url === "/update-notification" && req.method === "POST") {
+    let body = "";
+    req.on("data", chunk => { body += chunk.toString(); });
+    req.on("end", async () => {
+      try {
+        const { appName, oldVersion, newVersion } = JSON.parse(body);
+        res.writeHead(200);
+        res.end("ok");
+
+        if (!appName || !newVersion) return;
+
+        const msg =
+`🔔 *עדכון חדש יצא!*
+
+📱 *${appName}*
+📌 גרסה קודמת: \`${oldVersion}\`
+✅ גרסה חדשה: \`${newVersion}\`
+
+⬇️ כתוב את שם האפליקציה לקבלת קישור הורדה`;
+
+        if (sock && currentStatus.includes("מחובר")) {
+          await sock.sendMessage(TARGET_GROUP_JID_3, { text: msg });
+          console.log(`[UpdateNotif] נשלחה התראה עבור ${appName} → ${newVersion}`);
+        } else {
+          console.log(`[UpdateNotif] WhatsApp לא מחובר — לא נשלחה התראה עבור ${appName}`);
+        }
+      } catch (err) {
+        console.error("[UpdateNotif] שגיאה:", err);
+        if (!res.headersSent) { res.writeHead(500); res.end("error"); }
+      }
+    });
+    return;
+  }
+
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Not Found");
 });
