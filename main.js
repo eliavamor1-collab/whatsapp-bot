@@ -360,6 +360,8 @@ let sock = null;
 let reconnectTimer = null;
 let starting = false;
 const botSentMessageIds = new Set();
+// Cache של הודעות קבצים שכבר נשלחו — מאיץ שליחות חוזרות (forward במקום הורדה+העלאה מחדש)
+const sentFileCache = new Map();
 
 function cleanupSocket() {
   if (sock) {
@@ -683,8 +685,6 @@ async function startWhatsApp() {
               if (typeof command.getCaptionText === "function") {
                 captionText = command.getCaptionText();
               } else {
-                // fallback — חותכים מה-captionText הרגיל לפני ━━━
-                // מריצים execute עם sock מזויף שלא שולח כלום
                 const originalSend = sock.sendMessage.bind(sock);
                 sock.sendMessage = async (jid, content, opts) => {
                   const text = content?.caption || content?.text || content?.image?.caption || "";
@@ -698,31 +698,8 @@ async function startWhatsApp() {
               const textWithoutLink = captionText.split("━━━")[0].trimEnd();
 
               // ========================================
-              // אפשרות A — שליחת קובץ ישירות מ-URL (GitHub Releases וכו')
-              // אם לפקודה יש fileUrl, שולחים את ה-APK כמסמך ישירות מהקישור
-              // ========================================
-              if (command.fileUrl) {
-                if (textWithoutLink) {
-                  await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
-                }
-                try {
-                  const fileName = command.fileName || `${command.trigger}.apk`;
-                  await sock.sendMessage(remoteJid, {
-                    document: { url: command.fileUrl },
-                    fileName,
-                    mimetype: "application/vnd.android.package-archive"
-                  }, { quoted: message });
-                  console.log(`[File] קובץ נשלח מ-URL עבור ${command.trigger} ✅`);
-                } catch (urlErr) {
-                  console.error("❌ שגיאה בשליחת קובץ מ-URL:", urlErr);
-                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשליחת הקובץ, נסה שוב" }, { quoted: message });
-                }
-                console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);
-                continue;
-              }
-
-              // ========================================
-              // מנגנון ישן — קובץ שמור ב-DB (forward)
+              // עדיפות 1 — forward מ-DB (מהיר, הקובץ כבר בשרתי וואטסאפ)
+              // נשמר שם אוטומטית דרך ה-webhook, או ידנית דרך "שמור"
               // ========================================
               const namesToTry = [command.trigger, ...(command.aliases || [])];
               let fileData = null;
@@ -732,24 +709,54 @@ async function startWhatsApp() {
               }
 
               if (fileData) {
-                // שולחים טקסט בלי קישור
                 if (textWithoutLink) {
                   await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
                 }
-
-                // שולחים את כל הקבצים אחד אחרי השני
                 try {
                   for (const file of fileData) {
                     const rawMsg = file.raw_message;
                     await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
                   }
-                  console.log(`[File] ${fileData.length} קבצים נשלחו עבור ${command.trigger} ✅`);
+                  console.log(`[File] ${fileData.length} קבצים נשלחו (forward) עבור ${command.trigger} ✅`);
                 } catch (fwdErr) {
                   console.error("❌ שגיאה בהעברת קובץ:", fwdErr);
                   await sock.sendMessage(remoteJid, { text: "❌ שגיאה בהעברת הקובץ, נסה שוב" }, { quoted: message });
                 }
+
+              // ========================================
+              // עדיפות 2 — URL ישיר (fileUrl) עם cache בזיכרון
+              // fallback כשהקובץ עדיין לא עלה דרך webhook
+              // ========================================
+              } else if (command.fileUrl) {
+                if (textWithoutLink) {
+                  await sock.sendMessage(remoteJid, { text: textWithoutLink }, { quoted: message });
+                }
+                try {
+                  const fileName = command.fileName || `${command.trigger}.apk`;
+                  const cached = sentFileCache.get(command.fileUrl);
+                  if (cached) {
+                    console.log(`♻️ שולח קובץ מה-cache עבור ${command.trigger}...`);
+                    await sock.sendMessage(remoteJid, { forward: cached }, { quoted: message });
+                  } else {
+                    console.log(`⬇️ מוריד ומעלה קובץ בפעם הראשונה עבור ${command.trigger}...`);
+                    const sentMsg = await sock.sendMessage(remoteJid, {
+                      document: { url: command.fileUrl },
+                      fileName,
+                      mimetype: "application/vnd.android.package-archive"
+                    }, { quoted: message });
+                    if (sentMsg) {
+                      sentFileCache.set(command.fileUrl, sentMsg);
+                      console.log(`💾 הקובץ נשמר ב-cache עבור ${command.trigger}`);
+                    }
+                  }
+                  console.log(`[File] קובץ נשלח מ-URL עבור ${command.trigger} ✅`);
+                } catch (urlErr) {
+                  console.error("❌ שגיאה בשליחת קובץ מ-URL:", urlErr);
+                  await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשליחת הקובץ, נסה שוב" }, { quoted: message });
+                }
+
               } else {
-                // אין קובץ שמור — שולחים רק הודעת שגיאה
+                // אין לא DB ולא fileUrl
                 await sock.sendMessage(
                   remoteJid,
                   { text: `⚠️ אין קובץ שמור עבור *${command.trigger}*` },
@@ -876,6 +883,113 @@ const server = http.createServer((req, res) => {
         connected: Boolean(sock && currentStatus.includes("מחובר"))
       })
     );
+  }
+
+  // ========================================
+  // GitHub Webhook — העלאה אוטומטית של APK בעת release חדש
+  // ========================================
+  if (req.url === "/github-webhook" && req.method === "POST") {
+    let body = "";
+    req.on("data", chunk => { body += chunk.toString(); });
+    req.on("end", async () => {
+      try {
+        const event = req.headers["x-github-event"];
+
+        // מגיב רק לאירוע release שפורסם
+        if (event !== "release") {
+          res.writeHead(200);
+          return res.end("ignored");
+        }
+
+        const payload = JSON.parse(body);
+        if (payload.action !== "published") {
+          res.writeHead(200);
+          return res.end("ignored");
+        }
+
+        res.writeHead(200);
+        res.end("ok");
+
+        const assets = payload.release?.assets || [];
+        if (assets.length === 0) {
+          console.log("[Webhook] Release חדש אבל אין assets");
+          return;
+        }
+
+        console.log(`[Webhook] Release חדש: ${payload.release.name} — ${assets.length} assets`);
+
+        // בונים map מ-fileName ל-פקודה (לכל הפקודות שיש להן fileUrl)
+        const fileNameToCommand = new Map();
+        for (const cmd of commands.values()) {
+          if (cmd.fileName) {
+            fileNameToCommand.set(cmd.fileName.toLowerCase(), cmd);
+          }
+        }
+
+        for (const asset of assets) {
+          const assetName = asset.name;
+          const command = fileNameToCommand.get(assetName.toLowerCase());
+
+          if (!command) {
+            console.log(`[Webhook] לא נמצאה פקודה עבור הקובץ: ${assetName} — מדלג`);
+            continue;
+          }
+
+          // בודקים אם הקובץ כבר שמור ב-DB
+          const existing = await getFile(command.trigger);
+          if (existing) {
+            console.log(`[Webhook] הקובץ ${assetName} כבר קיים ב-DB — מדלג`);
+            continue;
+          }
+
+          // ממתינים לחיבור WhatsApp אם עדיין לא מחובר
+          if (!sock || !currentStatus.includes("מחובר")) {
+            console.log(`[Webhook] WhatsApp לא מחובר עדיין — מחכה 10 שניות...`);
+            await new Promise(r => setTimeout(r, 10000));
+          }
+
+          if (!sock) {
+            console.log(`[Webhook] WhatsApp עדיין לא מחובר — מדלג על ${assetName}`);
+            continue;
+          }
+
+          console.log(`[Webhook] מעלה ${assetName} לקבוצת האיחסון...`);
+          try {
+            const sentMsg = await sock.sendMessage(TARGET_GROUP_JID_2, {
+              document: { url: asset.browser_download_url },
+              fileName: assetName,
+              mimetype: "application/vnd.android.package-archive"
+            });
+
+            if (sentMsg) {
+              // שמירה ב-DB בדיוק כמו "שמור <שם>" ידני
+              const rawData = {
+                message: sentMsg.message,
+                key: {
+                  remoteJid: TARGET_GROUP_JID_2,
+                  id: sentMsg.key?.id,
+                  fromMe: true,
+                  participant: undefined
+                }
+              };
+              const saved = await saveFile(command.trigger, sentMsg.key?.id, TARGET_GROUP_JID_2, rawData);
+              if (saved) {
+                console.log(`[Webhook] ✅ ${assetName} הועלה ונשמר עבור פקודה "${command.trigger}"`);
+              }
+            }
+          } catch (uploadErr) {
+            console.error(`[Webhook] ❌ שגיאה בהעלאת ${assetName}:`, uploadErr);
+          }
+        }
+      } catch (err) {
+        console.error("[Webhook] שגיאה בעיבוד webhook:", err);
+        if (!res.headersSent) {
+          res.writeHead(500);
+          res.end("error");
+        }
+      }
+    });
+    return;
   }
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
