@@ -596,22 +596,38 @@ async function startWhatsApp() {
       try {
         if (type !== "notify" || !messages || messages.length === 0) return;
 
+        // מעבדים כל הודעה במקביל (בלי לחכות) כדי שהודעה איטית
+        // (למשל שליפת גרסה חיה) לא תחסום הודעות אחרות
         for (const message of messages) {
-          if (!message?.message) continue;
+          handleSingleMessage(message).catch((err) =>
+            console.error("שגיאה בעיבוד הודעה:", err)
+          );
+        }
+      } catch (error) {
+        console.error("שגיאה בעיבוד הודעות נכנסות:", error);
+      }
+    });
+
+    // ========================================
+    // עיבוד הודעה בודדת (רץ במקביל לשאר)
+    // ========================================
+    async function handleSingleMessage(message) {
+        {
+          if (!message?.message) return;
 
           const remoteJid = message.key?.remoteJid;
-          if (!ALLOWED_GROUPS.has(remoteJid)) continue;
+          if (!ALLOWED_GROUPS.has(remoteJid)) return;
 
           // ========================================
           // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
           // קבוצת האיחסון ממשיכה לעבוד רגיל
           // ========================================
-          if (remoteJid === TARGET_GROUP_JID) continue;
+          if (remoteJid === TARGET_GROUP_JID) return;
 
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
             botSentMessageIds.delete(messageId);
-            continue;
+            return;
           }
 
           const msgContent = message.message;
@@ -635,7 +651,7 @@ async function startWhatsApp() {
           const quotedMsgId = contextInfo?.stanzaId;
           const quotedParticipant = contextInfo?.participant;
 
-          if (!text) continue;
+          if (!text) return;
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
@@ -647,11 +663,11 @@ async function startWhatsApp() {
           const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
-            if (remoteJid !== TARGET_GROUP_JID_2) continue;
+            if (remoteJid !== TARGET_GROUP_JID_2) return;
             const appName = trimmedText.replace("שמור ", "").trim();
             if (appName.length === 0) {
               await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
-              continue;
+              return;
             }
             // שומרים את ה-raw message ביחד עם ה-key המלא
             const rawData = {
@@ -669,7 +685,7 @@ async function startWhatsApp() {
             } else {
               await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשמירת הקובץ, נסה שוב" }, { quoted: message });
             }
-            continue;
+            return;
           }
 
           // ========================================
@@ -689,14 +705,14 @@ async function startWhatsApp() {
             } catch (err) {
               console.error("❌ שגיאה בשליפת רשימת קבצים:", err);
             }
-            continue;
+            return;
           }
 
           // ========================================
           // מחיקת קובץ שמור — רק בקבוצת האיחסון
           // ========================================
           if (trimmedText.startsWith("מחק ")) {
-            if (remoteJid !== TARGET_GROUP_JID_2) continue;
+            if (remoteJid !== TARGET_GROUP_JID_2) return;
             const appName = trimmedText.replace(/^מחק /, "").trim();
             try {
               // מוחקים גם את השם המדויק וגם גרסאות עם suffix מספרי (למשל "סאבווי 1", "סאבווי 2")
@@ -714,13 +730,13 @@ async function startWhatsApp() {
             } catch (err) {
               console.error("❌ שגיאה במחיקת קובץ:", err);
             }
-            continue;
+            return;
           }
 
           // בדיקת קללות — לפני כל פקודה
           if (containsCurse(text) && !message.key?.fromMe) {
             await handleCurse(sock, message);
-            continue;
+            return;
           }
 
           // בדיקת ספוטיפי — אם כתבו רק "ספוטיפי" / "ספוטיפיי" בלי לציין סוג
@@ -732,7 +748,7 @@ async function startWhatsApp() {
               },
               { quoted: message }
             );
-            continue;
+            return;
           }
 
           let command = commands.get(trimmedText);
@@ -764,12 +780,12 @@ async function startWhatsApp() {
               },
               { quoted: message }
             );
-            continue;
+            return;
           }
 
           if (!command) {
             console.log(`[No Match] No command found for trigger: "${trimmedText}"`);
-            continue;
+            return;
           }
 
           console.log(`[Executing] Executing trigger: ${command.trigger}`);
@@ -874,10 +890,7 @@ async function startWhatsApp() {
             console.error(`[Error] Failed executing command "${command.trigger}":`, error);
           }
         }
-      } catch (error) {
-        console.error("שגיאה בעיבוד הודעות נכנסות:", error);
-      }
-    });
+    }
   } catch (error) {
     starting = false;
     cleanupSocket();

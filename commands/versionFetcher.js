@@ -80,7 +80,7 @@ async function refreshCache() {
 
   try {
     const res = await fetch(`${MOD_UPDATER_URL}/api/versions`, {
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
