@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "roblox",
   aliases: ["רובלוקס"],
@@ -24,7 +25,8 @@ export default {
 
     console.log("🚀 פקודת roblox הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *רובלוקס*
 🔢 *גירסא:* V2.732.1043
 📦 *גודל:* 180 MB
@@ -41,17 +43,26 @@ export default {
 https://9mod.com/download/roblox-123/1
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://9mod.com/wp-content/uploads/2024/05/roblox-150x150.webp" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Roblox...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Roblox בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://9mod.com/wp-content/uploads/2024/05/roblox-150x150.webp" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Roblox הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת roblox:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

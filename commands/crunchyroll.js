@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "crunchyroll",
   aliases: ["קראנצ'ירול", "קראנצירול", "אנימה"],
@@ -21,7 +22,8 @@ export default {
 
     console.log("🚀 פקודת crunchyroll הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Crunchyroll*
 🔢 *גירסא:* v3.115.0
 📦 *גודל:* ~50 MB
@@ -37,17 +39,20 @@ export default {
 https://9mod.com/crunchyroll-2.html
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://play-lh.googleusercontent.com/a-0bCAGf3ss5S5-MQ0WEkQWRFPU__LGJvDqAGlIjFkLcCbFJCz7I9Qk7gyq6NF0Qb0" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://play-lh.googleusercontent.com/a-0bCAGf3ss5S5-MQ0WEkQWRFPU__LGJvDqAGlIjFkLcCbFJCz7I9Qk7gyq6NF0Qb0" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+        if (sentMsg) savedMessage = sentMsg;
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת crunchyroll:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

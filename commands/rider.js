@@ -1,4 +1,4 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
 
 export default {
   trigger: "rider",
@@ -24,10 +24,10 @@ export default {
 
     console.log("🚀 פקודת rider הופעלה!");
 
-    let captionText =
+    const captionText =
 `📱 *שם האפליקציה:*
 *ריידר (Rider)*
-🔢 *גירסא:* v3.06.0.07
+🔢 *גירסא:* v2.0.0
 📦 *גודל:* 100 MB
 💾 *סוג:* משחק
 🎯 *תוכן:*
@@ -41,19 +41,26 @@ export default {
 https://liteapks.com/download/rider-14435/1
 ━━━━━━━━━━━━━━━`;
 
-    // מחליף את הגרסה בגרסה החיה מ-Mod Updater (אם זמינה)
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      console.log("📸 שולח תמונת Rider...");
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/06/rider-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Rider...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Rider בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/06/rider-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Rider הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת rider:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

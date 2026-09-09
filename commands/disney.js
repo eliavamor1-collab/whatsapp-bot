@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "disney",
   aliases: ["דיסני", "disney+", "דיסני פלוס"],
@@ -21,7 +22,8 @@ export default {
 
     console.log("🚀 פקודת disney הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Disney+*
 🔢 *גירסא:* v26.7.0
 📦 *גודל:* 50 MB
@@ -40,17 +42,26 @@ https://liteapks.com/download/disney-196/1
 https://liteapks.com/download/disney-196/2
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/disney-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Disney+...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Disney+ בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/disney-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Disney+ הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת disney:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

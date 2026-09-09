@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "truecaller",
   aliases: ["טרוקולר", "טרו קולר"],
@@ -8,7 +9,8 @@ export default {
 
     console.log("🚀 פקודת truecaller הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Truecaller Gold*
 🔢 *גירסא:* v26.32.7
 📦 *גודל:* 77 MB
@@ -30,17 +32,26 @@ https://fs20.uploadrar.com:183/d/mxsuai2yappay775m2h2vk67zf6zligmo4uuy36phrwcrej
 https://drive.google.com/file/d/1HifYPtci8cNWIh6AaTzluOOMPA0z9FKY/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/truecaller-caller-id-block-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Truecaller...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Truecaller בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/truecaller-caller-id-block-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Truecaller הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת truecaller:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

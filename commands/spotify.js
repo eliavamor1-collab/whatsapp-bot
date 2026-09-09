@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "spotify",
   aliases: ["ספוטיפי חלופה", "ספוטיפיי חלופה"],
@@ -8,7 +9,8 @@ export default {
 
     console.log("🚀 פקודת spotify הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Spotify Music*
 🔢 *גירסא:* v9.1.72.1891
 📦 *גודל:* 72 MB
@@ -27,17 +29,26 @@ https://spotify-premium-mod.latestmodapks.com/download/
 https://drive.google.com/file/d/1Tab8nK_-9VhqY0YVcabmC2Jaf4n8ZwcD/view?usp=drivesdk
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/spotify-music-and-podcasts-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Spotify...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Spotify בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/spotify-music-and-podcasts-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Spotify הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת spotify:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

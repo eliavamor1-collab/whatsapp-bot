@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "clash royale",
   aliases: ["קלאש רויאל"],
@@ -8,7 +9,8 @@ export default {
 
     console.log("🚀 פקודת clash royale הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Clash Royale*
 🔢 *גירסא:* v150535029
 📦 *גודל:* 1.03 GB
@@ -25,17 +27,26 @@ export default {
 https://9mod.com/download/clash-royale-1454/1
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://9mod.com/wp-content/uploads/2024/06/clash-royale-150x150.webp" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Clash Royale...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Clash Royale בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://9mod.com/wp-content/uploads/2024/06/clash-royale-150x150.webp" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Clash Royale הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת clash royale:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

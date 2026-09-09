@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "pic retouch",
   aliases: ["ai retouch", "פיק ריטוש", "פיק ריטאצ", "פיק ריטאצ'"],
@@ -8,7 +9,8 @@ export default {
 
     console.log("🚀 פקודת pic retouch הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Pic Retouch – Remove Objects*
 🔢 *גירסא:* v1.362.96
 📦 *גודל:* 42 MB
@@ -24,17 +26,26 @@ export default {
 https://liteapks.com/download/pic-retouch-remove-objects-360706/1
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2023/12/pic-retouch-remove-objects-150x150.webp" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Pic Retouch...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת Pic Retouch בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2023/12/pic-retouch-remove-objects-150x150.webp" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת Pic Retouch הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת pic retouch:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "slay the spire",
   aliases: ["slaythespire", "סליי דה ספייר"],
@@ -21,7 +22,8 @@ export default {
 
     console.log("🚀 פקודת slaythespire הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Slay the Spire 2*
 🔢 *גירסא:* v0.111.0
 📦 *גודל:* ~500 MB
@@ -37,17 +39,20 @@ export default {
 https://9mod.com/slay-the-spire.html
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://play-lh.googleusercontent.com/GLZW1d40yfCgQ5V0m7i0HbsNp_0PBUOrVCYKJH1P8JJpqc7L67AWh3VNB4FpWjgvNQ" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://play-lh.googleusercontent.com/GLZW1d40yfCgQ5V0m7i0HbsNp_0PBUOrVCYKJH1P8JJpqc7L67AWh3VNB4FpWjgvNQ" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+        if (sentMsg) savedMessage = sentMsg;
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת slaythespire:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

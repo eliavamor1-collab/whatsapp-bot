@@ -12,6 +12,7 @@ import makeWASocket, {
 import QRCode from "qrcode";
 import pg from "pg";
 import pino from "pino";
+import crypto from "crypto";
 
 process.on("uncaughtException", (err) => {
   const msg = err?.message || String(err);
@@ -280,7 +281,10 @@ async function usePostgresAuthState() {
       return JSON.parse(JSON.stringify(result.rows[0].data), BufferJSON.reviver);
     } catch (err) {
       console.error(`Error reading key ${id} from DB:`, err);
-      return null;
+      // חשוב: לא מחזירים null בתקלת DB — כדי לא לבלבל "אין נתונים" עם "תקלה".
+      // מסמנים את השגיאה כתקלת DB אמיתית כדי שקריאת ה-creds לא תדרוס סשן קיים.
+      err.isDbError = true;
+      throw err;
     }
   };
 
@@ -306,7 +310,14 @@ async function usePostgresAuthState() {
     }
   };
 
-  let creds = await readData("creds");
+  let creds;
+  try {
+    creds = await readData("creds");
+  } catch (err) {
+    // תקלת DB בזמן טעינת ה-creds — לא יוצרים סשן חדש (זה היה דורס את הקיים!)
+    console.error("❌ תקלת DB בטעינת creds — לא יוצרים סשן חדש כדי לא לדרוס את הקיים.");
+    throw err;
+  }
   if (!creds) {
     console.log("אין סשן קיים — יוצר התחברות חדשה...");
     creds = initAuthCreds();
@@ -321,7 +332,13 @@ async function usePostgresAuthState() {
           const data = {};
           await Promise.all(
             ids.map(async (id) => {
-              let value = await readData(`key-${type}-${id}`);
+              let value = null;
+              try {
+                value = await readData(`key-${type}-${id}`);
+              } catch (err) {
+                // מפתח זמני — בתקלת DB מחזירים null בשקט (לא דורסים creds, לא מפילים)
+                value = null;
+              }
               if (type === "app-state-sync-key" && value) {
                 value = proto.Message.AppStateSyncKeyData.fromObject(value);
               }
@@ -596,38 +613,22 @@ async function startWhatsApp() {
       try {
         if (type !== "notify" || !messages || messages.length === 0) return;
 
-        // מעבדים כל הודעה במקביל (בלי לחכות) כדי שהודעה איטית
-        // (למשל שליפת גרסה חיה) לא תחסום הודעות אחרות
         for (const message of messages) {
-          handleSingleMessage(message).catch((err) =>
-            console.error("שגיאה בעיבוד הודעה:", err)
-          );
-        }
-      } catch (error) {
-        console.error("שגיאה בעיבוד הודעות נכנסות:", error);
-      }
-    });
-
-    // ========================================
-    // עיבוד הודעה בודדת (רץ במקביל לשאר)
-    // ========================================
-    async function handleSingleMessage(message) {
-        {
-          if (!message?.message) return;
+          if (!message?.message) continue;
 
           const remoteJid = message.key?.remoteJid;
-          if (!ALLOWED_GROUPS.has(remoteJid)) return;
+          if (!ALLOWED_GROUPS.has(remoteJid)) continue;
 
           // ========================================
           // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
           // קבוצת האיחסון ממשיכה לעבוד רגיל
           // ========================================
-          if (remoteJid === TARGET_GROUP_JID) return;
+          if (remoteJid === TARGET_GROUP_JID) continue;
 
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
             botSentMessageIds.delete(messageId);
-            return;
+            continue;
           }
 
           const msgContent = message.message;
@@ -651,7 +652,7 @@ async function startWhatsApp() {
           const quotedMsgId = contextInfo?.stanzaId;
           const quotedParticipant = contextInfo?.participant;
 
-          if (!text) return;
+          if (!text) continue;
 
           console.log(`[Message Received] JID: ${remoteJid} | Text: "${text}" | FromMe: ${Boolean(message.key?.fromMe)}`);
 
@@ -663,11 +664,11 @@ async function startWhatsApp() {
           const quotedRemoteJid = quotedParticipant || remoteJid;
 
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
-            if (remoteJid !== TARGET_GROUP_JID_2) return;
+            if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace("שמור ", "").trim();
             if (appName.length === 0) {
               await sock.sendMessage(remoteJid, { text: "❌ כתוב שם אפליקציה אחרי שמור, למשל: שמור רובלוקס" }, { quoted: message });
-              return;
+              continue;
             }
             // שומרים את ה-raw message ביחד עם ה-key המלא
             const rawData = {
@@ -685,7 +686,7 @@ async function startWhatsApp() {
             } else {
               await sock.sendMessage(remoteJid, { text: "❌ שגיאה בשמירת הקובץ, נסה שוב" }, { quoted: message });
             }
-            return;
+            continue;
           }
 
           // ========================================
@@ -705,14 +706,14 @@ async function startWhatsApp() {
             } catch (err) {
               console.error("❌ שגיאה בשליפת רשימת קבצים:", err);
             }
-            return;
+            continue;
           }
 
           // ========================================
           // מחיקת קובץ שמור — רק בקבוצת האיחסון
           // ========================================
           if (trimmedText.startsWith("מחק ")) {
-            if (remoteJid !== TARGET_GROUP_JID_2) return;
+            if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace(/^מחק /, "").trim();
             try {
               // מוחקים גם את השם המדויק וגם גרסאות עם suffix מספרי (למשל "סאבווי 1", "סאבווי 2")
@@ -730,13 +731,13 @@ async function startWhatsApp() {
             } catch (err) {
               console.error("❌ שגיאה במחיקת קובץ:", err);
             }
-            return;
+            continue;
           }
 
           // בדיקת קללות — לפני כל פקודה
           if (containsCurse(text) && !message.key?.fromMe) {
             await handleCurse(sock, message);
-            return;
+            continue;
           }
 
           // בדיקת ספוטיפי — אם כתבו רק "ספוטיפי" / "ספוטיפיי" בלי לציין סוג
@@ -748,7 +749,7 @@ async function startWhatsApp() {
               },
               { quoted: message }
             );
-            return;
+            continue;
           }
 
           let command = commands.get(trimmedText);
@@ -780,12 +781,12 @@ async function startWhatsApp() {
               },
               { quoted: message }
             );
-            return;
+            continue;
           }
 
           if (!command) {
             console.log(`[No Match] No command found for trigger: "${trimmedText}"`);
-            return;
+            continue;
           }
 
           console.log(`[Executing] Executing trigger: ${command.trigger}`);
@@ -890,7 +891,10 @@ async function startWhatsApp() {
             console.error(`[Error] Failed executing command "${command.trigger}":`, error);
           }
         }
-    }
+      } catch (error) {
+        console.error("שגיאה בעיבוד הודעות נכנסות:", error);
+      }
+    });
   } catch (error) {
     starting = false;
     cleanupSocket();
@@ -1001,9 +1005,36 @@ const server = http.createServer((req, res) => {
   // ========================================
   if (req.url === "/github-webhook" && req.method === "POST") {
     let body = "";
-    req.on("data", chunk => { body += chunk.toString(); });
+    let tooLarge = false;
+    req.on("data", chunk => {
+      body += chunk.toString();
+      // הגנה מפני גוף ענק — עד 2MB
+      if (body.length > 2 * 1024 * 1024) {
+        tooLarge = true;
+        req.destroy();
+      }
+    });
     req.on("end", async () => {
+      if (tooLarge) return;
       try {
+        // ========================================
+        // אימות HMAC — מוודא שהבקשה באמת מגיטהאב
+        // נאכף רק אם GITHUB_WEBHOOK_SECRET מוגדר (אחרת עובד כרגיל)
+        // ========================================
+        const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+        if (webhookSecret) {
+          const signature = req.headers["x-hub-signature-256"];
+          const expected = "sha256=" + crypto.createHmac("sha256", webhookSecret).update(body).digest("hex");
+          const valid = typeof signature === "string" &&
+            signature.length === expected.length &&
+            crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+          if (!valid) {
+            console.warn("[Webhook] ❌ חתימת HMAC לא תקינה — נדחה");
+            res.writeHead(401);
+            return res.end("invalid signature");
+          }
+        }
+
         const event = req.headers["x-github-event"];
 
         // מגיב רק לאירוע release שפורסם
@@ -1098,43 +1129,6 @@ const server = http.createServer((req, res) => {
           res.writeHead(500);
           res.end("error");
         }
-      }
-    });
-    return;
-  }
-
-  // ========================================
-  // Mod Updater Webhook — התראת עדכון גרסה
-  // ========================================
-  if (req.url === "/update-notification" && req.method === "POST") {
-    let body = "";
-    req.on("data", chunk => { body += chunk.toString(); });
-    req.on("end", async () => {
-      try {
-        const { appName, oldVersion, newVersion } = JSON.parse(body);
-        res.writeHead(200);
-        res.end("ok");
-
-        if (!appName || !newVersion) return;
-
-        const msg =
-`🔔 *עדכון חדש יצא!*
-
-📱 *${appName}*
-📌 גרסה קודמת: \`${oldVersion}\`
-✅ גרסה חדשה: \`${newVersion}\`
-
-⬇️ כתוב את שם האפליקציה לקבלת קישור הורדה`;
-
-        if (sock && currentStatus.includes("מחובר")) {
-          await sock.sendMessage(TARGET_GROUP_JID_3, { text: msg });
-          console.log(`[UpdateNotif] נשלחה התראה עבור ${appName} → ${newVersion}`);
-        } else {
-          console.log(`[UpdateNotif] WhatsApp לא מחובר — לא נשלחה התראה עבור ${appName}`);
-        }
-      } catch (err) {
-        console.error("[UpdateNotif] שגיאה:", err);
-        if (!res.headersSent) { res.writeHead(500); res.end("error"); }
       }
     });
     return;

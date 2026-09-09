@@ -1,5 +1,6 @@
-import { applyLiveVersion } from "./versionFetcher.js";
 import { sendSuspended } from "./suspended.js";
+
+let savedMessage = null;
 
 export default {
   trigger: "nowhatsapp",
@@ -13,7 +14,8 @@ export default {
     // השעייה זמנית
     return await sendSuspended(sock, message);
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *NOWhatsApp*
 🔢 *גירסא:* v10.08
 📦 *גודל:* 53 MB
@@ -29,17 +31,26 @@ export default {
 https://liteapks.com/download/nowhatsapp-18045/1
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://liteapks.com/wp-content/uploads/2022/07/nowhatsapp-150x150.png" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת NOWhatsApp...");
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        console.log("📸 שולח תמונת NOWhatsApp בפעם הראשונה...");
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://liteapks.com/wp-content/uploads/2022/07/nowhatsapp-150x150.png" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+
+        if (sentMsg) {
+          savedMessage = sentMsg;
+          console.log("✅ הודעת NOWhatsApp הראשונה שנשלחה נשמרה בזיכרון!");
+        }
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת nowhatsapp:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

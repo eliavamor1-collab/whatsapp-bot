@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "shazam",
   aliases: ["שאזם", "שזאם"],
@@ -21,7 +22,8 @@ export default {
 
     console.log("🚀 פקודת shazam הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *Shazam*
 🔢 *גירסא:* v16.54.1
 📦 *גודל:* ~30 MB
@@ -37,17 +39,20 @@ export default {
 https://9mod.com/shazam.html
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://play-lh.googleusercontent.com/bfRcQY-gHEfhBp1-R3e6MnDMCmONnhcNDEs7JmmFQfjTXMVA0kxLQuCnTPxQv-ZNJlU" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://play-lh.googleusercontent.com/bfRcQY-gHEfhBp1-R3e6MnDMCmONnhcNDEs7JmmFQfjTXMVA0kxLQuCnTPxQv-ZNJlU" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+        if (sentMsg) savedMessage = sentMsg;
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת shazam:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,4 +1,5 @@
-import { applyLiveVersion } from "./versionFetcher.js";
+let savedMessage = null;
+
 export default {
   trigger: "moviebox",
   aliases: ["מובי בוקס", "מוביבוקס"],
@@ -21,7 +22,8 @@ export default {
 
     console.log("🚀 פקודת moviebox הופעלה!");
 
-    let captionText = `📱 *שם האפליקציה:*
+    const captionText =
+`📱 *שם האפליקציה:*
 *MovieBox*
 🔢 *גירסא:* v4.0.01
 📦 *גודל:* ~25 MB
@@ -37,17 +39,20 @@ export default {
 https://9mod.com/moviebox.html
 ━━━━━━━━━━━━━━━`;
 
-    captionText = await applyLiveVersion(this.trigger, captionText);
-
     try {
-      await sock.sendMessage(
-        jid,
-        {
-          image: { url: "https://play-lh.googleusercontent.com/7RiG3UtMDhUMjGnMC_4r2v1R_bJF_JpqxA3n7wNYfCY1qMmP6gGS3tj4YbjJCf_Kafs" },
-          caption: captionText
-        },
-        { quoted: message }
-      );
+      if (savedMessage) {
+        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
+      } else {
+        const sentMsg = await sock.sendMessage(
+          jid,
+          {
+            image: { url: "https://play-lh.googleusercontent.com/7RiG3UtMDhUMjGnMC_4r2v1R_bJF_JpqxA3n7wNYfCY1qMmP6gGS3tj4YbjJCf_Kafs" },
+            caption: captionText
+          },
+          { quoted: message }
+        );
+        if (sentMsg) savedMessage = sentMsg;
+      }
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת moviebox:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
