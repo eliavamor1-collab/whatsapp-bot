@@ -1,4 +1,5 @@
 import { sendSuspended } from "./suspended.js";
+import { getLiveVersion } from "./versionFetcher.js";
 
 // ========================================
 // תבנית אחידה לכל האפליקציות
@@ -10,7 +11,7 @@ import { sendSuspended } from "./suspended.js";
 //   trigger   (חובה)  — מילת ההפעלה הראשית, למשל "netflix"
 //   aliases   (רשות)  — מערך כינויים, למשל ["נטפליקס"]
 //   name      (חובה)  — שם האפליקציה המוצג, למשל "Netflix"
-//   version   (רשות)  — גרסה, למשל "v8.0"
+//   version   (רשות)  — גרסת ברירת מחדל (משמשת אם השרת החי לא זמין)
 //   size      (רשות)  — גודל, למשל "50 MB"
 //   type      (רשות)  — סוג, למשל "סטרימינג סרטים"
 //   content   (חובה)  — תיאור התוכן
@@ -20,13 +21,17 @@ import { sendSuspended } from "./suspended.js";
 //   fileUrl   (רשות)  — קישור ישיר ל-APK (GitHub Releases) לשליחה כמסמך
 //   fileName  (רשות)  — שם הקובץ שיישלח
 //   suspended (רשות)  — true אם האפליקציה בהשעיה זמנית
+//
+// הגרסה נמשכת אוטומטית מהשרת החי (Mod Updater). אם השרת לא זמין,
+// משתמשים בשדה version שכתוב בקוד כברירת מחדל.
 // ========================================
 
-function buildInfoText(app) {
+function buildInfoText(app, liveVersion) {
+  const version = liveVersion || app.version;
   const lines = [];
   lines.push("📱 *שם האפליקציה:*");
   lines.push(`*${app.name}*`);
-  if (app.version) lines.push(`🔢 *גירסא:* ${app.version}`);
+  if (version) lines.push(`🔢 *גירסא:* ${version}`);
   if (app.size) lines.push(`📦 *גודל:* ${app.size}`);
   if (app.type) lines.push(`💾 *סוג:* ${app.type}`);
   lines.push("🎯 *תוכן:*");
@@ -75,9 +80,10 @@ export function createApp(app) {
     fileName: app.fileName,
     suspended: Boolean(app.suspended),
 
-    // טקסט נקי בלי קישורים — לשליחה יחד עם קובץ
-    getCaptionText() {
-      return buildInfoText(app);
+    // טקסט נקי בלי קישורים — לשליחה יחד עם קובץ (עם גרסה חיה)
+    async getCaptionText() {
+      const liveVersion = await getLiveVersion(app.trigger);
+      return buildInfoText(app, liveVersion);
     },
 
     async execute(sock, message) {
@@ -89,7 +95,8 @@ export function createApp(app) {
         return await sendSuspended(sock, message);
       }
 
-      const infoText = buildInfoText(app);
+      const liveVersion = await getLiveVersion(app.trigger);
+      const infoText = buildInfoText(app, liveVersion);
       const linksBlock = buildLinksBlock(app);
       const captionText = linksBlock ? `${infoText}\n\n${linksBlock}` : infoText;
 

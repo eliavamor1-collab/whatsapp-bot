@@ -804,7 +804,7 @@ async function startWhatsApp() {
               // שולפים את הטקסט בלי קישור
               let captionText = "";
               if (typeof command.getCaptionText === "function") {
-                captionText = command.getCaptionText();
+                captionText = await command.getCaptionText();
               } else {
                 const originalSend = sock.sendMessage.bind(sock);
                 sock.sendMessage = async (jid, content, opts) => {
