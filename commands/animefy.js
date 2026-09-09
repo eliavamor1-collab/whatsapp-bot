@@ -1,54 +1,14 @@
-let savedMessage = null;
+import { createApp } from "../system/appTemplate.js";
 
-export default {
+export default createApp({
   trigger: "animefy",
   aliases: ["אנימפי"],
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת animefy הופעלה!");
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*AI Video Maker: Animefy*
-🔢 *גירסא:* v2.37.10183
-📦 *גודל:* 124 MB
-💾 *סוג:* יצירת וידאו ותמונות AI
-🎯 *תוכן:*
-הפוך סלפי לסרטון אנימה או קריקטורה מתנועע! ה-AI ממיר תמונות לדמויות אנימה אקספרסיביות, יוצר סצנות מונפשות מתמונות סטטיות, ומייצר אווטארים ייחודיים לשיתוף ברשתות החברתיות.
-
-ℹ️ *הערות:*
-פרימיום פתוח — פשוט להתקין ולהשתמש
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://9mod.com/download/ai-video-maker-animefy-156525/1
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Animefy...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Animefy בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://9mod.com/wp-content/uploads/2025/05/ai-video-maker-animefy-150x150.webp" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Animefy הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת animefy:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  name: "AI Video Maker: Animefy",
+  version: "v2.37.10183",
+  size: "124 MB",
+  type: "יצירת וידאו ותמונות AI",
+  content: "הפוך סלפי לסרטון אנימה או קריקטורה מתנועע! ה-AI ממיר תמונות לדמויות אנימה אקספרסיביות, יוצר סצנות מונפשות מתמונות סטטיות, ומייצר אווטארים ייחודיים לשיתוף ברשתות החברתיות.",
+  notes: "פרימיום פתוח — פשוט להתקין ולהשתמש",
+  image: "https://9mod.com/wp-content/uploads/2025/05/ai-video-maker-animefy-150x150.webp",
+  links: ["https://9mod.com/download/ai-video-maker-animefy-156525/1"]
+});

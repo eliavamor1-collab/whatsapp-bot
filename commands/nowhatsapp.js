@@ -1,59 +1,15 @@
-import { sendSuspended } from "../system/suspended.js";
+import { createApp } from "../system/appTemplate.js";
 
-let savedMessage = null;
-
-export default {
+export default createApp({
   trigger: "nowhatsapp",
   aliases: ["נוווצאפ", "נווצאפ"],
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת nowhatsapp הופעלה!");
-
-    // השעייה זמנית
-    return await sendSuspended(sock, message);
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*NOWhatsApp*
-🔢 *גירסא:* v10.08
-📦 *גודל:* 53 MB
-💾 *סוג:* מסנג'ר
-🎯 *תוכן:*
-גרסה מתקדמת של ווצאפ עם ערכות עיצוב, פרטיות מוגברת, שליחת קבצים גדולים, ועוד פיצ'רים שלא קיימים בווצאפ הרגיל.
-
-ℹ️ *הערות:*
-פשוט להתקין ולהשתמש
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://liteapks.com/download/nowhatsapp-18045/1
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת NOWhatsApp...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת NOWhatsApp בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/07/nowhatsapp-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת NOWhatsApp הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת nowhatsapp:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  suspended: true,
+  name: "NOWhatsApp",
+  version: "v10.08",
+  size: "53 MB",
+  type: "מסנג'ר",
+  content: "גרסה מתקדמת של ווצאפ עם ערכות עיצוב, פרטיות מוגברת, שליחת קבצים גדולים, ועוד פיצ'רים שלא קיימים בווצאפ הרגיל.",
+  notes: "פשוט להתקין ולהשתמש",
+  image: "https://liteapks.com/wp-content/uploads/2022/07/nowhatsapp-150x150.png",
+  links: ["https://liteapks.com/download/nowhatsapp-18045/1"]
+});

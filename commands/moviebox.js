@@ -1,61 +1,14 @@
-let savedMessage = null;
+import { createApp } from "../system/appTemplate.js";
 
-export default {
+export default createApp({
   trigger: "moviebox",
   aliases: ["מובי בוקס", "מוביבוקס"],
-
-  getCaptionText() {
-    return `📱 *שם האפליקציה:*
-*MovieBox*
-🔢 *גירסא:* v4.0.01
-📦 *גודל:* ~25 MB
-💾 *סוג:* סטרימינג סרטים וסדרות
-🎯 *תוכן:*
-צפייה בסרטים וסדרות ישירות מהטלפון — קטלוג ענק, איכות HD, בלי תשלום. פרימיום פרוץ.
-
-ℹ️ *הערות:*
-פשוט להתקין ולהשתמש`;
-  },
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת moviebox הופעלה!");
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*MovieBox*
-🔢 *גירסא:* v4.0.01
-📦 *גודל:* ~25 MB
-💾 *סוג:* סטרימינג סרטים וסדרות
-🎯 *תוכן:*
-צפייה בסרטים וסדרות ישירות מהטלפון — קטלוג ענק, איכות HD, בלי תשלום. פרימיום פרוץ.
-
-ℹ️ *הערות:*
-פשוט להתקין ולהשתמש
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://9mod.com/moviebox.html
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://play-lh.googleusercontent.com/7RiG3UtMDhUMjGnMC_4r2v1R_bJF_JpqxA3n7wNYfCY1qMmP6gGS3tj4YbjJCf_Kafs" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-        if (sentMsg) savedMessage = sentMsg;
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת moviebox:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  name: "MovieBox",
+  version: "v4.0.01",
+  size: "~25 MB",
+  type: "סטרימינג סרטים וסדרות",
+  content: "צפייה בסרטים וסדרות ישירות מהטלפון — קטלוג ענק, איכות HD, בלי תשלום. פרימיום פרוץ.",
+  notes: "פשוט להתקין ולהשתמש",
+  image: "https://play-lh.googleusercontent.com/7RiG3UtMDhUMjGnMC_4r2v1R_bJF_JpqxA3n7wNYfCY1qMmP6gGS3tj4YbjJCf_Kafs",
+  links: ["https://9mod.com/moviebox.html"]
+});

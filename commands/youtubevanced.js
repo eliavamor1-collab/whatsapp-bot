@@ -1,54 +1,14 @@
-let savedMessage = null;
+import { createApp } from "../system/appTemplate.js";
 
-export default {
+export default createApp({
   trigger: "youtube vanced",
   aliases: ["יוטיוב ונסד", "youtube vanced"],
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת youtube vanced הופעלה!");
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*YouTube Vanced*
-🔢 *גירסא:* v21.32.5
-📦 *גודל:* 89 MB
-💾 *סוג:* סטרימינג וידאו
-🎯 *תוכן:*
-יוטיוב ללא פרסומות עם ניגון ברקע — הגרסה הקלאסית האהובה שעדיין עובדת.
-
-ℹ️ *הערות:*
-פשוט להתקין ולהשתמש
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://liteapks.com/download/youtube-vanced-134/1
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת YouTube Vanced...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת YouTube Vanced בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/05/logo-e1635186772863-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת YouTube Vanced הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת youtube vanced:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  name: "YouTube Vanced",
+  version: "v21.32.5",
+  size: "89 MB",
+  type: "סטרימינג וידאו",
+  content: "יוטיוב ללא פרסומות עם ניגון ברקע — הגרסה הקלאסית האהובה שעדיין עובדת.",
+  notes: "פשוט להתקין ולהשתמש",
+  image: "https://liteapks.com/wp-content/uploads/2022/05/logo-e1635186772863-150x150.png",
+  links: ["https://liteapks.com/download/youtube-vanced-134/1"]
+});

@@ -1,38 +1,11 @@
-export default {
+import { createApp } from "../system/appTemplate.js";
+
+export default createApp({
   trigger: "ספורט",
   aliases: ["sport", "liveball"],
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת ספורט הופעלה!");
-
-    const captionText =
-`⚽ *צפייה בערוצי ספורט בלייב!*
-
-📺 *האתר:*
-*LiveBall*
-
-🎯 *תוכן:*
-צפייה חינמית בשידורים חיים של משחקי ספורט — כדורגל, כדורסל, הוקי ועוד, ישירות מהדפדפן.
-
-ℹ️ *הערות:*
-לא דורש הורדה — פתח מהדפדפן ותיהנה!
-
-━━━━━━━━━━━━━━━
-⚽ *כניסה לאתר:*
-https://liveball.sx/
-━━━━━━━━━━━━━━━`;
-
-    try {
-      await sock.sendMessage(
-        jid,
-        { text: captionText },
-        { quoted: message }
-      );
-      console.log("✅ הודעת ספורט נשלחה בהצלחה!");
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת ספורט:", error);
-    }
-  }
-};
+  name: "LiveBall — צפייה בספורט בלייב",
+  type: "צפייה בספורט (אתר)",
+  content: "צפייה חינמית בשידורים חיים של משחקי ספורט — כדורגל, כדורסל, הוקי ועוד, ישירות מהדפדפן.",
+  notes: "לא דורש הורדה — פתח מהדפדפן ותיהנה!",
+  links: [{ label: "⚽ *כניסה לאתר:*", url: "https://liveball.sx/" }]
+});

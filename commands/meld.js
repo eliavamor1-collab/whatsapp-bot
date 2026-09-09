@@ -1,67 +1,14 @@
-let savedMessage = null;
+import { createApp } from "../system/appTemplate.js";
 
-export default {
+export default createApp({
   trigger: "meld",
   aliases: ["מלד"],
-
-  getCaptionText() {
-    return `📱 *שם האפליקציה:*
-*Meld*
-🔢 *גירסא:* v0.8.8
-📦 *גודל:* 23.4 MB
-💾 *סוג:* סטרימינג מוזיקה ואודיו
-🎯 *תוכן:*
-ספוטיפיי פרוץ — כל השירים, הפלייליסטים וההמלצות האישיות בחינם, בלי מודעות ובלי מגבלות. פשוט מתחברים ומאזינים.
-
-ℹ️ *הערות:*
-📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o`;
-  },
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת meld הופעלה!");
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*Meld*
-🔢 *גירסא:* v0.8.8
-📦 *גודל:* 23.4 MB
-💾 *סוג:* סטרימינג מוזיקה ואודיו
-🎯 *תוכן:*
-ספוטיפיי פרוץ — כל השירים, הפלייליסטים וההמלצות האישיות בחינם, בלי מודעות ובלי מגבלות. פשוט מתחברים ומאזינים.
-
-ℹ️ *הערות:*
-📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://drive.google.com/file/d/1ZhrYBpt06IsUVbs3woFTEjScvEbMNJtl/view?usp=drivesdk
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Meld...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Meld בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://play-lh.googleusercontent.com/ng6R8Cl93dqQN6f0b0m1UQrWB4rVnHJZlklIsJApYU-ZbyRqUZe-1W-yZNZKl5c2lS3TEeOrRHtMRWToaiAC" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Meld הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת meld:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  name: "Meld",
+  version: "v0.8.8",
+  size: "23.4 MB",
+  type: "סטרימינג מוזיקה ואודיו",
+  content: "ספוטיפיי פרוץ — כל השירים, הפלייליסטים וההמלצות האישיות בחינם, בלי מודעות ובלי מגבלות. פשוט מתחברים ומאזינים.",
+  notes: "📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o",
+  image: "https://play-lh.googleusercontent.com/ng6R8Cl93dqQN6f0b0m1UQrWB4rVnHJZlklIsJApYU-ZbyRqUZe-1W-yZNZKl5c2lS3TEeOrRHtMRWToaiAC",
+  links: ["https://drive.google.com/file/d/1ZhrYBpt06IsUVbs3woFTEjScvEbMNJtl/view?usp=drivesdk"]
+});

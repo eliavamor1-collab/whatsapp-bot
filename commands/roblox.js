@@ -1,71 +1,14 @@
-let savedMessage = null;
+import { createApp } from "../system/appTemplate.js";
 
-export default {
+export default createApp({
   trigger: "roblox",
   aliases: ["רובלוקס"],
-
-  getCaptionText() {
-    return `📱 *שם האפליקציה:*
-*רובלוקס*
-🔢 *גירסא:* V2.732.1043
-📦 *גודל:* 180 MB
-💾 *סוג:* משחק
-🎯 *תוכן:*
-עולם וירטואלי שבו יוצרים, משתפים ומשחקים עם מיליוני שחקנים ברחבי העולם.
-אבל מקבלים גם: Mega Menu, Fly, Jump, Teleport ועוד...
-
-ℹ️ *הערות:*
-פשוט להתקין ולשחק
-
-⚠️ שימו לב, יש פה 2 סוגי רובלוקס פרוץ שונים אז למי שאחד מהם לא עובד שינסה את השני`;
-  },
-
-  async execute(sock, message) {
-    const jid = message.key.remoteJid;
-
-    console.log("🚀 פקודת roblox הופעלה!");
-
-    const captionText =
-`📱 *שם האפליקציה:*
-*רובלוקס*
-🔢 *גירסא:* V2.732.1043
-📦 *גודל:* 180 MB
-💾 *סוג:* משחק
-🎯 *תוכן:*
-עולם וירטואלי שבו יוצרים, משתפים ומשחקים עם מיליוני שחקנים ברחבי העולם.
-אבל מקבלים גם: Mega Menu, Fly, Jump, Teleport ועוד...
-
-ℹ️ *הערות:*
-פשוט להתקין ולשחק
-
-━━━━━━━━━━━━━━━
-⬇️ *לחץ להורדה ישירה* ⬇️
-https://9mod.com/download/roblox-123/1
-━━━━━━━━━━━━━━━`;
-
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Roblox...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Roblox בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://9mod.com/wp-content/uploads/2024/05/roblox-150x150.webp" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Roblox הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת הודעת roblox:", error);
-      await sock.sendMessage(jid, { text: captionText }, { quoted: message });
-    }
-  }
-};
+  name: "רובלוקס",
+  version: "V2.732.1043",
+  size: "180 MB",
+  type: "משחק",
+  content: "עולם וירטואלי שבו יוצרים, משתפים ומשחקים עם מיליוני שחקנים ברחבי העולם.\nאבל מקבלים גם: Mega Menu, Fly, Jump, Teleport ועוד...",
+  notes: "פשוט להתקין ולשחק\n\n⚠️ שימו לב, יש פה 2 סוגי רובלוקס פרוץ שונים אז למי שאחד מהם לא עובד שינסה את השני",
+  image: "https://9mod.com/wp-content/uploads/2024/05/roblox-150x150.webp",
+  links: ["https://9mod.com/download/roblox-123/1"]
+});
