@@ -27,8 +27,8 @@ process.on("unhandledRejection", (reason) => {
 // ========================================
 // Commands Import
 // ========================================
-import startCommand from "./commands/start.js";
-import listCommand from "./commands/list.js";
+import startCommand from "./system/start.js";
+import listCommand from "./system/list.js";
 import riderCommand from "./commands/rider.js";
 import robloxCommand from "./commands/roblox.js";
 import subwayCommand from "./commands/subwaysurfers.js";
@@ -62,7 +62,7 @@ import picretouchCommand from "./commands/picretouch.js";
 import sportCommand from "./commands/sport.js";
 import animefyCommand from "./commands/animefy.js";
 import clashRoyaleCommand from "./commands/clashroyale.js";
-import randomCommand from "./commands/random.js";
+import randomCommand from "./system/random.js";
 import fakeGpsCommand from "./commands/fakegps.js";
 import idleMinerCommand from "./commands/idleminer.js";
 import simpMusicCommand from "./commands/simpmusic.js";
@@ -83,7 +83,7 @@ import slaythespireCommand from "./commands/slaythespire.js";
 import soundcloudCommand from "./commands/soundcloud.js";
 import powerampCommand from "./commands/poweramp.js";
 import pixivCommand from "./commands/pixiv.js";
-import { containsCurse, handleCurse } from "./commands/cursefilter.js";
+import { containsCurse, handleCurse } from "./system/cursefilter.js";
 
 const { Pool } = pg;
 

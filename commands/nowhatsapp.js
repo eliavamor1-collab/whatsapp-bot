@@ -1,4 +1,4 @@
-import { sendSuspended } from "./suspended.js";
+import { sendSuspended } from "../system/suspended.js";
 
 let savedMessage = null;
 
