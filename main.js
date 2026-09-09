@@ -5,9 +5,7 @@ import makeWASocket, {
   Browsers,
   initAuthCreds,
   BufferJSON,
-  proto,
-  generateWAMessageFromContent,
-  isJidGroup
+  proto
 } from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 import pg from "pg";
@@ -196,10 +194,9 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is missing in environment variables!");
 }
 
-let dbUrl = process.env.DATABASE_URL;
-if (!dbUrl.includes("sslmode=")) {
-  dbUrl += (dbUrl.includes("?") ? "&" : "?") + "sslmode=verify-full";
-}
+// חיבור ל-Neon עם SSL. rejectUnauthorized: false נדרש כי Neon משתמש בתעודה
+// שלא תמיד מאומתת מול ה-CA המקומי. עקבי — בלי sslmode סותר ב-URL.
+const dbUrl = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: dbUrl,
@@ -401,16 +398,54 @@ function cleanupSocket() {
 const GITHUB_REPO = "eliavamor1-collab/whatsapp-bot";
 const GITHUB_RELEASE_TAG = "apps";
 
+// בונה map מ-fileName לפקודה (לכל הפקודות שיש להן fileName)
+function buildFileNameToCommandMap() {
+  const map = new Map();
+  for (const cmd of commands.values()) {
+    if (cmd.fileName) {
+      map.set(cmd.fileName.toLowerCase(), cmd);
+    }
+  }
+  return map;
+}
+
+// מעלה asset לקבוצת האיחסון ושומר ב-DB. מחזיר true אם הצליח.
+// משותף גם ל-sync בהפעלה וגם ל-webhook.
+async function uploadAssetToStorage(asset, command, logPrefix) {
+  console.log(`${logPrefix} מעלה ${asset.name} לקבוצת האיחסון...`);
+  try {
+    const sentMsg = await sock.sendMessage(TARGET_GROUP_JID_2, {
+      document: { url: asset.browser_download_url },
+      fileName: asset.name,
+      mimetype: "application/vnd.android.package-archive"
+    });
+
+    if (sentMsg) {
+      const rawData = {
+        message: sentMsg.message,
+        key: {
+          remoteJid: TARGET_GROUP_JID_2,
+          id: sentMsg.key?.id,
+          fromMe: true,
+          participant: undefined
+        }
+      };
+      const saved = await saveFile(command.trigger, sentMsg.key?.id, TARGET_GROUP_JID_2, rawData);
+      if (saved) {
+        console.log(`${logPrefix} ✅ ${asset.name} הועלה ונשמר עבור "${command.trigger}"`);
+        return true;
+      }
+    }
+  } catch (err) {
+    console.error(`${logPrefix} ❌ שגיאה בהעלאת ${asset.name}:`, err.message);
+  }
+  return false;
+}
+
 async function syncReleasesOnStartup() {
   console.log("[Sync] בודק קבצים חסרים מ-GitHub Releases...");
 
-  // בונים map מ-fileName לפקודה
-  const fileNameToCommand = new Map();
-  for (const cmd of commands.values()) {
-    if (cmd.fileName) {
-      fileNameToCommand.set(cmd.fileName.toLowerCase(), cmd);
-    }
-  }
+  const fileNameToCommand = buildFileNameToCommandMap();
 
   if (fileNameToCommand.size === 0) {
     console.log("[Sync] אין פקודות עם fileName — מדלג");
@@ -454,32 +489,7 @@ async function syncReleasesOnStartup() {
     }
 
     // מעלה לקבוצת האיחסון ושומר ב-DB
-    console.log(`[Sync] מעלה קובץ חסר: ${assetName}...`);
-    try {
-      const sentMsg = await sock.sendMessage(TARGET_GROUP_JID_2, {
-        document: { url: asset.browser_download_url },
-        fileName: assetName,
-        mimetype: "application/vnd.android.package-archive"
-      });
-
-      if (sentMsg) {
-        const rawData = {
-          message: sentMsg.message,
-          key: {
-            remoteJid: TARGET_GROUP_JID_2,
-            id: sentMsg.key?.id,
-            fromMe: true,
-            participant: undefined
-          }
-        };
-        const saved = await saveFile(command.trigger, sentMsg.key?.id, TARGET_GROUP_JID_2, rawData);
-        if (saved) {
-          console.log(`[Sync] ✅ ${assetName} הועלה ונשמר עבור "${command.trigger}"`);
-        }
-      }
-    } catch (err) {
-      console.error(`[Sync] ❌ שגיאה בהעלאת ${assetName}:`, err.message);
-    }
+    await uploadAssetToStorage(asset, command, "[Sync]");
 
     // המתנה קצרה בין קבצים כדי לא להעמיס
     await new Promise(r => setTimeout(r, 3000));
@@ -661,8 +671,6 @@ async function startWhatsApp() {
           // ========================================
           // זיהוי reply עם "שמור" — שמירת קובץ
           // ========================================
-          const quotedRemoteJid = quotedParticipant || remoteJid;
-
           if (trimmedText.startsWith("שמור ") && quotedMsg && quotedMsgId) {
             if (remoteJid !== TARGET_GROUP_JID_2) continue;
             const appName = trimmedText.replace("שמור ", "").trim();
@@ -1060,13 +1068,7 @@ const server = http.createServer((req, res) => {
 
         console.log(`[Webhook] Release חדש: ${payload.release.name} — ${assets.length} assets`);
 
-        // בונים map מ-fileName ל-פקודה (לכל הפקודות שיש להן fileUrl)
-        const fileNameToCommand = new Map();
-        for (const cmd of commands.values()) {
-          if (cmd.fileName) {
-            fileNameToCommand.set(cmd.fileName.toLowerCase(), cmd);
-          }
-        }
+        const fileNameToCommand = buildFileNameToCommandMap();
 
         for (const asset of assets) {
           const assetName = asset.name;
@@ -1095,33 +1097,7 @@ const server = http.createServer((req, res) => {
             continue;
           }
 
-          console.log(`[Webhook] מעלה ${assetName} לקבוצת האיחסון...`);
-          try {
-            const sentMsg = await sock.sendMessage(TARGET_GROUP_JID_2, {
-              document: { url: asset.browser_download_url },
-              fileName: assetName,
-              mimetype: "application/vnd.android.package-archive"
-            });
-
-            if (sentMsg) {
-              // שמירה ב-DB בדיוק כמו "שמור <שם>" ידני
-              const rawData = {
-                message: sentMsg.message,
-                key: {
-                  remoteJid: TARGET_GROUP_JID_2,
-                  id: sentMsg.key?.id,
-                  fromMe: true,
-                  participant: undefined
-                }
-              };
-              const saved = await saveFile(command.trigger, sentMsg.key?.id, TARGET_GROUP_JID_2, rawData);
-              if (saved) {
-                console.log(`[Webhook] ✅ ${assetName} הועלה ונשמר עבור פקודה "${command.trigger}"`);
-              }
-            }
-          } catch (uploadErr) {
-            console.error(`[Webhook] ❌ שגיאה בהעלאת ${assetName}:`, uploadErr);
-          }
+          await uploadAssetToStorage(asset, command, "[Webhook]");
         }
       } catch (err) {
         console.error("[Webhook] שגיאה בעיבוד webhook:", err);
