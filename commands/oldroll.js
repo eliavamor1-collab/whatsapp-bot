@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "oldroll",
   aliases: ["אולדרול", "מצלמה וינטג'", "מצלמה וינטג"],
@@ -22,8 +21,7 @@ export default {
 
     console.log("🚀 פקודת oldroll הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *OldRoll — Vintage Film Camera*
 🔢 *גירסא:* v6.6.1
 📦 *גודל:* ~45 MB
@@ -39,20 +37,17 @@ export default {
 https://9mod.com/oldroll.html
 ━━━━━━━━━━━━━━━`;
 
+    captionText = await applyLiveVersion(this.trigger, captionText);
+
     try {
-      if (savedMessage) {
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://play-lh.googleusercontent.com/9POgifiA-t_PxlPfHMHKGYcJrHvSPz9OCAaPlCuIUQkBc_S_OVnLbRfLSuS9VwL7Rg" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-        if (sentMsg) savedMessage = sentMsg;
-      }
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://play-lh.googleusercontent.com/9POgifiA-t_PxlPfHMHKGYcJrHvSPz9OCAaPlCuIUQkBc_S_OVnLbRfLSuS9VwL7Rg" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת oldroll:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "mimo",
   aliases: ["מימו", "לימוד קוד", "לימוד תכנות"],
@@ -22,8 +21,7 @@ export default {
 
     console.log("🚀 פקודת mimo הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Mimo — Learn Coding*
 🔢 *גירסא:* v9.26
 📦 *גודל:* ~60 MB
@@ -39,20 +37,17 @@ export default {
 https://9mod.com/mimo-learn-coding.html
 ━━━━━━━━━━━━━━━`;
 
+    captionText = await applyLiveVersion(this.trigger, captionText);
+
     try {
-      if (savedMessage) {
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://play-lh.googleusercontent.com/mhVz5SQ_jSjEY84MJQ9S7P1DdLq0vlkw05q5JmqXb0cmq0oUlWHAPyC1VhHwNBDqLQ" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
-        if (sentMsg) savedMessage = sentMsg;
-      }
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://play-lh.googleusercontent.com/mhVz5SQ_jSjEY84MJQ9S7P1DdLq0vlkw05q5JmqXb0cmq0oUlWHAPyC1VhHwNBDqLQ" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת mimo:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

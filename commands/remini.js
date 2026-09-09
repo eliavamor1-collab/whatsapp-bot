@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "remini",
   aliases: ["רמיני", "רימיני"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת remini הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Remini – AI Photo Enhancer*
 🔢 *גירסא:* v3.7.1411
 📦 *גודל:* 135 MB
@@ -26,26 +24,17 @@ export default {
 https://liteapks.com/download/remini-ai-photo-enhancer-2689/1
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Remini...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Remini בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/remini-ai-photo-enhancer-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Remini הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/remini-ai-photo-enhancer-150x150.png" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת remini:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "meld",
   aliases: ["מלד"],
@@ -22,8 +21,7 @@ export default {
 
     console.log("🚀 פקודת meld הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Meld*
 🔢 *גירסא:* v0.8.8
 📦 *גודל:* 23.4 MB
@@ -39,26 +37,17 @@ export default {
 https://drive.google.com/file/d/1ZhrYBpt06IsUVbs3woFTEjScvEbMNJtl/view?usp=drivesdk
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Meld...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Meld בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://play-lh.googleusercontent.com/ng6R8Cl93dqQN6f0b0m1UQrWB4rVnHJZlklIsJApYU-ZbyRqUZe-1W-yZNZKl5c2lS3TEeOrRHtMRWToaiAC" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Meld הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://play-lh.googleusercontent.com/ng6R8Cl93dqQN6f0b0m1UQrWB4rVnHJZlklIsJApYU-ZbyRqUZe-1W-yZNZKl5c2lS3TEeOrRHtMRWToaiAC" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת meld:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "alight motion",
   aliases: ["אליית מושן", "אלייט מושן"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת alight motion הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Alight Motion*
 🔢 *גירסא:* v5.0.279
 📦 *גודל:* 101 MB
@@ -26,26 +24,17 @@ export default {
 https://liteapks.com/download/alight-motion-175/1
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Alight Motion...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Alight Motion בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/alight-motion-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Alight Motion הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/alight-motion-150x150.png" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת alight motion:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -1,6 +1,5 @@
+import { applyLiveVersion } from "./versionFetcher.js";
 import { sendSuspended } from "./suspended.js";
-
-let savedMessage = null;
 
 export default {
   trigger: "youtube music",
@@ -25,8 +24,7 @@ https://youtu.be/PSjKGzsOzVs?si=Z8bnBFOPUofU0x7i&t=90`;
 
     console.log("🚀 פקודת youtube music הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *יוטיוב מיוזיק מורפ*
 🔢 *גירסא:* v9.15.51
 📦 *גודל:* 70.98 MB
@@ -49,26 +47,17 @@ https://drive.google.com/file/d/1G-sWLiTa5eIoGwxVsWH4sDjZWEgnbRUm/view?usp=shari
 https://drive.google.com/file/d/1d7fRifBeLIo8VIkbSb_1FLkG0_64br1D/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת youtube music...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת youtube music בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/youtube-music-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת youtube music הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/youtube-music-150x150.png" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת youtube music:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

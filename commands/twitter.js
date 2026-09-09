@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "twitter",
   aliases: ["טוויטר"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת twitter הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *X (Twitter)*
 🔢 *גירסא:* v12.14.0
 📦 *גודל:* 85 MB
@@ -26,26 +24,17 @@ export default {
 https://liteapks.com/download/twitter-78804/1
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Twitter...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Twitter בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2024/03/twitter-150x150.webp" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Twitter הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://liteapks.com/wp-content/uploads/2024/03/twitter-150x150.webp" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת twitter:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

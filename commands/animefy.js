@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "animefy",
   aliases: ["אנימפי"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת animefy הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *AI Video Maker: Animefy*
 🔢 *גירסא:* v2.37.10183
 📦 *גודל:* 124 MB
@@ -26,26 +24,17 @@ export default {
 https://9mod.com/download/ai-video-maker-animefy-156525/1
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Animefy...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Animefy בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://9mod.com/wp-content/uploads/2025/05/ai-video-maker-animefy-150x150.webp" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Animefy הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://9mod.com/wp-content/uploads/2025/05/ai-video-maker-animefy-150x150.webp" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת animefy:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

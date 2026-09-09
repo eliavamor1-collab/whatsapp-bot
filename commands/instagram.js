@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "instagram",
   aliases: ["אינסטגרם"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת instagram הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Instagram*
 🔢 *גירסא:* v442.0.0.46.79
 📦 *גודל:* 54 MB
@@ -26,26 +24,17 @@ export default {
 https://drive.google.com/file/d/1j50X-jUqXT_65fC2WJWcnEYig0nq_Tbx/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Instagram...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Instagram בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://liteapks.com/wp-content/uploads/2022/04/instagram-150x150.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Instagram הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://liteapks.com/wp-content/uploads/2022/04/instagram-150x150.png" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת instagram:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

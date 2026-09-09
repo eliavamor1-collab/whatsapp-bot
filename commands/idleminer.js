@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "idle miner",
   aliases: ["idle miner tycoon", "איידל מיינר"],
@@ -22,8 +21,7 @@ export default {
 
     console.log("🚀 פקודת idle miner הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Idle Miner Tycoon*
 🔢 *גירסא:* v5.61.1
 📦 *גודל:* 230.2 MB
@@ -39,26 +37,17 @@ export default {
 https://an1.com/file_4468-dw.html
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Idle Miner...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Idle Miner בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://an1.com/uploads/posts/2025-11/1763023257_idle-miner-tycoon.png" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Idle Miner הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://an1.com/uploads/posts/2025-11/1763023257_idle-miner-tycoon.png" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת idle miner:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

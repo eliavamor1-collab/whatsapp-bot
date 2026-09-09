@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "spotilol",
   aliases: ["ספוטילול", "ספוטי לול"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת spotilol הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Spotilol*
 🔢 *גירסא:* v1.0.10
 📦 *גודל:* 10.6 MB
@@ -26,26 +24,17 @@ export default {
 https://drive.google.com/file/d/13ymz7do-IaCwJ-iTq04Y9SAdapDSAaAk/view?usp=sharing
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Spotilol...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Spotilol בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIbb8PreAywlMvGT0PTMSsaNf0cEcLtNdxRYgmdGD-kQ&s=10" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Spotilol הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIbb8PreAywlMvGT0PTMSsaNf0cEcLtNdxRYgmdGD-kQ&s=10" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת spotilol:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });

@@ -85,7 +85,6 @@ import soundcloudCommand from "./commands/soundcloud.js";
 import powerampCommand from "./commands/poweramp.js";
 import pixivCommand from "./commands/pixiv.js";
 import { containsCurse, handleCurse } from "./commands/cursefilter.js";
-import { applyLiveVersion } from "./commands/versionFetcher.js";
 
 const { Pool } = pg;
 
@@ -867,24 +866,7 @@ async function startWhatsApp() {
               if (command.trigger === "random") {
                 await command.execute(sock, message, commands);
               } else {
-                // עוטפים את sendMessage כדי להזריק גרסה חיה מ-Mod Updater
-                // לכל הודעה שמכילה שורת "🔢 *גירסא:*"
-                const originalSend = sock.sendMessage.bind(sock);
-                sock.sendMessage = async (jid, content, opts) => {
-                  try {
-                    if (content && typeof content.caption === "string") {
-                      content = { ...content, caption: await applyLiveVersion(command.trigger, content.caption) };
-                    } else if (content && typeof content.text === "string") {
-                      content = { ...content, text: await applyLiveVersion(command.trigger, content.text) };
-                    }
-                  } catch (e) { /* אם נכשל — שולחים כמו שזה */ }
-                  return originalSend(jid, content, opts);
-                };
-                try {
-                  await command.execute(sock, message);
-                } finally {
-                  sock.sendMessage = originalSend;
-                }
+                await command.execute(sock, message);
               }
             }
             console.log(`[Success] Command "${command.trigger}" executed successfully ✅`);

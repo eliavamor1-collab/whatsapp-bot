@@ -1,5 +1,4 @@
-let savedMessage = null;
-
+import { applyLiveVersion } from "./versionFetcher.js";
 export default {
   trigger: "poweramp",
   aliases: ["פאווראמפ", "פאוור אמפ"],
@@ -9,8 +8,7 @@ export default {
 
     console.log("🚀 פקודת poweramp הופעלה!");
 
-    const captionText =
-`📱 *שם האפליקציה:*
+    let captionText = `📱 *שם האפליקציה:*
 *Poweramp Music Player*
 🔢 *גירסא:* v1023
 📦 *גודל:* 22 MB
@@ -26,26 +24,17 @@ Premium Unlocked (הגרסה המלאה פתוחה)
 https://9mod.com/download/poweramp-music-player-246512/1
 ━━━━━━━━━━━━━━━`;
 
-    try {
-      if (savedMessage) {
-        console.log("♻️ משתמש בהודעה שמורה בזיכרון לשליחת Poweramp...");
-        await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-      } else {
-        console.log("📸 שולח תמונת Poweramp בפעם הראשונה...");
-        const sentMsg = await sock.sendMessage(
-          jid,
-          {
-            image: { url: "https://9mod.com/wp-content/uploads/2025/11/poweramp-music-player-150x150.webp" },
-            caption: captionText
-          },
-          { quoted: message }
-        );
+    captionText = await applyLiveVersion(this.trigger, captionText);
 
-        if (sentMsg) {
-          savedMessage = sentMsg;
-          console.log("✅ הודעת Poweramp הראשונה שנשלחה נשמרה בזיכרון!");
-        }
-      }
+    try {
+      await sock.sendMessage(
+        jid,
+        {
+          image: { url: "https://9mod.com/wp-content/uploads/2025/11/poweramp-music-player-150x150.webp" },
+          caption: captionText
+        },
+        { quoted: message }
+      );
     } catch (error) {
       console.error("❌ שגיאה בשליחת הודעת poweramp:", error);
       await sock.sendMessage(jid, { text: captionText }, { quoted: message });
