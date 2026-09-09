@@ -376,8 +376,6 @@ let sock = null;
 let reconnectTimer = null;
 let starting = false;
 const botSentMessageIds = new Set();
-// Cache של הודעות קבצים שכבר נשלחו — מאיץ שליחות חוזרות (forward במקום הורדה+העלאה מחדש)
-const sentFileCache = new Map();
 
 function cleanupSocket() {
   if (sock) {
@@ -847,8 +845,8 @@ async function startWhatsApp() {
                 }
 
               // ========================================
-              // עדיפות 2 — URL ישיר (fileUrl) עם cache בזיכרון
-              // fallback כשהקובץ עדיין לא עלה דרך webhook
+              // עדיפות 2 — URL ישיר (fileUrl)
+              // fallback כשהקובץ עדיין לא עלה דרך webhook/sync ל-DB
               // ========================================
               } else if (command.fileUrl) {
                 if (textWithoutLink) {
@@ -856,22 +854,12 @@ async function startWhatsApp() {
                 }
                 try {
                   const fileName = command.fileName || `${command.trigger}.apk`;
-                  const cached = sentFileCache.get(command.fileUrl);
-                  if (cached) {
-                    console.log(`♻️ שולח קובץ מה-cache עבור ${command.trigger}...`);
-                    await sock.sendMessage(remoteJid, { forward: cached }, { quoted: message });
-                  } else {
-                    console.log(`⬇️ מוריד ומעלה קובץ בפעם הראשונה עבור ${command.trigger}...`);
-                    const sentMsg = await sock.sendMessage(remoteJid, {
-                      document: { url: command.fileUrl },
-                      fileName,
-                      mimetype: "application/vnd.android.package-archive"
-                    }, { quoted: message });
-                    if (sentMsg) {
-                      sentFileCache.set(command.fileUrl, sentMsg);
-                      console.log(`💾 הקובץ נשמר ב-cache עבור ${command.trigger}`);
-                    }
-                  }
+                  console.log(`⬇️ שולח קובץ מ-URL עבור ${command.trigger}...`);
+                  await sock.sendMessage(remoteJid, {
+                    document: { url: command.fileUrl },
+                    fileName,
+                    mimetype: "application/vnd.android.package-archive"
+                  }, { quoted: message });
                   console.log(`[File] קובץ נשלח מ-URL עבור ${command.trigger} ✅`);
                 } catch (urlErr) {
                   console.error("❌ שגיאה בשליחת קובץ מ-URL:", urlErr);
