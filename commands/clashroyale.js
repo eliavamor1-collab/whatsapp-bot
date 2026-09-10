@@ -4,7 +4,7 @@ export default createApp({
   trigger: "clash royale",
   aliases: ["קלאש רויאל"],
   name: "Clash Royale",
-  version: "v150535029",
+  version: "v160402002",
   size: "1.03 GB",
   type: "משחק",
   content: "משחק אסטרטגיה בזמן אמת — אסוף קלפים, בנה חפיסה ותלחם נגד שחקנים מכל העולם בקרבות PvP של 3 דקות. הרוס את המגדלים של היריב והגן על שלך!\nכולל משאבים בלתי מוגבלים 💎",
