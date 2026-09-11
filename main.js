@@ -96,6 +96,8 @@ const TARGET_GROUP_JID_2 = "120363408996332000@g.us";
 const TARGET_GROUP_NAME_3 = "פרוץ בוווצאפ (בדיקה)";
 const TARGET_GROUP_JID_3 = "120363430372014043@g.us";
 const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2, TARGET_GROUP_JID_3]);
+// קבוצת היעד להתראות עדכון גרסה מהשרת (כרגע קבוצת הבדיקה — קבוצת האפליקציות מושהית)
+const UPDATE_NOTIFY_GROUP_JID = TARGET_GROUP_JID_3;
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
 // ========================================
@@ -1085,6 +1087,58 @@ const server = http.createServer((req, res) => {
         }
       } catch (err) {
         console.error("[Webhook] שגיאה בעיבוד webhook:", err);
+        if (!res.headersSent) {
+          res.writeHead(500);
+          res.end("error");
+        }
+      }
+    });
+    return;
+  }
+
+  // ========================================
+  // Update Notification — שרת הגרסאות מודיע על עדכון, והבוט שולח לקבוצה
+  // ========================================
+  if (req.url === "/update-notification" && req.method === "POST") {
+    let body = "";
+    let tooLarge = false;
+    req.on("data", chunk => {
+      body += chunk.toString();
+      if (body.length > 64 * 1024) {
+        tooLarge = true;
+        req.destroy();
+      }
+    });
+    req.on("end", async () => {
+      if (tooLarge) return;
+      try {
+        const { appName, oldVersion, newVersion } = JSON.parse(body || "{}");
+
+        if (!appName || !newVersion) {
+          res.writeHead(400);
+          return res.end("missing appName/newVersion");
+        }
+
+        res.writeHead(200);
+        res.end("ok");
+
+        if (!sock || !currentStatus.includes("מחובר")) {
+          console.log(`[UpdateNotify] WhatsApp לא מחובר — מדלג על עדכון ${appName}`);
+          return;
+        }
+
+        const lines = [
+          `🆕 *עודכן!* ${appName}`,
+          `🔢 *גרסה חדשה:* ${newVersion}`,
+        ];
+        if (oldVersion) lines.push(`↩️ *לפני:* ${oldVersion}`);
+        const text = lines.join("\n");
+
+        const sent = await sock.sendMessage(UPDATE_NOTIFY_GROUP_JID, { text });
+        if (sent?.key?.id) botSentMessageIds.add(sent.key.id);
+        console.log(`[UpdateNotify] ✅ נשלחה הודעת עדכון ל-${appName}: ${newVersion}`);
+      } catch (err) {
+        console.error("[UpdateNotify] שגיאה בעיבוד עדכון:", err);
         if (!res.headersSent) {
           res.writeHead(500);
           res.end("error");
