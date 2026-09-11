@@ -5,7 +5,7 @@ export default createApp({
   aliases: ["טוויטר"],
   name: "X (Twitter)",
   version: "v12.14.0",
-  size: "85 MB",
+  size: "174.1 MB",
   type: "רשת חברתית",
   content: "טוויטר/X ללא פרסומות עם פיצ'רים פרימיום — הורדת סרטונים, הסרת מעקב, מצב קריאה, ועוד.",
   notes: "פשוט להתקין ולהשתמש",

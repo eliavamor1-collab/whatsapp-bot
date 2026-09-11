@@ -5,7 +5,7 @@ export default createApp({
   aliases: ["ריידר"],
   name: "ריידר (Rider)",
   version: "v3.06.0.07",
-  size: "100 MB",
+  size: "146.7 MB",
   type: "משחק",
   content: "משחק אקשן ופעלולים מלהיב עם מכוניות ניאון במסלולים מאתגרים!",
   notes: "פשוט להתקין ולשחק",

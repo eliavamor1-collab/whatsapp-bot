@@ -9,6 +9,6 @@ export default createApp({
   type: "לימוד שפות",
   content: "לימוד שפות ברמה אחרת — שיחות עם אנשים אמיתיים, תרגילים אינטראקטיביים, ותוכנית אישית. יותר מ-14 שפות.",
   notes: "פרימיום פרוץ — כל הקורסים פתוחים",
-  image: "https://play-lh.googleusercontent.com/IDWO_bMLJm2n4GS-GS-TQ5jiMJUhfUHN4K4Q1v9Rp6b5InaGePT2Y5W6VEwVBZpCKw",
-  links: ["https://9mod.com/busuu-learn-languages.html"]
+  image: "https://9mod.com/wp-content/uploads/2024/08/busuu-learn-speak-languages-150x150.webp",
+  links: ["https://9mod.com/download/busuu-22190/1"]
 });

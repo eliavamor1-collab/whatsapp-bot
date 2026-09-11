@@ -4,7 +4,7 @@ export default createApp({
   trigger: "meld",
   aliases: ["מלד"],
   name: "Meld",
-  version: "v0.8.8",
+  version: "v0.8.9",
   size: "23.4 MB",
   type: "סטרימינג מוזיקה ואודיו",
   content: "ספוטיפיי פרוץ — כל השירים, הפלייליסטים וההמלצות האישיות בחינם, בלי מודעות ובלי מגבלות. פשוט מתחברים ומאזינים.",

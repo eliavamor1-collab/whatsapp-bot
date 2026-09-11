@@ -2,10 +2,10 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "picsart",
-  aliases: ["פיקסארט", "pics art"],
+  aliases: ["פיקסארט", "פיקסרט", "pics art"],
   name: "Picsart Gold",
   version: "v30.5.1",
-  size: "לא צוין",
+  size: "81.27 MB",
   type: "עריכת תמונות",
   content: "עורך תמונות מקצועי עם פילטרים, הסרת רקע, אפקטי AI, קולאז' ועוד — כל הפיצ'רים פרימיום פתוחים.",
   notes: "פשוט להתקין ולהשתמש",

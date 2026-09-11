@@ -9,6 +9,6 @@ export default createApp({
   type: "מזג אוויר",
   content: "תחזית מזג אוויר הכי מדויקת — לדקה הקרובה, לשעה, לשבוע. התראות גשם, מפת רדאר, ואינדקס UV.",
   notes: "פרימיום פרוץ — בלי פרסומות",
-  image: "https://play-lh.googleusercontent.com/jJsBxq-eGf_FfxJb5xqU4aXFf0rGxNK_1r4HUBgT-FJCxRRMQ5dYMQ3PXiqJfkZHlQ",
-  links: ["https://9mod.com/accuweather.html"]
+  image: "https://9mod.com/wp-content/uploads/2025/01/accuweather-weather-radar-150x150.webp",
+  links: ["https://9mod.com/download/accuweather-90235/1"]
 });

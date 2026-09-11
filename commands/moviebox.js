@@ -9,6 +9,6 @@ export default createApp({
   type: "סטרימינג סרטים וסדרות",
   content: "צפייה בסרטים וסדרות ישירות מהטלפון — קטלוג ענק, איכות HD, בלי תשלום. פרימיום פרוץ.",
   notes: "פשוט להתקין ולהשתמש",
-  image: "https://play-lh.googleusercontent.com/7RiG3UtMDhUMjGnMC_4r2v1R_bJF_JpqxA3n7wNYfCY1qMmP6gGS3tj4YbjJCf_Kafs",
-  links: ["https://9mod.com/moviebox.html"]
+  image: "https://liteapks.com/wp-content/uploads/2025/03/moviebox-asian-dramasanime-150x150.webp",
+  links: ["https://9mod.com/download/moviebox-111979/1"]
 });

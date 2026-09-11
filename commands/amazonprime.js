@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "amazon prime",
-  aliases: ["אמזון פריים", "prime video", "פריים וידאו"],
+  aliases: ["אמזון פריים", "prime video", "פריים וידאו", "אמזון סרטים",],
   name: "Amazon Prime Video",
   version: "v3.0.468.1357",
   size: "39 MB",

@@ -5,7 +5,7 @@ export default createApp({
   aliases: ["רמיני", "רימיני"],
   name: "Remini – AI Photo Enhancer",
   version: "v3.7.1411",
-  size: "135 MB",
+  size: "167.8 MB",
   type: "שיפור תמונות AI",
   content: "שפר תמונות ישנות, מטושטשות ובאיכות נמוכה לתמונות חדות וברורות באמצעות AI מתקדם.",
   notes: "פשוט להתקין ולהשתמש",

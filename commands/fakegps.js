@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "מזייף מיקום",
-  aliases: ["fake gps", "פייק gps", "זייף מיקום"],
+  aliases: ["fake gps", "פייק gps", "זייף מיקום", "מזיף מיקום"],
   name: "מזייף מיקום — Fake GPS Joystick",
   version: "v4.1.25",
   size: "5.5 MB",

@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "lightroom",
-  aliases: ["לייטרום"],
+  aliases: ["לייטרום", "לייט רום", "לייתרום", "ליית רום"],
   name: "Lightroom",
   version: "v11.5.01",
   size: "117 MB",

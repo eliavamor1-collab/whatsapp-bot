@@ -4,11 +4,11 @@ export default createApp({
   trigger: "spotui",
   aliases: ["ספוטוי"],
   name: "Spotui",
-  version: "v1.0",
-  size: "13.66 MB",
+  version: "v1.5",
+  size: "14.2 MB",
   type: "סטרימינג מוזיקה",
   content: "ספוטיפי פרוץ — כל השירים, הפודקאסטים והפלייליסטים בלי הגבלות.",
   notes: "פשוט להתקין ולהשתמש",
-  image: "https://static.rustore.ru/imgproxy/2lkwRVncQ2BRVm4gOzntmx_OHEwgtoL-fmZvNSvw9LA/preset:vk_og_img/plain/https://static.rustore.ru/2026/6/12/59/apk/2063722450/content/ICON/208494ac-88db-43b5-a2ec-e34282fd1140.png@webp",
-  links: ["https://drive.google.com/file/d/1JqNjgQHHYClSWu8FFnMFH1lhM_4tXQop/view?usp=sharing"]
+  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbNiE3axG5QNQH_1Dssaz9g452tJKhb-O_yUL0UXkOywZ96n3RV1b8F4&s=10",
+  links: ["https://smartrelease.bytedream.dev/github/Spotui/Spotui/spotui-{major}.{minor}.apk"]
 });

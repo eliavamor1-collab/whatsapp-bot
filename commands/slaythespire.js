@@ -9,6 +9,6 @@ export default createApp({
   type: "משחק קלפים אסטרטגי",
   content: "משחק קלפים אסטרטגי ממכר — בונים חפיסה, עולים קומות, ונלחמים בבוסים. כל משחק שונה. המשחק שכולם מדברים עליו.",
   notes: "גרסה מלאה פרוצה",
-  image: "https://play-lh.googleusercontent.com/GLZW1d40yfCgQ5V0m7i0HbsNp_0PBUOrVCYKJH1P8JJpqc7L67AWh3VNB4FpWjgvNQ",
-  links: ["https://9mod.com/slay-the-spire.html"]
+  image: "https://9mod.com/wp-content/uploads/2024/09/slay-the-spire-150x150.webp",
+  links: ["https://9mod.com/download/slay-the-spire-32973/1"]
 });

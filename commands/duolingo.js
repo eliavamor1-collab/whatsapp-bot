@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "duolingo",
-  aliases: ["דואולינגו", "דולינגו"],
+  aliases: ["דואולינגו", "דולינגו", "דואלינגו",],
   name: "Duolingo",
   version: "v6.92.5",
   size: "47 MB",

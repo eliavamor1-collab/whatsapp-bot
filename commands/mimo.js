@@ -9,6 +9,6 @@ export default createApp({
   type: "לימוד תכנות",
   content: "לומדים תכנות בצורה אינטראקטיבית — Python, JavaScript, HTML ועוד. שיעורים קצרים, אתגרים יומיים, ומסלולים מלאים.",
   notes: "פרימיום פרוץ — כל המסלולים פתוחים",
-  image: "https://play-lh.googleusercontent.com/mhVz5SQ_jSjEY84MJQ9S7P1DdLq0vlkw05q5JmqXb0cmq0oUlWHAPyC1VhHwNBDqLQ",
-  links: ["https://9mod.com/mimo-learn-coding.html"]
+  image: "https://9mod.com/wp-content/uploads/2024/08/learn-codingprogramming-mimo-150x150.webp",
+  links: ["https://9mod.com/download/mimo-learn-coding-22276/1"]
 });

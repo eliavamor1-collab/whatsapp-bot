@@ -3,7 +3,7 @@ import { createApp } from "../system/appTemplate.js";
 export default createApp({
   trigger: "cube acr",
   aliases: ["מקליט שיחות", "call recorder", "קיוב אקר"],
-  name: "Call Recorder — Cube ACR",
+  name: "Call Recorder — Cube ACR", 
   type: "מקליט שיחות",
   content: "מקליט השיחות המתקדם ביותר לאנדרואיד — מקליט שיחות נכנסות ויוצאות אוטומטית, כולל שיחות WhatsApp, Viber, Skype ועוד אפליקציות VoIP.",
   notes: "⚠️ האפליקציה לא עובדת בהרבה טלפונים עקב מגבלות של אנדרואיד 10+ שחוסם הקלטת שיחות. יש להוריד גם את התוסף Talker לתמיכה מלאה",

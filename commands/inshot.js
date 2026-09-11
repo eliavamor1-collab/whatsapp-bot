@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "inshot",
-  aliases: ["אינשוט"],
+  aliases: ["אינשוט", "אינשות"],
   name: "InShot Pro",
   version: "v2.222.1548",
   size: "79 MB",

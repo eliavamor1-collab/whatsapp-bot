@@ -43,7 +43,6 @@ import tiktokCommand from "./commands/tiktok.js";
 import instagramCommand from "./commands/instagram.js";
 import twitterCommand from "./commands/twitter.js";
 import nowhatsappCommand from "./commands/nowhatsapp.js";
-import youtuberevancedCommand from "./commands/youtuberevanced.js";
 import amazonprimeCommand from "./commands/amazonprime.js";
 import picsartCommand from "./commands/picsart.js";
 import alightmotionCommand from "./commands/alightmotion.js";
@@ -68,16 +67,15 @@ import idleMinerCommand from "./commands/idleminer.js";
 import simpMusicCommand from "./commands/simpmusic.js";
 import callRecorderCommand from "./commands/callrecorder.js";
 import meldCommand from "./commands/meld.js";
-import shazamCommand from "./commands/shazam.js";
 import crunchyrollCommand from "./commands/crunchyroll.js";
 import movieboxCommand from "./commands/moviebox.js";
 import oldrollCommand from "./commands/oldroll.js";
 import protonvpnCommand from "./commands/protonvpn.js";
-import photovaultCommand from "./commands/photovault.js";
+import nordvpnCommand from "./commands/nordvpn.js";
+import galleryvaultCommand from "./commands/galleryvault.js";
 import busuuCommand from "./commands/busuu.js";
 import mimoCommand from "./commands/mimo.js";
 import accuweatherCommand from "./commands/accuweather.js";
-import speaktranslateCommand from "./commands/speaktranslate.js";
 import fnfCommand from "./commands/fnf.js";
 import slaythespireCommand from "./commands/slaythespire.js";
 import soundcloudCommand from "./commands/soundcloud.js";
@@ -144,7 +142,6 @@ registerCommand(tiktokCommand);
 registerCommand(instagramCommand);
 registerCommand(twitterCommand);
 registerCommand(nowhatsappCommand);
-registerCommand(youtuberevancedCommand);
 registerCommand(amazonprimeCommand);
 registerCommand(picsartCommand);
 registerCommand(alightmotionCommand);
@@ -169,16 +166,15 @@ registerCommand(idleMinerCommand);
 registerCommand(simpMusicCommand);
 registerCommand(callRecorderCommand);
 registerCommand(meldCommand);
-registerCommand(shazamCommand);
 registerCommand(crunchyrollCommand);
 registerCommand(movieboxCommand);
 registerCommand(oldrollCommand);
 registerCommand(protonvpnCommand);
-registerCommand(photovaultCommand);
+registerCommand(nordvpnCommand);
+registerCommand(galleryvaultCommand);
 registerCommand(busuuCommand);
 registerCommand(mimoCommand);
 registerCommand(accuweatherCommand);
-registerCommand(speaktranslateCommand);
 registerCommand(fnfCommand);
 registerCommand(slaythespireCommand);
 registerCommand(soundcloudCommand);
@@ -783,7 +779,7 @@ async function startWhatsApp() {
             await sock.sendMessage(
               remoteJid,
               {
-                text: `איזה יוטיוב אתה רוצה? 🎬\n\n▶️ *יוטיוב מורפ* — כתוב: *יוטיוב מורפ* או *youtube morphe*\n🔄 *יוטיוב ריוונסד* — כתוב: *יוטיוב ריוונסד* או *youtube revanced*\n⚡ *יוטיוב ונסד* — כתוב: *יוטיוב ונסד* או *youtube vanced*`
+                text: `איזה יוטיוב אתה רוצה? 🎬\n\n▶️ *יוטיוב מורפ* — כתוב: *יוטיוב מורפ* או *youtube morphe*\n⚡ *יוטיוב ונסד* — כתוב: *יוטיוב ונסד* או *youtube vanced*`
               },
               { quoted: message }
             );

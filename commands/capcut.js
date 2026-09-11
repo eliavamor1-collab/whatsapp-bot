@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "capcut",
-  aliases: ["קאפקאט", "cap cut", "קאפ קאט"],
+  aliases: ["קאפקאט", "cap cut", "קאפ קאט", "קאפ קאת", "קאפקאת"],
   name: "CapCut – עורך וידאו",
   version: "v18.8.0",
   size: "297.84 MB",

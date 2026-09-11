@@ -2,10 +2,10 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "idle miner",
-  aliases: ["idle miner tycoon", "איידל מיינר"],
+  aliases: ["idle miner tycoon", "איידל מיינר", "איידל מינר", "אידל מיינר"],
   name: "Idle Miner Tycoon",
   version: "v5.61.1",
-  size: "230.2 MB",
+  size: "191.61 MB",
   type: "משחק",
   content: "בנה אימפריית כרייה ענקית! שכור עובדים, שדרג מכרות ואסוף כסף גם כשאתה לא במשחק. ככל שתשקיע יותר, ככה הכסף והדולרים ישתכפלו וגדלו.",
   notes: "בהתחלה תתחילו באמת בלי שום כסף ודולרים, אבל ככל שתקבלו יותר כסף ודולרים ככה הם ילכו וישתכפלו",

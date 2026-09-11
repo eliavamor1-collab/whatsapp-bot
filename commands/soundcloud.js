@@ -5,7 +5,7 @@ export default createApp({
   aliases: ["סאונדקלאוד", "סאונד קלאוד"],
   name: "SoundCloud",
   version: "v2026.08.13",
-  size: "90 MB",
+  size: "56.1 MB",
   type: "סטרימינג מוזיקה",
   content: "פלטפורמת סטרימינג מוזיקה פופולרית עם מיליוני שירים ואמנים עצמאיים. גרסת פרימיום ללא פרסומות.",
   notes: "Premium Unlocked + ללא פרסומות",

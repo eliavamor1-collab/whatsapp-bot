@@ -5,10 +5,10 @@ export default createApp({
   aliases: ["fnf", "פריידי נייט פאנקין"],
   name: "Friday Night Funkin'",
   version: "v0.8.7",
-  size: "~100 MB",
+  size: "1.01 GB",
   type: "משחק ריתם/מוזיקה",
   content: "משחק ריתם מכור — לוחצים על החצים בקצב המוזיקה ומנצחים יריבים. סטייל רטרו עם מוזיקה ממכרת.",
   notes: "גרסה מלאה פרוצה",
-  image: "https://play-lh.googleusercontent.com/VuVNi_bHCxQR-2hXr3g_TZON-S3Y2Wx4USzVKAU5R0qVaQw9J0CbQ3a0GqilXm4qjA",
-  links: ["https://9mod.com/friday-night-funkin.html"]
+  image: "https://9mod.com/wp-content/uploads/2026/01/friday-night-funkin-150x150.webp",
+  links: ["https://9mod.com/download/friday-night-funkin-265473/1"]
 });

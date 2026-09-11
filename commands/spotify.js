@@ -1,7 +1,7 @@
 import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
-  trigger: "spotify",
+  trigger: "spotify alternative",
   aliases: ["ספוטיפי חלופה", "ספוטיפיי חלופה"],
   name: "Spotify Music",
   version: "v9.1.72.1891",
