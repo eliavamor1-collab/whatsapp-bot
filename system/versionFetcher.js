@@ -31,7 +31,6 @@ const TRIGGER_TO_SLUG = {
   "disney": "disney-plus",
   "netflix": "netflix",
   "youtube morphe": "youtube-morphe",
-  "youtube vanced": "youtube-vanced",
   "youtube music": "youtube-music",
   "spotify": "spotify",
   "spotilol": "spotilol",

@@ -46,7 +46,6 @@ import nowhatsappCommand from "./commands/nowhatsapp.js";
 import amazonprimeCommand from "./commands/amazonprime.js";
 import picsartCommand from "./commands/picsart.js";
 import alightmotionCommand from "./commands/alightmotion.js";
-import youtubevancedCommand from "./commands/youtubevanced.js";
 import lightroomCommand from "./commands/lightroom.js";
 import snaptubeCommand from "./commands/snaptube.js";
 import disneyCommand from "./commands/disney.js";
@@ -147,7 +146,6 @@ registerCommand(nowhatsappCommand);
 registerCommand(amazonprimeCommand);
 registerCommand(picsartCommand);
 registerCommand(alightmotionCommand);
-registerCommand(youtubevancedCommand);
 registerCommand(lightroomCommand);
 registerCommand(snaptubeCommand);
 registerCommand(disneyCommand);
@@ -781,7 +779,7 @@ async function startWhatsApp() {
             await sock.sendMessage(
               remoteJid,
               {
-                text: `איזה יוטיוב אתה רוצה? 🎬\n\n▶️ *יוטיוב מורפ* — כתוב: *יוטיוב מורפ* או *youtube morphe*\n⚡ *יוטיוב ונסד* — כתוב: *יוטיוב ונסד* או *youtube vanced*`
+                text: `איזה יוטיוב אתה רוצה? 🎬\n\n▶️ *יוטיוב מורפ* — כתוב: *יוטיוב מורפ* או *youtube morphe*`
               },
               { quoted: message }
             );
