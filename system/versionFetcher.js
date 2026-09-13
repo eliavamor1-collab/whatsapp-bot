@@ -31,7 +31,7 @@ const TRIGGER_TO_SLUG = {
   "netflix": "netflix",
   "youtube morphe": "youtube-morphe",
   "youtube music": "youtube-music",
-  "spotify": "spotify",
+  "spotify alternative": "spotify",
   "spotilol": "spotilol",
   "spotui": "spotui",
   "snaptube": "snaptube",
