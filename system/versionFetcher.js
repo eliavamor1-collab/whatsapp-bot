@@ -26,7 +26,6 @@ const TRIGGER_TO_SLUG = {
   "tiktok": "tiktok",
   "twitter": "twitter",
   "telegram": "telegram",
-  "nowhatsapp": "nowhatsapp",
   "amazon prime": "amazon-prime",
   "disney": "disney-plus",
   "netflix": "netflix",
@@ -61,6 +60,7 @@ const TRIGGER_TO_SLUG = {
   "proton vpn": "proton-vpn",
   "nordvpn": "nordvpn",
   "gallery vault": "gallery-vault",
+  "wedj": "wedj",
   "moviebox": "moviebox",
   "crunchyroll": "crunchyroll",
   "pixiv": "pixiv"

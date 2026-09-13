@@ -8,7 +8,7 @@ export default createApp({
   size: "23.4 MB",
   type: "סטרימינג מוזיקה ואודיו",
   content: "ספוטיפיי פרוץ — כל השירים, הפלייליסטים וההמלצות האישיות בחינם, בלי מודעות ובלי מגבלות. פשוט מתחברים ומאזינים.",
-  notes: "📺 מדריך התקנה: https://youtube.com/shorts/utw6NESn670?si=fL-njGIf1JiZ6y0o",
+  notes: "📺 מדריך התקנה: https://www.youtube.com/watch?v=jpTqEf9jipc",
   image: "https://play-lh.googleusercontent.com/ng6R8Cl93dqQN6f0b0m1UQrWB4rVnHJZlklIsJApYU-ZbyRqUZe-1W-yZNZKl5c2lS3TEeOrRHtMRWToaiAC",
   links: ["https://drive.google.com/file/d/1ZhrYBpt06IsUVbs3woFTEjScvEbMNJtl/view?usp=drivesdk"]
 });
