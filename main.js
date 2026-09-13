@@ -637,7 +637,6 @@ async function startWhatsApp() {
           // השעייה זמנית — הבוט לא מגיב כלל בקבוצת האפליקציות
           // קבוצת האיחסון ממשיכה לעבוד רגיל
           // ========================================
-          if (remoteJid === TARGET_GROUP_JID) continue;
 
           const messageId = message.key?.id;
           if (messageId && botSentMessageIds.has(messageId)) {
