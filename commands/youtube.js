@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "youtube morphe",
-  aliases: ["יוטיוב מורפ", "youtube morphe"],
+  aliases: ["יוטיוב", "youtube morphe"],
   name: "יוטיוב מורפ",
   version: "v1.25.0",
   size: "17.64 MB",
