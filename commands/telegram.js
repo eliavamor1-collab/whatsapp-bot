@@ -3,7 +3,7 @@ import { createApp } from "../system/appTemplate.js";
 export default createApp({
   trigger: "telegram",
   aliases: ["טלגרם"],
-  suspended: true,
+  suspended: false,
   name: "Telegram",
   version: "v12.9.2",
   size: "67 MB",
