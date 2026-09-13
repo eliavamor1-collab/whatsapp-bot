@@ -94,9 +94,19 @@ const TARGET_GROUP_NAME_2 = "פרוץ בווצאפ (איחסון)";
 const TARGET_GROUP_JID_2 = "120363408996332000@g.us";
 const TARGET_GROUP_NAME_3 = "פרוץ בוווצאפ (בדיקה)";
 const TARGET_GROUP_JID_3 = "120363430372014043@g.us";
+// ---- רשימת slugs שישלחו עדכון גם לקבוצת האפליקציות הראשית ----
+const APPS_GROUP_SLUGS = new Set([
+  'tiktok', 'twitter', 'pixiv', 'telegram', 'soundcloud', 'snaptube',
+  'capcut-video-editor', 'alight-motion', 'inshot-pro', 'mx-player',
+  'picsart-photo-editor', 'lightroom', 'remini', 'pic-retouch',
+  'netflix', 'disney-plus', 'amazon-prime', 'duolingo', 'truecaller',
+  'fake-gps', 'call-recorder-cube-acr', 'subway-surfers', 'rider',
+  'fl-studio', 'instagram', 'spotify', 'roblox', 'poweramp',
+  'clash-royale', 'animefy', 'accuweather', 'slay-the-spire',
+  'proton-vpn', 'nordvpn', 'gallery-vault', 'oldroll', 'moviebox',
+  'mimo', 'friday-night-funkin', 'crunchyroll', 'busuu', 'idle-miner',
+]);
 const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2, TARGET_GROUP_JID_3]);
-// קבוצת היעד להתראות עדכון גרסה מהשרת (כרגע קבוצת הבדיקה — קבוצת האפליקציות מושהית)
-const UPDATE_NOTIFY_GROUP_JID = TARGET_GROUP_JID_3;
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
 
 // ========================================
@@ -1098,7 +1108,7 @@ const server = http.createServer((req, res) => {
     req.on("end", async () => {
       if (tooLarge) return;
       try {
-        const { appName, oldVersion, newVersion } = JSON.parse(body || "{}");
+        const { appSlug, appName, oldVersion, newVersion } = JSON.parse(body || "{}");
 
         if (!appName || !newVersion) {
           res.writeHead(400);
@@ -1120,9 +1130,18 @@ const server = http.createServer((req, res) => {
         if (oldVersion) lines.push(`↩️ *לפני:* ${oldVersion}`);
         const text = lines.join("\n");
 
-        const sent = await sock.sendMessage(UPDATE_NOTIFY_GROUP_JID, { text });
-        if (sent?.key?.id) botSentMessageIds.add(sent.key.id);
-        console.log(`[UpdateNotify] ✅ נשלחה הודעת עדכון ל-${appName}: ${newVersion}`);
+        // תמיד שולחים לקבוצת הבדיקה/עדכונים
+        const sent3 = await sock.sendMessage(TARGET_GROUP_JID_3, { text });
+        if (sent3?.key?.id) botSentMessageIds.add(sent3.key.id);
+
+        // אם האפליקציה ברשימת ה-43 — שולחים גם לקבוצת האפליקציות
+        if (appSlug && APPS_GROUP_SLUGS.has(appSlug)) {
+          const sent1 = await sock.sendMessage(TARGET_GROUP_JID, { text });
+          if (sent1?.key?.id) botSentMessageIds.add(sent1.key.id);
+          console.log(`[UpdateNotify] ✅ ${appName} נשלח ל-2 קבוצות`);
+        } else {
+          console.log(`[UpdateNotify] ✅ ${appName} נשלח רק לקבוצת עדכונים`);
+        }
       } catch (err) {
         console.error("[UpdateNotify] שגיאה בעיבוד עדכון:", err);
         if (!res.headersSent) {
