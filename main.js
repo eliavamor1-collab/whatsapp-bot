@@ -831,6 +831,12 @@ async function startWhatsApp() {
                 try {
                   for (const file of fileData) {
                     const rawMsg = file.raw_message;
+                    // בדיקת תקינות — לא שולחים forward ריק
+                    if (!rawMsg?.message || Object.keys(rawMsg.message).length === 0) {
+                      console.warn(`[File] ⚠️ הודעה ריקה עבור ${command.trigger} — מדלג ומוחק מה-DB`);
+                      await pool.query("DELETE FROM saved_files WHERE app_name = $1", [file.app_name]);
+                      continue;
+                    }
                     await sock.sendMessage(remoteJid, { forward: { key: rawMsg.key, message: rawMsg.message } });
                   }
                   console.log(`[File] ${fileData.length} קבצים נשלחו (forward) עבור ${command.trigger} ✅`);
