@@ -604,7 +604,16 @@ async function startWhatsApp() {
 
         if (statusCode === DisconnectReason.loggedOut) {
           currentStatus = "התנתק לצמיתות — נדרשת סריקה מחדש";
-          console.log("החשבון נותק מ-WhatsApp (Logged Out).");
+          console.log("החשבון נותק מ-WhatsApp (Logged Out). מתחיל מחדש לקבלת QR...");
+          // מחיקת auth ישן מה-DB כדי לאפשר QR חדש
+          try {
+            await pool.query("DELETE FROM whatsapp_auth");
+            console.log("Auth ישן נמחק — ממתין לסריקת QR חדש");
+          } catch (e) {
+            console.error("שגיאה במחיקת auth:", e.message);
+          }
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(() => startWhatsApp(), 3000);
           return;
         }
 
