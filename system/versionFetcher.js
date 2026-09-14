@@ -57,6 +57,7 @@ const TRIGGER_TO_SLUG = {
   "fl studio": "fl-studio",
   "מזייף מיקום": "fake-gps",
   "accuweather": "accuweather",
+  "kinestop": "kinestop",
   "proton vpn": "proton-vpn",
   "nordvpn": "nordvpn",
   "gallery vault": "gallery-vault",
