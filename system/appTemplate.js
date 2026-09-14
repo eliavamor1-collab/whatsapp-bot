@@ -71,8 +71,6 @@ export function createApp(app) {
     throw new Error(`createApp: חסר שדה חובה (trigger/name/content) עבור "${app.trigger || "?"}"`);
   }
 
-  let savedMessage = null;
-
   return {
     trigger: app.trigger,
     aliases: app.aliases || [],
@@ -101,20 +99,12 @@ export function createApp(app) {
       const captionText = linksBlock ? `${infoText}\n\n${linksBlock}` : infoText;
 
       try {
-        if (savedMessage) {
-          console.log(`♻️ משתמש בהודעה שמורה בזיכרון לשליחת ${app.name}...`);
-          await sock.sendMessage(jid, { forward: savedMessage }, { quoted: message });
-        } else if (app.image) {
-          console.log(`📸 שולח תמונת ${app.name} בפעם הראשונה...`);
-          const sentMsg = await sock.sendMessage(
+        if (app.image) {
+          await sock.sendMessage(
             jid,
             { image: { url: app.image }, caption: captionText },
             { quoted: message }
           );
-          if (sentMsg) {
-            savedMessage = sentMsg;
-            console.log(`✅ הודעת ${app.name} הראשונה נשמרה בזיכרון!`);
-          }
         } else {
           // אין תמונה — שולחים טקסט בלבד
           await sock.sendMessage(jid, { text: captionText }, { quoted: message });
