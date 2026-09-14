@@ -1101,15 +1101,17 @@ const server = http.createServer((req, res) => {
 
   // ניקוי כל הקבצים השמורים מה-DB
   if (req.url === "/clear-files" && req.method === "POST") {
-    try {
-      const result = await pool.query("DELETE FROM saved_files RETURNING app_name");
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: true, deleted: result.rows.length }));
-      console.log(`[Clear] נמחקו ${result.rows.length} קבצים מה-DB`);
-    } catch (err) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ error: err.message }));
-    }
+    (async () => {
+      try {
+        const result = await pool.query("DELETE FROM saved_files RETURNING app_name");
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, deleted: result.rows.length }));
+        console.log(`[Clear] נמחקו ${result.rows.length} קבצים מה-DB`);
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    })();
     return;
   }
   // ========================================
