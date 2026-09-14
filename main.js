@@ -1093,8 +1093,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ========================================
-  // Update Notification — שרת הגרסאות מודיע על עדכון, והבוט שולח לקבוצה
+  // ניקוי כל הקבצים השמורים מה-DB
+  if (req.url === "/clear-files" && req.method === "POST") {
+    try {
+      const result = await pool.query("DELETE FROM saved_files RETURNING app_name");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, deleted: result.rows.length }));
+      console.log(`[Clear] נמחקו ${result.rows.length} קבצים מה-DB`);
+    } catch (err) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
   // ========================================
   if (req.url === "/update-notification" && req.method === "POST") {
     let body = "";
