@@ -58,6 +58,7 @@ const TRIGGER_TO_SLUG = {
   "מזייף מיקום": "fake-gps",
   "accuweather": "accuweather",
   "kinestop": "kinestop",
+  "moovit": "moovit",
   "proton vpn": "proton-vpn",
   "nordvpn": "nordvpn",
   "gallery vault": "gallery-vault",
