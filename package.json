@@ -1,0 +1,11 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WhatsApp bot for modded apps + version tracker server",
+  "scripts": {
+    "start:bot": "npm start --prefix bot",
+    "start:server": "npm start --prefix server",
+    "install:all": "npm install --prefix bot && npm install --prefix server"
+  }
+}

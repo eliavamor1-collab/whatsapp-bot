@@ -1,0 +1,6 @@
+node_modules/
+.env
+service-account-key.json
+tracker.db
+tracker.db-wal
+tracker.db-shm

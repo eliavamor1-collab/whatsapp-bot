@@ -1,0 +1,18 @@
+services:
+  - type: web
+    runtime: node
+    name: whatsapp-bot
+    rootDir: bot
+    buildCommand: npm install
+    startCommand: node main.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PORT
+        value: "10000"
+      - key: RENDER_EXTERNAL_URL
+        sync: false
+      - key: MOD_UPDATER_URL
+        value: https://version-tracker-server.onrender.com
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false

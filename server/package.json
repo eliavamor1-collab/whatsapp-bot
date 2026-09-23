@@ -1,0 +1,25 @@
+{
+  "name": "@whatsapp-bot/server",
+  "version": "1.0.0",
+  "description": "Version tracker server - scrapes app versions and sends FCM notifications",
+  "main": "index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node test-scrape.js"
+  },
+  "dependencies": {
+    "express": "4.18.2",
+    "firebase-admin": "12.0.0",
+    "node-cron": "3.0.3",
+    "axios": "1.6.7",
+    "cheerio": "1.0.0-rc.12",
+    "pg": "8.13.1",
+    "dotenv": "16.4.1",
+    "got-scraping": "3.2.15"
+  }
+}
