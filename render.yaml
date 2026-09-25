@@ -18,3 +18,4 @@ services:
         sync: false
       - key: WHATSAPP_BOT_URL
         value: https://whatsapp-bot-m6bc.onrender.com
+
