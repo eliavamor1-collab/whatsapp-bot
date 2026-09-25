@@ -11,7 +11,7 @@ export default createApp({
   notes: "עיקבו בדיוק אחר הוראות ההתקנה בסירטון פה:\nhttps://www.youtube.com/watch?v=Z-nYCyhr0no",
   image: "https://images.icon-icons.com/1488/PNG/512/5295-youtube-i_102568.png",
   links: [
-    { label: "⬇️ *לחץ להורדת יוטיוב מורפ* ⬇️", url: "https://drive.google.com/file/d/1-APF6dib6tWzp5FHS-GzZBWZRSEU5RrD/view?usp=drivesdk" },
+    { label: "⬇️ *לחץ להורדת יוטיוב מורפ* ⬇️", url: "https://drive.google.com/file/d/14UD8cjnKJfy0SwTrxveUPY9thEEQsDD4/view?usp=drivesdk" },
     { label: "📦 *לחץ להורדת Micro G* 📦", url: "https://drive.google.com/file/d/1mK9WUhQlv_NBefwTH8lXvrR5RgqM4t_o/view?usp=drivesdk" },
     { label: "⚙️ *לחץ להורדת הגדרות ליוטיוב מורפ* ⚙️", url: "https://drive.google.com/file/d/1AV3MrVokAxK1t20qRPLeZ3DkqSTlKwEH/view?usp=sharing" }
   ]
