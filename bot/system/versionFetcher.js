@@ -6,7 +6,7 @@
 // ונשארים עם הגרסה שכתובה בקוד.
 
 const MOD_UPDATER_URL =
-  process.env.MOD_UPDATER_URL || "https://version-tracker-server.onrender.com";
+  process.env.MOD_UPDATER_URL || "https://version-tracker-server-fn35.onrender.com";
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 דקות
 
