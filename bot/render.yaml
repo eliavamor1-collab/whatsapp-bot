@@ -13,6 +13,6 @@ services:
       - key: RENDER_EXTERNAL_URL
         sync: false
       - key: MOD_UPDATER_URL
-        value: https://version-tracker-server.onrender.com
+        value: https://version-tracker-server-fn35.onrender.com
       - key: GITHUB_WEBHOOK_SECRET
         sync: false
