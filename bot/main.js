@@ -82,6 +82,7 @@ import slaythespireCommand from "./commands/slaythespire.js";
 import soundcloudCommand from "./commands/soundcloud.js";
 import powerampCommand from "./commands/poweramp.js";
 import pixivCommand from "./commands/pixiv.js";
+import spotidosCommand from "./commands/spotidos.js";
 import { containsCurse, handleCurse } from "./system/cursefilter.js";
 
 const { Pool } = pg;
@@ -194,6 +195,7 @@ registerCommand(slaythespireCommand);
 registerCommand(soundcloudCommand);
 registerCommand(powerampCommand);
 registerCommand(pixivCommand);
+registerCommand(spotidosCommand);
 
 console.log("פקודות נטענו בהצלחה:", [...new Set(commands.keys())].join(", "));
 

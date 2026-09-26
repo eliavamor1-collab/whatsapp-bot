@@ -2,7 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "rider",
-  aliases: ["ריידר"],
+  aliases: ["ריידר", "רידר"],
   name: "ריידר (Rider)",
   version: "v3.06.0.07",
   size: "146.7 MB",
