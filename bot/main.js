@@ -109,7 +109,7 @@ const APPS_GROUP_SLUGS = new Set([
   'mimo', 'friday-night-funkin', 'crunchyroll', 'busuu', 'idle-miner',
 ]);
 const ALLOWED_GROUPS = new Set([TARGET_GROUP_JID, TARGET_GROUP_JID_2, TARGET_GROUP_JID_3]);
-const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-m6bc.onrender.com";
+const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || "https://whatsapp-bot-plvb.onrender.com";
 
 // ========================================
 // Commands Map Registration

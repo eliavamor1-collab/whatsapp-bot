@@ -224,7 +224,7 @@ function extractVersion(text) {
  * שולח webhook לבוט הווצאפ על עדכון גרסה.
  */
 async function notifyWhatsAppBot(appSlug, appName, oldVersion, newVersion) {
-  const WHATSAPP_BOT_URL = process.env.WHATSAPP_BOT_URL || 'https://whatsapp-bot-m6bc.onrender.com';
+  const WHATSAPP_BOT_URL = process.env.WHATSAPP_BOT_URL || 'https://whatsapp-bot-plvb.onrender.com';
   const MAX_RETRIES = 5;
   const RETRY_DELAY_MS = 15000; // 15 שניות בין ניסיונות — נותן לבוט זמן להתעורר
 

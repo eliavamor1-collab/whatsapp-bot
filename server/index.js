@@ -142,7 +142,7 @@ app.post('/api/check-updates', async (req, res) => {
 // Test endpoint — sends a fake update notification to the WhatsApp bot (GET, browser-friendly)
 app.get('/api/test-whatsapp', async (req, res) => {
   const axios = require('axios');
-  const WHATSAPP_BOT_URL = process.env.WHATSAPP_BOT_URL || 'https://whatsapp-bot-m6bc.onrender.com';
+  const WHATSAPP_BOT_URL = process.env.WHATSAPP_BOT_URL || 'https://whatsapp-bot-plvb.onrender.com';
   try {
     const r = await axios.post(`${WHATSAPP_BOT_URL}/update-notification`, {
       appName: 'בדיקה 🧪',
