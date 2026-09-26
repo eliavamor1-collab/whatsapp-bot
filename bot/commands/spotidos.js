@@ -2,10 +2,7 @@ import { createApp } from "../system/appTemplate.js";
 
 export default createApp({
   trigger: "ספוטידוס",
-  aliases: [
-    "spotidos",
-    "ספוטי דוס"
-  ],
+  aliases: ["spotidos","ספוטי דוס", "ספוטידוס"],
   name: "Spotidos",
   version: "v3.0.1",
   size: "6.45 MB",
