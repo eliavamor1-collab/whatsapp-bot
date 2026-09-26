@@ -12,4 +12,5 @@ export default createApp({
   links: [
     { label: "⬇️ *לחץ להורדת Spotidos* ⬇️", url: "https://ogenplay.com/apps/416e87f7-c82e-47d6-92cd-e3a170fdc72c" }
   ],
+  slug: "spotidos",
 });

@@ -74,6 +74,7 @@ const APP_SOURCES = {
   'youtube-music':          { site: 'github-notes', slug: 'MorpheApp/morphe-patches', pattern: 'YouTube Music:\\*\\* Add (?:experimental )?support for `([\\d.]+)`' },
   'spotilol':               { site: 'github', type: 'page', slug: 'lyssadev/Spotilol' },
   'spotui':                 { site: 'github', type: 'page', slug: 'Spotui/Spotui' },
+  'spotidos':               { site: 'ogenplay', type: 'page', slug: '416e87f7-c82e-47d6-92cd-e3a170fdc72c' },
 };
 
 const GOT_OPTS = {
@@ -112,6 +113,9 @@ async function scrapeAppVersion(slug) {
   } else if (source.site === 'crackshash') {
     // crackshash — דף מוצר: crackshash.com/{slug}/  (הגרסה בכותרת)
     url = `https://crackshash.com/${source.slug}/`;
+  } else if (source.site === 'ogenplay') {
+    // ogenplay — דף אפליקציה: ogenplay.com/apps/{slug}
+    url = `https://ogenplay.com/apps/${source.slug}`;
   } else {
     const base = BASE_URLS[source.site] || 'https://liteapks.com';
     url = source.type === 'download'
@@ -152,6 +156,11 @@ async function scrapeAppVersion(slug) {
       // GitHub: הרליס האחרון הוא הקישור הראשון "releases/tag/vX.Y.Z"
       const tagMatch = response.body.match(/releases\/tag\/([^"]+)"/);
       version = tagMatch ? extractVersion(tagMatch[1]) : null;
+    } else if (source.site === 'ogenplay') {
+      // ogenplay: מחפש "גרסה: X.Y.Z" בטקסט הדף
+      const bodyText = $('body').text();
+      const verMatch = bodyText.match(/גרסה[:\s]+v?([\d.]+)/);
+      version = verMatch ? verMatch[1] : extractVersion(bodyText);
     } else if (source.site === 'github-notes') {
       // GitHub release notes: מחלץ גרסת אפליקציה לפי pattern מתוך טקסט ה-release
       const regex = new RegExp(source.pattern);

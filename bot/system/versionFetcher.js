@@ -34,6 +34,8 @@ const TRIGGER_TO_SLUG = {
   "spotify alternative": "spotify",
   "spotilol": "spotilol",
   "spotui": "spotui",
+  "ספוטידוס": "spotidos",
+  "spotidos": "spotidos",
   "snaptube": "snaptube",
   "simpmusic": "simpmusic",
   "meld": "meld",
