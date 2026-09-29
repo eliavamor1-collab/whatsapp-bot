@@ -57,8 +57,13 @@ function buildLinksBlock(app) {
   });
   parts.push("━━━━━━━━━━━━━━━");
   parts.push("");
-  parts.push(`הצטרפו ל״פרוץ בווצאפ״:`);
-  parts.push(GROUP_INVITE);
+  parts.push("🔥 רוצה עוד משחקים ואפליקציות פרוצים?");
+  parts.push("");
+  parts.push("💬 הצטרף לקבוצת הוואטסאפ שלנו!");
+  parts.push("");
+  parts.push("👥 פרוץ בווצאפ 🚀 🔗 " + GROUP_INVITE);
+  parts.push("");
+  parts.push("✨ עדכונים | משחקים | אפליקציות | הורדות");
   return parts.join("\n");
 }
 
