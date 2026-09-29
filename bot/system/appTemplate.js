@@ -42,6 +42,8 @@ function buildInfoText(app, liveVersion) {
   return lines.join("\n");
 }
 
+const GROUP_INVITE = "https://chat.whatsapp.com/Gbz7oPUytljDlnpzfksH5J?s=cl&p=a&ilr=4&iam=0";
+
 function buildLinksBlock(app) {
   const links = normalizeLinks(app.links);
   if (links.length === 0) return "";
@@ -54,6 +56,9 @@ function buildLinksBlock(app) {
     if (index < links.length - 1) parts.push("");
   });
   parts.push("━━━━━━━━━━━━━━━");
+  parts.push("");
+  parts.push(`הצטרפו ל״פרוץ בווצאפ״:`);
+  parts.push(GROUP_INVITE);
   return parts.join("\n");
 }
 
