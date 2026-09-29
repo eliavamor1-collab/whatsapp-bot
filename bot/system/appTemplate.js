@@ -58,7 +58,6 @@ function buildLinksBlock(app) {
   parts.push("━━━━━━━━━━━━━━━");
   parts.push("");
   parts.push("🔥 רוצה עוד משחקים ואפליקציות פרוצים?\n💬 הצטרף לקבוצת הוואטסאפ שלנו!\n👥 *פרוץ בווצאפ* 🚀 🔗 " + GROUP_INVITE + "\n✨ עדכונים | משחקים | אפליקציות | הורדות");
-  parts.push("✨ עדכונים | משחקים | אפליקציות | הורדות");
   return parts.join("\n");
 }
 
