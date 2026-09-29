@@ -56,14 +56,7 @@ function buildLinksBlock(app) {
     if (index < links.length - 1) parts.push("");
   });
   parts.push("━━━━━━━━━━━━━━━");
-  parts.push("");
-  parts.push("🔥 רוצה עוד משחקים ואפליקציות פרוצים?");
-  parts.push("");
-  parts.push("💬 הצטרף לקבוצת הוואטסאפ שלנו!");
-  parts.push("");
-  parts.push("👥 פרוץ בווצאפ 🚀 🔗 " + GROUP_INVITE);
-  parts.push("");
-  parts.push("✨ עדכונים | משחקים | אפליקציות | הורדות");
+  parts.push("🔥 רוצה עוד משחקים ואפליקציות פרוצים?\n💬 הצטרף לקבוצת הוואטסאפ שלנו!\n👥 פרוץ בווצאפ 🚀 🔗 " + GROUP_INVITE + "\n✨ עדכונים | משחקים | אפליקציות | הורדות");
   return parts.join("\n");
 }
 
